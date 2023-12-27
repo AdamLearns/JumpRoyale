@@ -1,0 +1,21 @@
+{
+  // Note: got this from here:
+  // https://github.com/godotengine/godot-csharp-vscode/issues/43#issuecomment-1258321229
+  "version": "0.2.0",
+  "configurations": [
+    // For these launch configurations to work, you need to setup a GODOT4
+    // environment variable. On mac or linux, this can be done by adding
+    // the following to your .zshrc, .bashrc, or .bash_profile file:
+    // export GODOT4="/Applications/Godot.app/Contents/MacOS/Godot"
+    {
+      "name": "Play",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${env:GODOT4}",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false
+    }
+  ]
+}
