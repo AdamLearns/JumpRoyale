@@ -8,9 +8,22 @@ using Microsoft.Extensions.Configuration;
 
 namespace TwitchChat
 {
+
+  public class MessageEventArgs : EventArgs
+  {
+    public string Message { get; set; }
+    public string SenderName { get; set; }
+    public string SenderId { get; set; }
+
+    public string HexColor { get; set; }
+  }
+
+
   class TwitchChatClient
   {
     readonly TwitchClient client;
+
+    public event EventHandler<MessageEventArgs> OnMessage;
 
     public TwitchChatClient()
     {
@@ -46,17 +59,23 @@ namespace TwitchChat
 
     private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
     {
-      HandleChatMessage(e.ChatMessage.UserId, e.ChatMessage.Username, e.ChatMessage.Message);
+      HandleChatMessage(e.ChatMessage.UserId, e.ChatMessage.DisplayName, e.ChatMessage.Message, e.ChatMessage.ColorHex);
     }
 
     private void Client_OnWhisperReceived(object sender, OnWhisperReceivedArgs e)
     {
-      HandleChatMessage(e.WhisperMessage.UserId, e.WhisperMessage.Username, e.WhisperMessage.Message);
+      HandleChatMessage(e.WhisperMessage.UserId, e.WhisperMessage.DisplayName, e.WhisperMessage.Message, e.WhisperMessage.ColorHex);
     }
 
-    private void HandleChatMessage(string senderId, string senderName, string message)
+    private void HandleChatMessage(string senderId, string senderName, string message, string colorHex)
     {
-      Console.WriteLine($"Got message from {senderName}: {message}");
+      OnMessage.Invoke(this, new MessageEventArgs
+      {
+        Message = message,
+        SenderName = senderName,
+        SenderId = senderId,
+        HexColor = colorHex ?? "#ffffff"
+      });
     }
   }
 }
