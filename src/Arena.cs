@@ -20,15 +20,15 @@ public partial class Arena : Node2D
 
 	private void OnMessage(object sender, MessageEventArgs e)
 	{
-		if (e.Message.StartsWith("!reset"))
+		if (e.Message.StartsWith("reset"))
 		{
 			CallDeferred(nameof(ResetPlayer), e.SenderId);
 		}
-		if (e.Message.StartsWith("!join"))
+		if (e.Message.StartsWith("join"))
 		{
 			CallDeferred(nameof(AddPlayer), e.SenderId, e.SenderName, "#ffffff");
 		}
-		if (e.Message.StartsWith("!jump"))
+		if (e.Message.StartsWith("jump"))
 		{
 			HandleJump(e);
 		}
