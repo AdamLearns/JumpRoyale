@@ -117,4 +117,19 @@ public partial class Arena : Node2D
 		Jumper jumper = jumpers[userId];
 		jumper.Reset();
 	}
+
+	public override void _PhysicsProcess(double delta)
+	{
+		if (Input.IsActionJustPressed("ui_accept"))
+		{
+			var adamId = "AdamTestPlayer";
+			if (!jumpers.ContainsKey(adamId))
+			{
+				AddPlayer(adamId, "AdamTest", "#ffffff");
+			}
+
+			var adam = jumpers[adamId];
+			adam.RandomJump();
+		}
+	}
 }

@@ -1,8 +1,10 @@
-[gd_scene load_steps=17 format=3 uid="uid://bhke5myraos1m"]
+[gd_scene load_steps=19 format=3 uid="uid://bhke5myraos1m"]
 
 [ext_resource type="Script" path="res://src/Jumper.cs" id="1_jn4ug"]
 [ext_resource type="Texture2D" uid="uid://kyw1nvwod7b" path="res://assets/sprites/male_character_1/Character1M_1_idle_0.png" id="1_xnwtq"]
 [ext_resource type="Texture2D" uid="uid://dp7vvy4s00t4t" path="res://assets/sprites/male_character_1/Character1M_1_idle_1.png" id="2_gghp5"]
+[ext_resource type="Texture2D" uid="uid://b36cq4ndqfhnm" path="res://assets/sprites/male_character_1/Character1M_1_fall_0.png" id="2_ntle6"]
+[ext_resource type="Texture2D" uid="uid://da8kbfye3yvmf" path="res://assets/sprites/male_character_1/Character1M_1_fall_1.png" id="3_jwsbg"]
 [ext_resource type="Texture2D" uid="uid://cdkxfskjl7rj8" path="res://assets/sprites/male_character_1/Character1M_1_idle_2.png" id="3_ptt7k"]
 [ext_resource type="Texture2D" uid="uid://biuqs3u71qrnt" path="res://assets/sprites/male_character_1/Character1M_1_idle_3.png" id="4_mjeaj"]
 [ext_resource type="Texture2D" uid="uid://m6885tmhvka4" path="res://assets/sprites/male_character_1/Character1M_1_idle_4.png" id="5_yq3ug"]
@@ -16,6 +18,17 @@
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_1dd66"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_ntle6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_jwsbg")
+}],
+"loop": true,
+"name": &"fall",
+"speed": 5.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": ExtResource("1_xnwtq")
@@ -63,9 +76,9 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("12_bwbvy")
 }],
-"loop": true,
+"loop": false,
 "name": &"land",
-"speed": 5.0
+"speed": 10.0
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qf4q3"]
@@ -81,8 +94,10 @@ script = ExtResource("1_jn4ug")
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -16)
 sprite_frames = SubResource("SpriteFrames_1dd66")
-animation = &"idle"
+animation = &"land"
 autoplay = "idle"
+frame = 1
+frame_progress = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -16)

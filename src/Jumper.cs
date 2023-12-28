@@ -3,6 +3,12 @@ using System;
 
 public partial class Jumper : CharacterBody2D
 {
+	private const string AnimationIdle = "idle";
+	private const string AnimationJump = "jump";
+	private const string AnimationFall = "fall";
+	private const string AnimationLand = "land";
+	private const string SpriteNodeName = "Sprite";
+	private const string NameNodeName = "Name";
 	private bool wasOnFloor = false;
 
 	// Get the gravity from the project settings to be synced with RigidBody nodes.
@@ -23,7 +29,18 @@ public partial class Jumper : CharacterBody2D
 	{
 		Position = new Vector2(xCoord, 0);
 		Name = userName;
-		GetNode<Label>("Name").Text = userName;
+		GetNode<Label>(NameNodeName).Text = userName;
+	}
+
+	public override void _Ready()
+	{
+		GetNode<AnimatedSprite2D>(SpriteNodeName).AnimationFinished += OnSpriteAnimationFinished;
+	}
+
+	public void RandomJump()
+	{
+		var rng = new RandomNumberGenerator();
+		Jump(rng.RandiRange(45, 135), rng.RandiRange(10, 100));
 	}
 
 	public void Jump(int angle, int power)
@@ -43,7 +60,7 @@ public partial class Jumper : CharacterBody2D
 
 	public void SetColor(string hexColor)
 	{
-		var sprite = GetNode<AnimatedSprite2D>("Sprite");
+		var sprite = GetNode<AnimatedSprite2D>(SpriteNodeName);
 		sprite.Modulate = Color.FromHtml(hexColor);
 		sprite.Modulate = new Color(sprite.Modulate.R, sprite.Modulate.G, sprite.Modulate.B, 1f);
 	}
@@ -61,17 +78,45 @@ public partial class Jumper : CharacterBody2D
 		if (!IsOnFloor())
 			velocity.Y += gravity * (float)delta;
 
+		var sprite = GetNode<AnimatedSprite2D>(SpriteNodeName);
+
 		if (jumpVelocity != Vector2.Zero)
 		{
 			velocity = jumpVelocity;
-			GetNode<AnimatedSprite2D>("Sprite").FlipH = velocity.X < 0;
+			sprite.FlipH = velocity.X < 0;
 			jumpVelocity = Vector2.Zero;
 		}
 
 		Velocity = velocity;
 
+		if (Velocity.Y > 0)
+		{
+			sprite.Play(AnimationJump);
+		}
+		else if (Velocity.Y < 0)
+		{
+			sprite.Play(AnimationFall);
+		}
+
+		var justLanded = !wasOnFloor && IsOnFloor();
+		var stuckInAir = (sprite.Animation == AnimationFall || sprite.Animation == AnimationJump) && Velocity.Y == 0;
+
+		if (justLanded || stuckInAir)
+		{
+			sprite.Play(AnimationLand);
+		}
+
 		wasOnFloor = IsOnFloor();
 
 		MoveAndSlide();
+	}
+
+	public void OnSpriteAnimationFinished()
+	{
+		var sprite = GetNode<AnimatedSprite2D>(SpriteNodeName);
+		if (sprite.Animation == AnimationLand)
+		{
+			sprite.Play(AnimationIdle);
+		}
 	}
 }
