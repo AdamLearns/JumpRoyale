@@ -1,0 +1,52 @@
+[gd_scene load_steps=6 format=3 uid="uid://bvl6vnp0t3iy6"]
+
+[ext_resource type="Script" path="res://src/LobbyOverlay.cs" id="1_15rvs"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_n02u3"]
+font_size = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_aso2h"]
+font_size = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_k2448"]
+font_size = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_wud63"]
+font_size = 40
+
+[node name="LobbyOverlay" type="VFlowContainer"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 20.0
+offset_top = 109.0
+offset_right = -20.0
+offset_bottom = 809.89
+grow_horizontal = 2
+theme_override_constants/v_separation = 26
+script = ExtResource("1_15rvs")
+
+[node name="JoinInstructions" type="Label" parent="."]
+layout_mode = 2
+text = "Type \"join\" to play!"
+label_settings = SubResource("LabelSettings_n02u3")
+
+[node name="JumpInstructions" type="Label" parent="."]
+layout_mode = 2
+text = "Type jump <angle> [power=100]
+                           ↑                 ↑
+                   -90 to 90        1-100
+You can also do \"L <angle> [power]\" to jump left
+\"u\" jumps straight up
+
+"
+label_settings = SubResource("LabelSettings_aso2h")
+
+[node name="LobbyTimer" type="Label" parent="."]
+layout_mode = 2
+text = "Game will start soon!"
+label_settings = SubResource("LabelSettings_k2448")
+
+[node name="NumPlayers" type="Label" parent="."]
+layout_mode = 2
+text = "Players: 0"
+label_settings = SubResource("LabelSettings_wud63")

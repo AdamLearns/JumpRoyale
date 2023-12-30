@@ -1,20 +1,20 @@
 [gd_scene load_steps=19 format=3 uid="uid://bhke5myraos1m"]
 
 [ext_resource type="Script" path="res://src/Jumper.cs" id="1_jn4ug"]
-[ext_resource type="Texture2D" uid="uid://kyw1nvwod7b" path="res://assets/sprites/male_character_1/Character1M_1_idle_0.png" id="1_xnwtq"]
-[ext_resource type="Texture2D" uid="uid://dp7vvy4s00t4t" path="res://assets/sprites/male_character_1/Character1M_1_idle_1.png" id="2_gghp5"]
-[ext_resource type="Texture2D" uid="uid://b36cq4ndqfhnm" path="res://assets/sprites/male_character_1/Character1M_1_fall_0.png" id="2_ntle6"]
-[ext_resource type="Texture2D" uid="uid://da8kbfye3yvmf" path="res://assets/sprites/male_character_1/Character1M_1_fall_1.png" id="3_jwsbg"]
-[ext_resource type="Texture2D" uid="uid://cdkxfskjl7rj8" path="res://assets/sprites/male_character_1/Character1M_1_idle_2.png" id="3_ptt7k"]
-[ext_resource type="Texture2D" uid="uid://biuqs3u71qrnt" path="res://assets/sprites/male_character_1/Character1M_1_idle_3.png" id="4_mjeaj"]
-[ext_resource type="Texture2D" uid="uid://m6885tmhvka4" path="res://assets/sprites/male_character_1/Character1M_1_idle_4.png" id="5_yq3ug"]
-[ext_resource type="Texture2D" uid="uid://bx18ptrkt4dnn" path="res://assets/sprites/male_character_1/Character1M_1_idle_5.png" id="6_i52g0"]
-[ext_resource type="Texture2D" uid="uid://bcbmp17au6ue2" path="res://assets/sprites/male_character_1/Character1M_1_idle_6.png" id="7_l7ogf"]
-[ext_resource type="Texture2D" uid="uid://dv0wlr3558tyy" path="res://assets/sprites/male_character_1/Character1M_1_idle_7.png" id="8_abmtt"]
-[ext_resource type="Texture2D" uid="uid://r6f5gpom7met" path="res://assets/sprites/male_character_1/Character1M_1_jump_0.png" id="9_ijm3f"]
-[ext_resource type="Texture2D" uid="uid://dfhe2p84c7yuh" path="res://assets/sprites/male_character_1/Character1M_1_jump_1.png" id="10_ac3fu"]
-[ext_resource type="Texture2D" uid="uid://ie7tpp4n84di" path="res://assets/sprites/male_character_1/Character1M_1_land_0.png" id="11_3fxgy"]
-[ext_resource type="Texture2D" uid="uid://dsjs3ft53bf23" path="res://assets/sprites/male_character_1/Character1M_1_land_1.png" id="12_bwbvy"]
+[ext_resource type="Texture2D" uid="uid://dpubrdjemodhh" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_idle_0.png" id="1_xnwtq"]
+[ext_resource type="Texture2D" uid="uid://4ltkeye5qop1" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_idle_1.png" id="2_gghp5"]
+[ext_resource type="Texture2D" uid="uid://d4gmhtm6ek2g4" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_fall_0.png" id="2_ntle6"]
+[ext_resource type="Texture2D" uid="uid://bs2kqhkeineud" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_fall_1.png" id="3_jwsbg"]
+[ext_resource type="Texture2D" uid="uid://bpf160d0ai74t" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_idle_2.png" id="3_ptt7k"]
+[ext_resource type="Texture2D" uid="uid://c8a466r8suxht" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_idle_3.png" id="4_mjeaj"]
+[ext_resource type="Texture2D" uid="uid://ceana40ov0msa" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_idle_4.png" id="5_yq3ug"]
+[ext_resource type="Texture2D" uid="uid://3iq4qxg87v2u" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_idle_5.png" id="6_i52g0"]
+[ext_resource type="Texture2D" uid="uid://d4f5r8olhd8pc" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_idle_6.png" id="7_l7ogf"]
+[ext_resource type="Texture2D" uid="uid://cemkj8yk5dkv" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_idle_7.png" id="8_abmtt"]
+[ext_resource type="Texture2D" uid="uid://com7b7hjfqfc6" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_jump_0.png" id="9_ijm3f"]
+[ext_resource type="Texture2D" uid="uid://dn80vo65nle0y" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_jump_1.png" id="10_ac3fu"]
+[ext_resource type="Texture2D" uid="uid://cr7baxkpawx43" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_land_0.png" id="11_3fxgy"]
+[ext_resource type="Texture2D" uid="uid://de5vceaa85fe0" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_land_1.png" id="12_bwbvy"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_1dd66"]
 animations = [{
@@ -27,7 +27,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"fall",
-"speed": 5.0
+"speed": 10.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -81,8 +81,8 @@ animations = [{
 "speed": 10.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qf4q3"]
-radius = 6.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6u5om"]
+size = Vector2(14, 26)
 
 [sub_resource type="LabelSettings" id="LabelSettings_wa6ai"]
 font_size = 10
@@ -91,17 +91,29 @@ font_size = 10
 collision_layer = 2
 script = ExtResource("1_jn4ug")
 
+[node name="Glow" type="CPUParticles2D" parent="."]
+visible = false
+position = Vector2(0, -14)
+amount = 16
+lifetime = 0.75
+emission_shape = 2
+emission_sphere_radius = 1.0
+spread = 180.0
+gravity = Vector2(2.08165e-12, 2.08165e-12)
+initial_velocity_min = 34.72
+initial_velocity_max = 34.72
+angle_max = 360.0
+scale_amount_max = 3.0
+
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -16)
 sprite_frames = SubResource("SpriteFrames_1dd66")
-animation = &"land"
+animation = &"jump"
 autoplay = "idle"
-frame = 1
-frame_progress = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -16)
-shape = SubResource("CapsuleShape2D_qf4q3")
+position = Vector2(0, -13)
+shape = SubResource("RectangleShape2D_6u5om")
 
 [node name="Name" type="Label" parent="."]
 offset_left = -115.0

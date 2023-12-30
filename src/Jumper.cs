@@ -3,18 +3,17 @@ using System;
 
 public partial class Jumper : CharacterBody2D
 {
-	private const string AnimationIdle = "idle";
-	private const string AnimationJump = "jump";
-	private const string AnimationFall = "fall";
-	private const string AnimationLand = "land";
 	private const string SpriteNodeName = "Sprite";
 	private const string NameNodeName = "Name";
+	private const string ParticleSystemNodeName = "Glow";
 	private bool wasOnFloor = false;
 
 	// Get the gravity from the project settings to be synced with RigidBody nodes.
 	public float gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle();
 
 	private Vector2 jumpVelocity;
+
+	public PlayerData playerData;
 
 	public void Reset()
 	{
@@ -25,11 +24,65 @@ public partial class Jumper : CharacterBody2D
 		Velocity = new Vector2(0, 0);
 	}
 
-	public void Init(int xCoord, string userName)
+	public void Init(int x, int y, string userName, PlayerData playerData)
 	{
-		Position = new Vector2(xCoord, 0);
+		Position = new Vector2(x, y);
 		Name = userName;
+		this.playerData = playerData;
 		GetNode<Label>(NameNodeName).Text = userName;
+
+		SetCharacter(playerData.CharacterChoice);
+
+		if (playerData.GlowColor != null)
+		{
+			SetGlow(playerData.GlowColor);
+		}
+	}
+
+	public void SetCrazyParticles()
+	{
+		var particles = GetGlowNode();
+		particles.Amount *= 5;
+	}
+
+	public void SetCharacter(int choice)
+	{
+		playerData.CharacterChoice = choice;
+		var gender = choice > 9 ? "f" : "m";
+		var charNumber = ((choice - 1) % 9 / 3) + 1;
+		var clothingNumber = ((choice - 1) % 3) + 1;
+		GD.Print("Choice: " + choice + " Gender: " + gender + " Char: " + charNumber + " Clothing: " + clothingNumber);
+		var sprite = GetNode<AnimatedSprite2D>(SpriteNodeName);
+		sprite.SpriteFrames = SpriteFrameCreator.getInstance().GetSpriteFrames(gender, charNumber, clothingNumber);
+	}
+
+	public void SetGlow(string colorString)
+	{
+		try
+		{
+			var color = Color.FromHtml(colorString);
+			color = new Color(color.R, color.G, color.B, 1f);
+			var particles = GetGlowNode();
+			particles.SelfModulate = color;
+			particles.Visible = true;
+			playerData.GlowColor = color.ToHtml(false);
+		}
+		catch (Exception e)
+		{
+			GD.Print($"Failed to set glow color to {colorString}", e);
+		}
+	}
+
+	private CpuParticles2D GetGlowNode()
+	{
+		return GetNode<CpuParticles2D>(ParticleSystemNodeName);
+	}
+
+	public void DisableGlow()
+	{
+		var particles = GetGlowNode();
+		particles.Visible = false;
+		playerData.GlowColor = null;
 	}
 
 	public override void _Ready()
@@ -55,6 +108,7 @@ public partial class Jumper : CharacterBody2D
 			jumpVelocity.X = Mathf.Cos(Mathf.DegToRad(angle + 180));
 			jumpVelocity.Y = Mathf.Sin(Mathf.DegToRad(angle + 180));
 			jumpVelocity = jumpVelocity.Normalized() * (float)normalizedPower;
+			playerData.NumJumps++;
 		}
 	}
 
@@ -91,19 +145,19 @@ public partial class Jumper : CharacterBody2D
 
 		if (Velocity.Y > 0)
 		{
-			sprite.Play(AnimationJump);
+			sprite.Play(JumperAnimations.AnimationJump);
 		}
 		else if (Velocity.Y < 0)
 		{
-			sprite.Play(AnimationFall);
+			sprite.Play(JumperAnimations.AnimationFall);
 		}
 
 		var justLanded = !wasOnFloor && IsOnFloor();
-		var stuckInAir = (sprite.Animation == AnimationFall || sprite.Animation == AnimationJump) && Velocity.Y == 0;
+		var stuckInAir = (sprite.Animation == JumperAnimations.AnimationFall || sprite.Animation == JumperAnimations.AnimationJump) && Velocity.Y == 0;
 
 		if (justLanded || stuckInAir)
 		{
-			sprite.Play(AnimationLand);
+			sprite.Play(JumperAnimations.AnimationLand);
 		}
 
 		wasOnFloor = IsOnFloor();
@@ -114,9 +168,9 @@ public partial class Jumper : CharacterBody2D
 	public void OnSpriteAnimationFinished()
 	{
 		var sprite = GetNode<AnimatedSprite2D>(SpriteNodeName);
-		if (sprite.Animation == AnimationLand)
+		if (sprite.Animation == JumperAnimations.AnimationLand)
 		{
-			sprite.Play(AnimationIdle);
+			sprite.Play(JumperAnimations.AnimationIdle);
 		}
 	}
 }

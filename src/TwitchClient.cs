@@ -5,6 +5,8 @@ using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 using Microsoft.Extensions.Configuration;
+using TwitchLib.PubSub;
+using TwitchLib.PubSub.Events;
 
 namespace TwitchChat
 {
@@ -16,17 +18,35 @@ namespace TwitchChat
     public string SenderId { get; set; }
 
     public string HexColor { get; set; }
+    public bool IsPrivileged { get; set; }
   }
-
 
   class TwitchChatClient
   {
     readonly TwitchClient client;
 
     public event EventHandler<MessageEventArgs> OnMessage;
+    public event EventHandler<OnRewardRedeemedArgs> OnRedemption;
+
+    private TwitchPubSub tps;
 
     public TwitchChatClient()
     {
+
+      tps = new TwitchPubSub();
+      tps.OnPubSubServiceConnected += (object sender, EventArgs e) =>
+      {
+        Console.WriteLine("PubSub connected");
+        tps.ListenToRewards("47098493");
+        tps.SendTopics();
+        tps.OnRewardRedeemed += (object sender, OnRewardRedeemedArgs e) =>
+        {
+          Console.WriteLine($"Reward redeemed: {e}");
+          OnRedemption.Invoke(this, e);
+        };
+      };
+      tps.Connect();
+
       var config = new ConfigurationBuilder().AddUserSecrets<TwitchChatClient>().Build();
       string accessToken = config["twitch_access_token"] ?? throw new Exception("No access token found. Please run `dotnet user-secrets set twitch_access_token <your access token>`");
       ConnectionCredentials credentials = new ConnectionCredentials("WhyOhWhyOhWhyOh", accessToken);
@@ -41,7 +61,6 @@ namespace TwitchChat
 
       client.OnJoinedChannel += Client_OnJoinedChannel;
       client.OnMessageReceived += Client_OnMessageReceived;
-      client.OnWhisperReceived += Client_OnWhisperReceived;
       client.OnConnected += Client_OnConnected;
 
       client.Connect();
@@ -59,22 +78,19 @@ namespace TwitchChat
 
     private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
     {
-      HandleChatMessage(e.ChatMessage.UserId, e.ChatMessage.DisplayName, e.ChatMessage.Message, e.ChatMessage.ColorHex);
+      var isPrivileged = e.ChatMessage.IsSubscriber || e.ChatMessage.IsModerator || e.ChatMessage.IsVip;
+      HandleChatMessage(e.ChatMessage.UserId, e.ChatMessage.DisplayName, e.ChatMessage.Message, e.ChatMessage.ColorHex, isPrivileged);
     }
 
-    private void Client_OnWhisperReceived(object sender, OnWhisperReceivedArgs e)
-    {
-      HandleChatMessage(e.WhisperMessage.UserId, e.WhisperMessage.DisplayName, e.WhisperMessage.Message, e.WhisperMessage.ColorHex);
-    }
-
-    private void HandleChatMessage(string senderId, string senderName, string message, string colorHex)
+    private void HandleChatMessage(string senderId, string senderName, string message, string colorHex, bool isPrivileged)
     {
       OnMessage.Invoke(this, new MessageEventArgs
       {
         Message = message,
         SenderName = senderName,
         SenderId = senderId,
-        HexColor = colorHex ?? "#ffffff"
+        HexColor = colorHex ?? "#ffffff",
+        IsPrivileged = isPrivileged
       });
     }
   }

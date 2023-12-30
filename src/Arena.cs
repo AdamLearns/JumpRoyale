@@ -1,7 +1,12 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
 using TwitchChat;
+using TwitchLib.PubSub.Events;
+using TwitchLib.PubSub.Models.Responses.Messages.Redemption;
 
 public partial class Arena : Node2D
 {
@@ -9,77 +14,572 @@ public partial class Arena : Node2D
 	[Export]
 	public PackedScene JumperScene;
 
+	[Export]
+	public TileSet TileSetToUse;
+
+	[Signal]
+	public delegate void PlayerCountChangeEventHandler(int numPlayers);
+
+	[Signal]
+	public delegate void MaxHeightChangedEventHandler(string playerName, int height);
+
+	[Signal]
+	public delegate void CameraSpeedChangedEventHandler(int speed);
+
+	int choice = 1;
+
+	bool gameDone = false;
+	long gameEndTime = 0;
+
+	private const string LobbyOverlayNodeName = "LobbyOverlay";
+	private const string GameOverlayNodeName = "GameOverlay";
+	private const string EndScreenOverlayNodeName = "EndScreenOverlay";
+	private const string CameraNodeName = "Camera";
+	private const string CanvasLayerNodeName = "CanvasLayer";
+	private const string SaveLocation = "res://save_data/players.json";
+
+	private const int WallHeight = 15; // in tiles
+	private int WidthInTiles;
+	private int HeightInTiles;
+	private int CeilingHeight;
+	private TileMap lobbyTilemap;
+
 	private Dictionary<string, Jumper> jumpers = new Dictionary<string, Jumper>();
+
+	private AllPlayerData allPlayerData = new AllPlayerData();
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		TwitchChatClient twitchChatClient = new();
+		twitchChatClient.OnRedemption += OnRedemption;
 		twitchChatClient.OnMessage += OnMessage;
+
+		GetLobbyOverlay().TimerDone += OnLobbyTimerDone;
+		GetGameOverlay().TimerDone += OnGameTimerDone;
+
+		SetBackground();
+
+		GenerateWorld();
+
+		LoadPlayerData();
+	}
+
+	private void SetBackground()
+	{
+		var background = GetNode<Sprite2D>("Background");
+		var colors = new string[] {
+			"Blue",
+			"Brown",
+			"Gray",
+			"Green",
+			"Pink",
+			"Purple",
+			"Yellow"
+		};
+		var color = colors[new RandomNumberGenerator().RandiRange(0, colors.Length - 1)];
+		background.Texture = ResourceLoader.Load<Texture2D>($"res://assets/sprites/backgrounds/{color}.png");
+	}
+
+	private FlowContainer GetEndScreenOverlay()
+	{
+		return GetNode<CanvasLayer>(CanvasLayerNodeName).GetNode<FlowContainer>(EndScreenOverlayNodeName);
+	}
+
+	private GameOverlay GetGameOverlay()
+	{
+		return GetNode<CanvasLayer>(CanvasLayerNodeName).GetNode<GameOverlay>(GameOverlayNodeName);
+	}
+
+	private LobbyOverlay GetLobbyOverlay()
+	{
+		return GetNode<CanvasLayer>(CanvasLayerNodeName).GetNode<LobbyOverlay>(LobbyOverlayNodeName);
+	}
+
+	private void LoadPlayerData()
+	{
+		var filesystemLocation = ProjectSettings.GlobalizePath(SaveLocation);
+		if (!File.Exists(filesystemLocation))
+		{
+			return;
+		}
+
+		var jsonString = File.ReadAllText(filesystemLocation);
+		allPlayerData = JsonSerializer.Deserialize<AllPlayerData>(jsonString);
+	}
+
+	private void SaveAllPlayers()
+	{
+		var filesystemLocation = ProjectSettings.GlobalizePath(SaveLocation);
+		string jsonString = JsonSerializer.Serialize<AllPlayerData>(allPlayerData);
+		File.WriteAllText(filesystemLocation, jsonString);
+	}
+
+	private void GenerateWorld()
+	{
+		lobbyTilemap = new TileMap
+		{
+			Name = "TileMap",
+			TileSet = TileSetToUse
+		};
+
+		var viewport = GetViewportRect();
+		HeightInTiles = (int)(viewport.Size.Y / TileSetToUse.TileSize.Y);
+		WidthInTiles = (int)(viewport.Size.X / TileSetToUse.TileSize.X);
+
+		int floorY = HeightInTiles - 3;
+
+		// Draw grass along the bottom to form the floor
+		lobbyTilemap.SetCell(0, new Vector2I(0, floorY), 0, new Vector2I(6, 0));
+		lobbyTilemap.SetCell(0, new Vector2I(0, floorY + 1), 0, new Vector2I(6, 1));
+		lobbyTilemap.SetCell(0, new Vector2I(0, floorY + 2), 0, new Vector2I(6, 2));
+
+		lobbyTilemap.SetCell(0, new Vector2I(WidthInTiles - 1, floorY), 0, new Vector2I(8, 0));
+		lobbyTilemap.SetCell(0, new Vector2I(WidthInTiles - 1, floorY + 1), 0, new Vector2I(8, 1));
+		lobbyTilemap.SetCell(0, new Vector2I(WidthInTiles - 1, floorY + 2), 0, new Vector2I(8, 2));
+
+		for (int x = 1; x < WidthInTiles - 1; x++)
+		{
+			lobbyTilemap.SetCell(0, new Vector2I(x, floorY), 0, new Vector2I(7, 0));
+			lobbyTilemap.SetCell(0, new Vector2I(x, floorY + 1), 0, new Vector2I(7, 1));
+			lobbyTilemap.SetCell(0, new Vector2I(x, floorY + 2), 0, new Vector2I(7, 2));
+		}
+
+		int wallStartY = floorY - 1;
+		CeilingHeight = wallStartY - WallHeight - 1;
+
+		// Draw the vertical walls
+		for (int y = wallStartY; y >= CeilingHeight; y--)
+		{
+			lobbyTilemap.SetCell(0, new Vector2I(0, y), 0, new Vector2I(12, 1));
+			lobbyTilemap.SetCell(0, new Vector2I(WidthInTiles - 1, y), 0, new Vector2I(12, 1));
+		}
+		for (int y = wallStartY; y >= CeilingHeight - 200; y--)
+		{
+			lobbyTilemap.SetCell(0, new Vector2I(0, y), 0, new Vector2I(12, 1));
+			lobbyTilemap.SetCell(0, new Vector2I(WidthInTiles - 1, y), 0, new Vector2I(12, 1));
+		}
+
+		// Draw the ceiling
+		for (int x = 1; x < WidthInTiles - 1; x++)
+		{
+			lobbyTilemap.SetCell(0, new Vector2I(x, CeilingHeight), 0, new Vector2I(12, 1));
+		}
+
+		// Add some platforms
+		//
+		// The easiest way to do this is to generate one platform per row of the
+		// lobby area, then generate a platform of random width in that row, that
+		// way there are no collisions.
+		int platformStartY = wallStartY - 2;
+		int platformEndY = CeilingHeight + 4;
+		for (int y = platformStartY; y >= platformEndY; y--)
+		{
+			RandomNumberGenerator rng = new RandomNumberGenerator();
+			int width = rng.RandiRange(3, 15);
+			int startX = rng.RandiRange(2, WidthInTiles - width - 2);
+			int endX = startX + width - 1;
+
+			lobbyTilemap.SetCell(0, new Vector2I(startX, y), 0, new Vector2I(17, 1));
+			for (int x = startX + 1; x < endX; x++)
+			{
+				lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(18, 1));
+			}
+			lobbyTilemap.SetCell(0, new Vector2I(endX, y), 0, new Vector2I(19, 1));
+		}
+
+		// Add platforms higher up
+		int lowestY = -600;
+		for (int y = CeilingHeight - 2; y > lowestY; y--)
+		{
+			// This goes from 0 to 1 linearly as Y decreases
+			float difficultyFactor = (float)Math.Min(0, y) / lowestY;
+
+			// Rarely, make a solid block to add some variety
+			RandomNumberGenerator rng = new RandomNumberGenerator();
+			int r = rng.RandiRange(0, 100);
+			if (r < 6 + difficultyFactor * 40)
+			{
+				int blockWidth = 2 + (int)(difficultyFactor * 24);
+				int blockX = rng.RandiRange(2, WidthInTiles - 1 - blockWidth);
+				DrawRectangleOfTiles(blockX, y + 1, blockWidth, blockWidth, new Vector2I(12, 1));
+			}
+
+			r = rng.RandiRange(0, 100);
+			if (r > (70 - difficultyFactor * 60))
+			{
+				continue;
+			}
+			int width = rng.RandiRange(3, 15 - (int)Math.Round(6 * difficultyFactor));
+			int startX = rng.RandiRange(2, WidthInTiles - width - 2);
+			int endX = startX + width - 1;
+
+			lobbyTilemap.SetCell(0, new Vector2I(startX, y), 0, new Vector2I(17, 1));
+			for (int x = startX + 1; x < endX; x++)
+			{
+				lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(18, 1));
+			}
+			lobbyTilemap.SetCell(0, new Vector2I(endX, y), 0, new Vector2I(19, 1));
+		}
+
+		AddChild(lobbyTilemap);
+	}
+
+	private void OnGameTimerDone()
+	{
+		GetGameOverlay().Visible = false;
+		gameDone = true;
+		gameEndTime = DateTime.Now.Ticks;
+
+		var winners = ComputeStats();
+		SaveAllPlayers();
+
+		ShowEndScreen(winners);
+
+		CreateEndArena(winners);
+	}
+
+	private void CreateEndArena(string[] winners)
+	{
+		// Draw border around the whole arena and clear any platforms
+		for (int x = 0; x < WidthInTiles; x++)
+		{
+			for (int y = HeightInTiles; y > -HeightInTiles; y--)
+			{
+				if (x == 0 || x == WidthInTiles - 1 || y == HeightInTiles - 1)
+				{
+					lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(12, 1));
+				}
+				else
+				{
+					lobbyTilemap.SetCell(0, new Vector2I(x, y), -1);
+				}
+			}
+		}
+
+		var rng = new RandomNumberGenerator();
+		var viewport = GetViewportRect();
+		var xPadding = 100;
+
+		// Put all players back in the arena
+		for (int i = 0; i < jumpers.Count; i++)
+		{
+			var jumper = jumpers.ElementAt(i).Value;
+
+			jumper.Position = new Vector2(rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding), rng.RandiRange((int)(viewport.Size.Y / 2), (int)viewport.Size.Y - 100));
+			jumper.Scale = new Vector2(1, 1);
+			jumper.Velocity = new Vector2(0, 0);
+		}
+
+		// Reset the camera position
+		var camera = GetNode<Camera2D>(CameraNodeName);
+		camera.PositionSmoothingEnabled = false;
+		camera.Position = new Vector2(0, 0);
+
+		// Draw podiums
+		var numPodiums = 3;
+		var podiumWidth = 6;
+		var podiumHeight = 6; // has to be divisible by numPodiums
+		var podiumHeightDifference = podiumHeight / numPodiums;
+		var podiumX = WidthInTiles / 2;
+		var podiumY = 13;
+
+		DrawRectangleOfTiles(podiumX, podiumY, podiumWidth, podiumHeight, new Vector2I(12, 1));
+		DrawRectangleOfTiles(podiumX - podiumWidth, podiumY + podiumHeightDifference, podiumWidth, podiumHeight - podiumHeightDifference, new Vector2I(12, 1));
+		DrawRectangleOfTiles(podiumX + podiumWidth, podiumY + podiumHeightDifference * 2, podiumWidth, podiumHeight - podiumHeightDifference * 2, new Vector2I(12, 1));
+
+		// Place winners on podiums
+		for (int i = 0; i < winners.Length; i++)
+		{
+			var userId = winners[i];
+			var jumper = jumpers[userId];
+			var tileX = podiumX + (podiumWidth / 2);
+			if (i == 1)
+			{
+				tileX -= podiumWidth;
+			}
+			else if (i == 2)
+			{
+				tileX += podiumWidth;
+			}
+			jumper.Position = new Vector2(tileX * TileSetToUse.TileSize.X, 50);
+			int scale = winners.Length + 1 - i;
+			jumper.Scale = new Vector2(scale, scale);
+			jumper.SetCrazyParticles();
+		}
+
+		// Add some platforms so that there are "fun" jumps to make
+		for (int y = podiumY + podiumHeight + 15; y < HeightInTiles; y += 10)
+		{
+			int width = WidthInTiles / 3;
+			int startX = WidthInTiles / 3;
+			int endX = startX + width - 1;
+
+			lobbyTilemap.SetCell(0, new Vector2I(startX, y), 0, new Vector2I(17, 1));
+			for (int x = startX + 1; x < endX; x++)
+			{
+				lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(18, 1));
+			}
+			lobbyTilemap.SetCell(0, new Vector2I(endX, y), 0, new Vector2I(19, 1));
+		}
+	}
+
+	private void DrawRectangleOfTiles(int leftX, int topY, int width, int height, Vector2I tileIndex)
+	{
+		for (int x = leftX; x < leftX + width; x++)
+		{
+			for (int y = topY; y < topY + height; y++)
+			{
+				lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, tileIndex);
+			}
+		}
+	}
+
+	private void ShowEndScreen(string[] winners)
+	{
+		GetEndScreenOverlay().Visible = true;
+
+		var endScreen = GetEndScreenOverlay();
+
+		string text = "Winners:\n";
+		for (int i = 0; i < winners.Length; i++)
+		{
+			var userId = winners[i];
+			var playerData = allPlayerData.players[userId];
+			var jumper = jumpers[userId];
+			var height = GetHeightFromYPosition(jumper.Position.Y);
+			text += $"\t{i + 1}: {playerData.Name}. Height reached: {height}. Games played: {playerData.NumPlays}. Wins: {playerData.Num1stPlaceWins}/{playerData.Num2ndPlaceWins}/{playerData.Num3rdPlaceWins}. Lifetime height: {playerData.TotalHeightAchieved}\n";
+		}
+
+		text += "\n";
+		text += "Number of players this game: " + jumpers.Count + "\n";
+		text += "\n";
+		text += "YOU CAN NOW JUMP FREELY (until Adam gets back)!\n";
+
+		endScreen.GetNode<Label>("Output").Text = text;
+	}
+
+	private List<Tuple<string, int>> GetPlayersByHeight()
+	{
+		List<Tuple<string, int>> playersByHeight = jumpers.OrderByDescending(o => GetHeightFromYPosition(o.Value.Position.Y)).Select(o => new Tuple<string, int>(o.Key, GetHeightFromYPosition((int)o.Value.Position.Y))).ToList();
+		return playersByHeight;
+	}
+
+	private string[] ComputeStats()
+	{
+		List<Tuple<string, int>> playersByHeight = GetPlayersByHeight();
+
+		var winners = playersByHeight.Take(3).Select(p => p.Item1).ToArray();
+		for (int i = 0; i < jumpers.Count; i++)
+		{
+			var jumper = jumpers.ElementAt(i).Value;
+			var playerData = jumper.playerData;
+			playerData.NumPlays++;
+			playerData.TotalHeightAchieved += GetHeightFromYPosition(jumper.Position.Y);
+			if (winners.Length > 0 && winners[0] == playerData.UserId)
+			{
+				playerData.Num1stPlaceWins++;
+			}
+			else if (winners.Length > 1 && winners[1] == playerData.UserId)
+			{
+				playerData.Num2ndPlaceWins++;
+
+			}
+			else if (winners.Length > 2 && winners[2] == playerData.UserId)
+			{
+				playerData.Num3rdPlaceWins++;
+			}
+		}
+
+		return winners;
+	}
+
+	private void OnLobbyTimerDone()
+	{
+		for (int x = 1; x < WidthInTiles - 1; x++)
+		{
+			lobbyTilemap.SetCell(0, new Vector2I(x, CeilingHeight), -1);
+		}
+		GetLobbyOverlay().Visible = false;
+		var gameOverlay = GetGameOverlay();
+		gameOverlay.Visible = true;
+		gameOverlay.init();
+	}
+
+	private void OnRedemption(object sender, OnRewardRedeemedArgs e)
+	{
+		if (!e.RewardId.Equals(Guid.Parse("f04bb300-d135-4670-a7ba-1d6761590042")))
+		{
+			return;
+		}
+
+		GD.Print($"{e.DisplayName} is redeeming a revive!");
+
+		CallDeferred(nameof(RedeemRevive), e.DisplayName);
+	}
+
+	private void RedeemRevive(string displayName)
+	{
+		foreach (var jumpersEntry in jumpers)
+		{
+			var jumper = jumpersEntry.Value;
+			if (jumper.playerData.Name.ToLower() == displayName.ToLower())
+			{
+				GD.Print("Reviving " + displayName);
+				var playersByHeight = GetPlayersByHeight();
+				if (playersByHeight.Count > 2)
+				{
+					var thirdHighestPlayerId = playersByHeight[2].Item1;
+					var thirdHighestJumper = jumpers[thirdHighestPlayerId];
+					GD.Print("Snapping to " + thirdHighestJumper.playerData.Name);
+
+					jumper.Position = thirdHighestJumper.Position;
+					jumper.Velocity = thirdHighestJumper.Velocity;
+				}
+				break;
+			}
+		}
 	}
 
 	private void OnMessage(object sender, MessageEventArgs e)
 	{
-		if (e.Message.StartsWith("reset"))
+		var lowercaseMessage = e.Message.ToLower();
+		// if (e.Message.StartsWith("reset"))
+		// {
+		// 	CallDeferred(nameof(ResetPlayer), e.SenderId);
+		// }
+		if (lowercaseMessage.StartsWith("join"))
 		{
-			CallDeferred(nameof(ResetPlayer), e.SenderId);
+			CallDeferred(nameof(AddPlayer), e.SenderId, e.SenderName, e.HexColor, e.IsPrivileged);
 		}
-		if (e.Message.StartsWith("join"))
+		else if (lowercaseMessage.StartsWith("glow"))
 		{
-			CallDeferred(nameof(AddPlayer), e.SenderId, e.SenderName, "#ffffff");
+			CallDeferred(nameof(HandleGlow), e.SenderId, lowercaseMessage, e.HexColor, e.IsPrivileged);
 		}
-		if (e.Message.StartsWith("jump"))
+		else if (lowercaseMessage.StartsWith("unglow"))
+		{
+			CallDeferred(nameof(HandleUnglow), e.SenderId);
+		}
+		else if (lowercaseMessage.StartsWith("char"))
+		{
+			CallDeferred(nameof(HandleChangeCharacter), e.SenderId, lowercaseMessage);
+		}
+		else if (lowercaseMessage.StartsWith("jump") || lowercaseMessage.StartsWith("j ") || lowercaseMessage.Equals("j") || lowercaseMessage.StartsWith("l ") || lowercaseMessage.Equals("l") || lowercaseMessage.StartsWith("r ") || lowercaseMessage.Equals("r") || lowercaseMessage.StartsWith("u ") || lowercaseMessage.Equals("u"))
 		{
 			HandleJump(e);
 		}
 	}
 
-	private void HandleJumpWithPowerAndAngle(string[] parts, MessageEventArgs e)
+	private void HandleGlow(string senderId, string message, string hexColor, bool isPrivileged)
 	{
-		if (!int.TryParse(parts[1], out int angle) || !int.TryParse(parts[2], out int power))
+		if (!isPrivileged)
 		{
 			return;
 		}
 
-		angle = Math.Clamp(angle, -90, 90);
-		angle += 90;
-		CallDeferred(nameof(JumpPlayer), e.SenderId, angle, power);
-	}
-
-	private void HandleJumpWithDirection(string[] parts, MessageEventArgs e)
-	{
-		string dir = parts[1];
-
-		if (!int.TryParse(parts[2], out int angle) || !int.TryParse(parts[3], out int power))
+		var userId = senderId;
+		if (!jumpers.ContainsKey(userId))
 		{
 			return;
 		}
 
-		angle = Math.Clamp(angle, 0, 90);
-		if (dir.ToLower().StartsWith("l"))
+		Jumper jumper = jumpers[userId];
+
+
+		string[] parts = message.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+		if (parts.Length == 1)
 		{
-			angle = 90 - angle;
+			jumper.SetGlow(hexColor);
 		}
 		else
 		{
-			angle += 90;
+			jumper.SetGlow(parts[1]);
 		}
-		CallDeferred(nameof(JumpPlayer), e.SenderId, angle, power);
+	}
+	private void HandleUnglow(string userId)
+	{
+		if (!jumpers.ContainsKey(userId))
+		{
+			return;
+		}
+
+		Jumper jumper = jumpers[userId];
+		jumper.DisableGlow();
 	}
 
+	private void HandleChangeCharacter(string userId, string message)
+	{
+		if (!jumpers.ContainsKey(userId))
+		{
+			return;
+		}
+
+		RandomNumberGenerator rng = new RandomNumberGenerator();
+		int choice = rng.RandiRange(1, 18);
+
+		string[] parts = message.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+		if (parts.Length > 1 && int.TryParse(parts[1], out int specifiedChoice))
+		{
+			choice = specifiedChoice;
+		}
+
+		choice = Math.Clamp(choice, 1, 18);
+
+		Jumper jumper = jumpers[userId];
+		jumper.SetCharacter(choice);
+	}
 
 	private void HandleJump(MessageEventArgs e)
 	{
-		string[] parts = e.Message.Split(" ");
+		// Prevent jumps for 5 seconds after the game ends so that winners don't
+		// jump off the podiums immediately.
+		if (gameEndTime > 0 && (DateTime.Now.Ticks - gameEndTime) / TimeSpan.TicksPerMillisecond < 5000)
+		{
+			return;
+		}
 
-		if (parts.Length == 3)
+		string[] parts = e.Message.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+		if (parts.Length < 1)
 		{
-			HandleJumpWithPowerAndAngle(parts, e);
+			return;
 		}
-		else if (parts.Length == 4)
+		var command = parts[0].ToLower();
+
+		// Check the last part. If it's not a number, then just reject it entirely.
+		// This way, people can get around the duplicate-message problem on Twitch.
+		if (!int.TryParse(parts[^1], out _))
 		{
-			HandleJumpWithDirection(parts, e);
+			parts = parts.Take(parts.Length - 1).ToArray();
 		}
+
+		var angleString = parts.Length > 1 ? parts[1] : "0";
+		var powerString = parts.Length > 2 ? parts[2] : "100";
+
+		if (!int.TryParse(angleString, out int angle) || !int.TryParse(powerString, out int power))
+		{
+			return;
+		}
+		angle = Math.Clamp(angle, -90, 90);
+		if (command == "jump" || command == "j" || command == "r")
+		{
+			angle += 90;
+		}
+		else if (command == "l")
+		{
+			angle = 90 - angle;
+		}
+		else if (command == "u")
+		{
+			angle = 90;
+		}
+		else
+		{
+			return;
+		}
+		CallDeferred(nameof(JumpPlayer), e.SenderId, angle, power);
 	}
 
 	private void JumpPlayer(string userId, int angle, int power)
@@ -93,7 +593,7 @@ public partial class Arena : Node2D
 		jumper.Jump(angle, power);
 	}
 
-	private void AddPlayer(string userId, string userName, string hexColor)
+	private void AddPlayer(string userId, string userName, string hexColor, bool isPrivileged)
 	{
 		if (jumpers.ContainsKey(userId))
 		{
@@ -101,11 +601,41 @@ public partial class Arena : Node2D
 		}
 
 		RandomNumberGenerator rng = new RandomNumberGenerator();
+		int randomCharacterChoice = rng.RandiRange(1, 18);
+
+		var playerData = allPlayerData.players.ContainsKey(userId) ? allPlayerData.players[userId] : new PlayerData(hexColor, randomCharacterChoice);
+		allPlayerData.players[userId] = playerData;
+
+		// Even if the player already existed, we may need to update their name.
+		playerData.Name = userName;
+		playerData.UserId = userId;
+
+		if (!isPrivileged)
+		{
+			playerData.GlowColor = null;
+		}
+
 		Jumper jumper = JumperScene.Instantiate() as Jumper;
-		jumper.Init(rng.RandiRange(0, 1000), userName);
+		int tileHeight = TileSetToUse.TileSize.Y;
+		var viewport = GetViewportRect();
+		int y = ((int)(viewport.Size.Y / tileHeight) - 1 - WallHeight) * tileHeight;
+		int xPadding = TileSetToUse.TileSize.X * 3;
+		jumper.Init(rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding), y, userName, playerData);
 		AddChild(jumper);
 
 		jumpers.Add(userId, jumper);
+
+		EmitSignal(SignalName.PlayerCountChange, jumpers.Count);
+	}
+
+	// Y decreases as you go up, so this converts it to a "height" property that
+	// increases as you go up.
+	//
+	// Note that ideally, the height should return 0 when you're on the lowest
+	// floor, but that's probably not the case at the time of writing.
+	private int GetHeightFromYPosition(float y)
+	{
+		return (int)(-1 * y + GetViewportRect().Size.Y);
 	}
 
 	private void ResetPlayer(string userId)
@@ -122,14 +652,74 @@ public partial class Arena : Node2D
 	{
 		if (Input.IsActionJustPressed("ui_accept"))
 		{
-			var adamId = "AdamTestPlayer";
-			if (!jumpers.ContainsKey(adamId))
-			{
-				AddPlayer(adamId, "AdamTest", "#ffffff");
-			}
+			GD.Print("Saving all players");
+			OnGameTimerDone();
+			// var adamId = "AdamTestPlayer";
+			// if (!jumpers.ContainsKey(adamId))
+			// {
+			// 	AddPlayer(adamId, "AdamTest", "#ffffff");
+			// }
 
-			var adam = jumpers[adamId];
-			adam.RandomJump();
+			// var adam = jumpers[adamId];
+			// // adam.RandomJump();
+			// adam.SetCharacter(choice++);
 		}
+
+		ModifyPlayerScales();
+
+		MoveCamera();
+	}
+	private void ModifyPlayerScales()
+	{
+		if (gameDone)
+		{
+			return;
+		}
+		for (int i = 0; i < jumpers.Count; i++)
+		{
+			var jumper = jumpers.ElementAt(i).Value;
+			int height = GetHeightFromYPosition(jumper.Position.Y);
+			if (height > 0)
+			{
+				var scale = height / 5000f + 1;
+				jumper.Scale = new Vector2(scale, scale);
+			}
+		}
+	}
+
+	private void MoveCamera()
+	{
+		// Iterate over jumpers and check for the highest player
+		if (jumpers.Count == 0 || gameDone)
+		{
+			return;
+		}
+
+		// 792
+		// Top of camera is what we set with the Y coordinate
+		// When a player is at 800, we want the Y to be 0 still
+		// When a player is at <400, we want the camera to move
+
+		int lowestYValue = 999999;
+		string playerName = "";
+		for (int i = 0; i < jumpers.Count; i++)
+		{
+			var jumper = jumpers.ElementAt(i).Value;
+			if (jumper.Position.Y < lowestYValue)
+			{
+				lowestYValue = (int)jumper.Position.Y;
+				playerName = jumper.Name;
+			}
+		}
+
+		int maxHeight = GetHeightFromYPosition(lowestYValue);
+		EmitSignal(SignalName.MaxHeightChanged, playerName, maxHeight);
+
+		// Make sure the camera doesn't go higher than 0
+		int tileHeight = TileSetToUse.TileSize.Y;
+		lowestYValue = Math.Min(lowestYValue - tileHeight * 16, 0);
+
+		var camera = GetNode<Camera2D>(CameraNodeName);
+		camera.Position = new Vector2(0, lowestYValue);
 	}
 }
