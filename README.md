@@ -32,7 +32,42 @@ To bypass the same-message limitation on Twitch, add some garbage letters after 
 
 - `char <choice>`: change your character graphic. This is only for cosmetics.
   - `choice` is a number from `1` to `18`
-  - Note to self: include the 18 images directly from the sprites folder. If you're reading this text, then please remind Adam to do this! 🙏
+  - `char 1` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%201/Clothes%201/Character1M_1_idle_0.png?raw=true)
+  - `char 2` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%201/Clothes%202/Character1M_2_idle_0.png?raw=true)
+  - `char 3` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%201/Clothes%203/Character1M_3_idle_0.png?raw=true)
+  - `char 4` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%202/Clothes%201/Character2M_1_idle_0.png?raw=true)
+  - `char 5` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%202/Clothes%202/Character2M_2_idle_0.png?raw=true)
+  - `char 6` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%202/Clothes%203/Character2M_3_idle_0.png?raw=true)
+  - `char 7` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%203/Clothes%201/Character3M_1_idle_0.png?raw=true)
+  - `char 8` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%203/Clothes%202/Character3M_2_idle_0.png?raw=true)
+  - `char 9` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%203/Clothes%203/Character3M_3_idle_0.png?raw=true)
+  - `char 10` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%201/Clothes%201/Character1F_1_idle_0.png?raw=true)
+  - `char 11` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%201/Clothes%202/Character1F_2_idle_0.png?raw=true)
+  - `char 12` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%201/Clothes%203/Character1F_3_idle_0.png?raw=true)
+  - `char 13` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%202/Clothes%201/Character2F_1_idle_0.png?raw=true)
+  - `char 14` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%202/Clothes%202/Character2F_2_idle_0.png?raw=true)
+  - `char 15` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%202/Clothes%203/Character2F_3_idle_0.png?raw=true)
+  - `char 16` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%203/Clothes%201/Character3F_1_idle_0.png?raw=true)
+  - `char 17` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%203/Clothes%202/Character3F_2_idle_0.png?raw=true)
+  - `char 18` ↓
+    - ![](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%203/Clothes%203/Character3F_3_idle_0.png?raw=true)
 - `glow [color]`: change your glow color. This is for subscribers, VIPs, and moderators only.
   - If `color` isn't specified, it'll take the color of your Twitch name.
   - `color` is in the form `RGB` or `RRGGBB`, e.g. `color f00` to set it to red, `color f0f` to set it to pink.
