@@ -443,10 +443,6 @@ public partial class Arena : Node2D
 	private void OnMessage(object sender, MessageEventArgs e)
 	{
 		var lowercaseMessage = e.Message.ToLower();
-		// if (e.Message.StartsWith("reset"))
-		// {
-		// 	CallDeferred(nameof(ResetPlayer), e.SenderId);
-		// }
 		if (lowercaseMessage.StartsWith("join"))
 		{
 			CallDeferred(nameof(AddPlayer), e.SenderId, e.SenderName, e.HexColor, e.IsPrivileged);
@@ -637,31 +633,12 @@ public partial class Arena : Node2D
 		return (int)(-1 * y + GetViewportRect().Size.Y);
 	}
 
-	private void ResetPlayer(string userId)
-	{
-		if (!jumpers.ContainsKey(userId))
-		{
-			return;
-		}
-		Jumper jumper = jumpers[userId];
-		jumper.Reset();
-	}
-
 	public override void _PhysicsProcess(double delta)
 	{
 		if (Input.IsActionJustPressed("ui_accept"))
 		{
 			GD.Print("Saving all players");
 			OnGameTimerDone();
-			// var adamId = "AdamTestPlayer";
-			// if (!jumpers.ContainsKey(adamId))
-			// {
-			// 	AddPlayer(adamId, "AdamTest", "#ffffff");
-			// }
-
-			// var adam = jumpers[adamId];
-			// // adam.RandomJump();
-			// adam.SetCharacter(choice++);
 		}
 
 		ModifyPlayerScales();
@@ -693,11 +670,6 @@ public partial class Arena : Node2D
 		{
 			return;
 		}
-
-		// 792
-		// Top of camera is what we set with the Y coordinate
-		// When a player is at 800, we want the Y to be 0 still
-		// When a player is at <400, we want the camera to move
 
 		int lowestYValue = 999999;
 		string playerName = "";

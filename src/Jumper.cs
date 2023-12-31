@@ -15,15 +15,6 @@ public partial class Jumper : CharacterBody2D
 
 	public PlayerData playerData;
 
-	public void Reset()
-	{
-		RandomNumberGenerator rng = new RandomNumberGenerator();
-
-		Position = new Vector2(rng.RandiRange(0, 1000), 0);
-		jumpVelocity = new Vector2(0, 0);
-		Velocity = new Vector2(0, 0);
-	}
-
 	public void Init(int x, int y, string userName, PlayerData playerData)
 	{
 		Position = new Vector2(x, y);
