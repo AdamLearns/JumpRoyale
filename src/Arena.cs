@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text.Json;
 using TwitchChat;
 using TwitchLib.PubSub.Events;
-using TwitchLib.PubSub.Models.Responses.Messages.Redemption;
 
 public partial class Arena : Node2D
 {
@@ -178,14 +177,7 @@ public partial class Arena : Node2D
 			RandomNumberGenerator rng = new RandomNumberGenerator();
 			int width = rng.RandiRange(3, 15);
 			int startX = rng.RandiRange(2, WidthInTiles - width - 2);
-			int endX = startX + width - 1;
-
-			lobbyTilemap.SetCell(0, new Vector2I(startX, y), 0, new Vector2I(17, 1));
-			for (int x = startX + 1; x < endX; x++)
-			{
-				lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(18, 1));
-			}
-			lobbyTilemap.SetCell(0, new Vector2I(endX, y), 0, new Vector2I(19, 1));
+			AddPlatform(startX, y, width);
 		}
 
 		// Add platforms higher up
@@ -212,17 +204,30 @@ public partial class Arena : Node2D
 			}
 			int width = rng.RandiRange(3, 15 - (int)Math.Round(6 * difficultyFactor));
 			int startX = rng.RandiRange(2, WidthInTiles - width - 2);
-			int endX = startX + width - 1;
-
-			lobbyTilemap.SetCell(0, new Vector2I(startX, y), 0, new Vector2I(17, 1));
-			for (int x = startX + 1; x < endX; x++)
-			{
-				lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(18, 1));
-			}
-			lobbyTilemap.SetCell(0, new Vector2I(endX, y), 0, new Vector2I(19, 1));
+			AddPlatform(startX, y, width);
 		}
 
 		AddChild(lobbyTilemap);
+	}
+
+	private void AddPlatform(int x, int y, int width)
+	{
+		int endX = x + width - 1;
+
+		// Draw left side
+		lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(17, 1));
+
+		// Draw middle
+		if (width > 2)
+		{
+			for (int i = x + 1; i < endX; i++)
+			{
+				lobbyTilemap.SetCell(0, new Vector2I(i, y), 0, new Vector2I(18, 1));
+			}
+		}
+
+		// Draw right side
+		lobbyTilemap.SetCell(0, new Vector2I(endX, y), 0, new Vector2I(19, 1));
 	}
 
 	private void OnGameTimerDone()
@@ -313,14 +318,8 @@ public partial class Arena : Node2D
 		{
 			int width = WidthInTiles / 3;
 			int startX = WidthInTiles / 3;
-			int endX = startX + width - 1;
 
-			lobbyTilemap.SetCell(0, new Vector2I(startX, y), 0, new Vector2I(17, 1));
-			for (int x = startX + 1; x < endX; x++)
-			{
-				lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(18, 1));
-			}
-			lobbyTilemap.SetCell(0, new Vector2I(endX, y), 0, new Vector2I(19, 1));
+			AddPlatform(startX, y, width);
 		}
 	}
 
