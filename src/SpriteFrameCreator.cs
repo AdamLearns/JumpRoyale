@@ -87,7 +87,7 @@ public class SpriteFrameCreator
       {
         var fileName = $"Character{charNumber}{fullGender[0]}_{clothingNumber}_{animName}_{frameNumber}.png";
 
-        // res://assets/sprites/characters/Female/Character 2/Clothes 2/Character2F_2_fall_0.png
+        // E.g. "res://assets/sprites/characters/Female/Character 2/Clothes 2/Character2F_2_fall_0.png"
         var pathToImage = $"{pathToFolder}{fileName}";
         var texture = ResourceLoader.Load<Texture2D>(pathToImage);
 
