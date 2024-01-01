@@ -40,16 +40,17 @@ namespace TwitchChat
         tps.ListenToRewards("47098493");
         tps.SendTopics();
         tps.OnRewardRedeemed += (object sender, OnRewardRedeemedArgs e) =>
-        {
-          Console.WriteLine($"Reward redeemed: {e}");
-          OnRedemption.Invoke(this, e);
-        };
+      {
+        Console.WriteLine($"Reward redeemed: {e}");
+        OnRedemption.Invoke(this, e);
+      };
       };
       tps.Connect();
 
       var config = new ConfigurationBuilder().AddUserSecrets<TwitchChatClient>().Build();
       string accessToken = config["twitch_access_token"] ?? throw new Exception("No access token found. Please run `dotnet user-secrets set twitch_access_token <your access token>`");
-      ConnectionCredentials credentials = new ConnectionCredentials("WhyOhWhyOhWhyOh", accessToken);
+      string channel = config["twitch_channel_name"] ?? throw new Exception("Channel not found. Please run `dotnet user-secrets set twitch_channel_name <your twitch channel>`");
+      ConnectionCredentials credentials = new ConnectionCredentials(channel, accessToken);
       var clientOptions = new ClientOptions
       {
         MessagesAllowedInPeriod = 750,
@@ -57,7 +58,7 @@ namespace TwitchChat
       };
       WebSocketClient customClient = new WebSocketClient(clientOptions);
       client = new TwitchClient(customClient);
-      client.Initialize(credentials, "AdamLearnsLive");
+      client.Initialize(credentials, channel);
 
       client.OnJoinedChannel += Client_OnJoinedChannel;
       client.OnMessageReceived += Client_OnMessageReceived;
