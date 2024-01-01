@@ -82,16 +82,18 @@ To bypass the same-message limitation on Twitch, add some garbage letters after 
 - Developed hastily in three days (although there'll probably be minor improvements made in the future... 👀)
 
 ## Building, running, testing
+
 - Prerequisites:
   - Install [DotNet](https://dotnet.microsoft.com/en-us/download)
-  - Install [Godot ≥ 4.2](https://godotengine.org/download/windows/)
+  - Install [Godot ≥4.2](https://godotengine.org/download/windows/)
   - Clone this repo
   - Generate a twitch token for your twitch account: https://twitchtokengenerator.com/. You only need the scopes "chat:read" and "chat:edit" for now. Copy the **access token** and set it:
     - `cd JumpRoyale`
     - `dotnet user-secrets set twitch_access_token <your access token>`
     - `dotnet user-secrets set twitch_channel_name <your channel name>`
-  - In Windows system properties, set the environment variable:
-    - `GODOT4` to `C:\myPath\Godot_vx.y.z-stable_mono_win64.exe`
+  - Ensure that you have a `GODOT4` environment variable:
+    - Windows: modify system properties to set the environment variable to something like `C:\myPath\Godot_vx.y.z-stable_mono_win64.exe`
+    - macOS: modify your shell's start-up script to add: `export GODOT4="/Applications/Godot_mono.app/Contents/MacOS/Godot"`
 - Building:
   - Run `dotnet restore`
   - Open in Godot
