@@ -64,6 +64,6 @@ public partial class GameOverlay : VFlowContainer
 
 	public void OnMaxHeightChange(string playerName, int height)
 	{
-		GetNode<Label>(HeightOutputNodeName).Text = $"Leader: {playerName} at height={height}";
+		GetNode<Label>(HeightOutputNodeName).Text = $"Leader: {playerName} at height={Formatter.FormatBigNumber(height)}";
 	}
 }
