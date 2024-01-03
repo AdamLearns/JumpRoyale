@@ -23,7 +23,7 @@ public class JumpCommand : CommandParser
         if (int.TryParse(angleFromCommand, out int angle))
         {
             /// We only have to clamp the user value at this point, because we override
-            /// that value to natch the direction we want to jump in
+            /// that value to match the direction we want to jump in
             Angle = Math.Clamp(angle, -90, 90);
         }
 
