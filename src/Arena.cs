@@ -536,10 +536,7 @@ public partial class Arena : Node2D
 			return;
 		}
 		
-		// Prevent jumps for 5 seconds after the game ends so that winners don't
-		// jump off the podiums immediately.
-		if (gameEndTime > 0 && (DateTime.Now.Ticks - gameEndTime) / TimeSpan.TicksPerMillisecond < 5000)
-		{
+		if (!IsAllowedToJump()) {
 			return;
 		}
 
@@ -586,6 +583,12 @@ public partial class Arena : Node2D
 		Jumper jumper = jumpers[userId];
 
 		jumper.CallDeferred(nameof(jumper.Jump), angle, power);
+	}
+
+	private bool IsAllowedToJump()
+	{
+		/// Only the first 5 seconds of the Result Screen disallows the jump action
+		return gameEndTime <= 0 || (DateTime.Now.Ticks - gameEndTime) / TimeSpan.TicksPerMillisecond > 5000;
 	}
 
 	private void AddPlayer(string userId, string userName, string hexColor, bool isPrivileged)
