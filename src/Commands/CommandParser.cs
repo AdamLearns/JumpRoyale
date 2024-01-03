@@ -12,6 +12,8 @@ public abstract class CommandParser
         _arguments = chatMessage.Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
         /// TODO: test if it's actually possible to receive an empty message from Twitch, because
+        /// previously this had a check for <1 Arguments Length, but Twitch blocks empty
+        /// message requests, although there could be extensions preventing that
 
         _name = _arguments[0].ToLower();
 
