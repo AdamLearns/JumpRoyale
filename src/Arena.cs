@@ -564,21 +564,10 @@ public partial class Arena : Node2D
 		{
 			return;
 		}
+
 		angle = Math.Clamp(angle, -90, 90);
-		if (command == "jump" || command == "j" || command == "r")
-		{
-			angle += 90;
-		}
-		else if (command == "l")
-		{
-			angle = 90 - angle;
-		}
-		else if (command == "u")
-		{
-			angle = 90;
-		}
-		else
-		{
+
+		if (!CanAdjustAngleByCommand(command, ref angle)) {
 			return;
 		}
 
@@ -591,6 +580,27 @@ public partial class Arena : Node2D
 	{
 		/// Only the first 5 seconds of the Result Screen disallows the jump action
 		return _timeSinceGameEnd <= 0 || (DateTime.Now.Ticks - _timeSinceGameEnd) / TimeSpan.TicksPerMillisecond > 5000;
+	}
+
+	private static bool CanAdjustAngleByCommand(string command, ref int angle) {
+		try
+		{
+			angle = command switch
+			{
+				"jump" or "j" or "r" => angle + 90,
+				"l" => 90 - angle,
+				"u" => 90,
+				
+				/// Unknown command causes it to exit, then skip the jump
+				_ => throw new Exception(),
+			};
+
+			return true;
+		}
+		catch
+		{
+			return false;
+		}
 	}
 
 	private void AddPlayer(string userId, string userName, string hexColor, bool isPrivileged)
