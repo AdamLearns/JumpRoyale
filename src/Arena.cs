@@ -528,6 +528,14 @@ public partial class Arena : Node2D
 
 	private void HandleJump(MessageEventArgs e)
 	{
+		string userId = e.SenderId;
+
+		/// We don't have to go through the logic if the sender does not exist on the jumpers list
+		if (!jumpers.ContainsKey(userId))
+		{
+			return;
+		}
+		
 		// Prevent jumps for 5 seconds after the game ends so that winners don't
 		// jump off the podiums immediately.
 		if (gameEndTime > 0 && (DateTime.Now.Ticks - gameEndTime) / TimeSpan.TicksPerMillisecond < 5000)
@@ -574,17 +582,15 @@ public partial class Arena : Node2D
 		{
 			return;
 		}
+
+		
 		CallDeferred(nameof(JumpPlayer), e.SenderId, angle, power);
 	}
 
 	private void JumpPlayer(string userId, int angle, int power)
 	{
-		if (!jumpers.ContainsKey(userId))
-		{
-			return;
-		}
-
 		Jumper jumper = jumpers[userId];
+
 		jumper.Jump(angle, power);
 	}
 
