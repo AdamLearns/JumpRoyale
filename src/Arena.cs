@@ -583,15 +583,9 @@ public partial class Arena : Node2D
 			return;
 		}
 
-		
-		CallDeferred(nameof(JumpPlayer), e.SenderId, angle, power);
-	}
-
-	private void JumpPlayer(string userId, int angle, int power)
-	{
 		Jumper jumper = jumpers[userId];
 
-		jumper.Jump(angle, power);
+		jumper.CallDeferred(nameof(jumper.Jump), angle, power);
 	}
 
 	private void AddPlayer(string userId, string userName, string hexColor, bool isPrivileged)
