@@ -91,9 +91,6 @@ public partial class Jumper : CharacterBody2D
 	{
 		if (IsOnFloor())
 		{
-			// Only allow percentage inputs
-			power = Math.Clamp(power, 1, 100);
-
 			double normalizedPower = Math.Sqrt(power * 5 * gravity);
 
 			jumpVelocity.X = Mathf.Cos(Mathf.DegToRad(angle + 180));

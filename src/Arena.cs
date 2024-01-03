@@ -538,69 +538,28 @@ public partial class Arena : Node2D
 			return;
 		}
 		
-		if (!IsAllowedToJump()) {
-			return;
-		}
-
-		string[] parts = e.Message.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-
-		if (parts.Length < 1)
-		{
-			return;
-		}
-		var command = parts[0].ToLower();
-
-		// Check the last part. If it's not a number, then just reject it entirely.
-		// This way, people can get around the duplicate-message problem on Twitch.
-		if (!int.TryParse(parts[^1], out _))
-		{
-			parts = parts.Take(parts.Length - 1).ToArray();
-		}
-
-		var angleString = parts.Length > 1 ? parts[1] : "0";
-		var powerString = parts.Length > 2 ? parts[2] : "100";
-
-		if (!int.TryParse(angleString, out int angle) || !int.TryParse(powerString, out int power))
+		if (!IsAllowedToJump())
 		{
 			return;
 		}
 
-		angle = Math.Clamp(angle, -90, 90);
+		JumpCommand command = new(e.Message);
 
-		if (!CanAdjustAngleByCommand(command, ref angle)) {
+		/// Drop the execution if the detected command was not present in the allowed aliases list
+		if (!command.IsValid())
+		{
 			return;
 		}
 
 		Jumper jumper = jumpers[userId];
 
-		jumper.CallDeferred(nameof(jumper.Jump), angle, power);
+		jumper.CallDeferred(nameof(jumper.Jump), command.Angle, command.Power);
 	}
 
 	private bool IsAllowedToJump()
 	{
 		/// Only the first 5 seconds of the Result Screen disallows the jump action
 		return _timeSinceGameEnd <= 0 || (DateTime.Now.Ticks - _timeSinceGameEnd) / TimeSpan.TicksPerMillisecond > 5000;
-	}
-
-	private static bool CanAdjustAngleByCommand(string command, ref int angle) {
-		try
-		{
-			angle = command switch
-			{
-				"jump" or "j" or "r" => angle + 90,
-				"l" => 90 - angle,
-				"u" => 90,
-				
-				/// Unknown command causes it to exit, then skip the jump
-				_ => throw new Exception(),
-			};
-
-			return true;
-		}
-		catch
-		{
-			return false;
-		}
 	}
 
 	private void AddPlayer(string userId, string userName, string hexColor, bool isPrivileged)
