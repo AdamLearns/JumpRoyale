@@ -27,8 +27,8 @@ public partial class Arena : Node2D
 
 	int choice = 1;
 
-	bool gameDone = false;
-	long gameEndTime = 0;
+	private bool _hasGameEnded = false;
+	private long _timeSinceGameEnd = 0;
 
 	private const string LobbyOverlayNodeName = "LobbyOverlay";
 	private const string GameOverlayNodeName = "GameOverlay";
@@ -233,8 +233,10 @@ public partial class Arena : Node2D
 	private void OnGameTimerDone()
 	{
 		GetGameOverlay().Visible = false;
-		gameDone = true;
-		gameEndTime = DateTime.Now.Ticks;
+
+		_hasGameEnded = true;
+		
+		_timeSinceGameEnd = DateTime.Now.Ticks;
 
 		var winners = ComputeStats();
 		SaveAllPlayers();
@@ -588,7 +590,7 @@ public partial class Arena : Node2D
 	private bool IsAllowedToJump()
 	{
 		/// Only the first 5 seconds of the Result Screen disallows the jump action
-		return gameEndTime <= 0 || (DateTime.Now.Ticks - gameEndTime) / TimeSpan.TicksPerMillisecond > 5000;
+		return _timeSinceGameEnd <= 0 || (DateTime.Now.Ticks - _timeSinceGameEnd) / TimeSpan.TicksPerMillisecond > 5000;
 	}
 
 	private void AddPlayer(string userId, string userName, string hexColor, bool isPrivileged)
@@ -650,7 +652,7 @@ public partial class Arena : Node2D
 	}
 	private void ModifyPlayerScales()
 	{
-		if (gameDone)
+		if (_hasGameEnded)
 		{
 			return;
 		}
@@ -669,7 +671,7 @@ public partial class Arena : Node2D
 	private void MoveCamera()
 	{
 		// Iterate over jumpers and check for the highest player
-		if (jumpers.Count == 0 || gameDone)
+		if (jumpers.Count == 0 || _hasGameEnded)
 		{
 			return;
 		}
