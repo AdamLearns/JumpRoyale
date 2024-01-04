@@ -39,7 +39,7 @@ public class JumpCommand : BaseChatCommand
 
     public override bool IsValid()
     {
-        return _allowedCommandAliases.Contains(GetCommandName());
+        return _allowedCommandAliases.Contains(Name);
     }
 
     public void AdjustAngle()
@@ -47,7 +47,7 @@ public class JumpCommand : BaseChatCommand
         /// The command aliases are exceptions, where the angle is fixed, but we should be able
         /// to at least modify the power of those jump and we will do this by assigning the
         /// first argument as Power, so we don't want to force the Angle to be present
-        if (_fixedAngleCommands.Contains(GetCommandName()))
+        if (_fixedAngleCommands.Contains(Name))
         {
             /// The default Angle value is always 0, so we will only assign the Angle if user
             /// has actually provided something, otherwise jump at maximum power (100). At
@@ -57,7 +57,7 @@ public class JumpCommand : BaseChatCommand
 
         Angle = Math.Clamp(Angle, -90, 90);
 
-        Angle = GetCommandName() switch
+        Angle = Name switch
         {
             "jump" or "j" or "r" => Angle + 90,
             "l" => 90 - Angle,
