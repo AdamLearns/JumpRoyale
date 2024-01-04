@@ -1,13 +1,13 @@
 using System;
 using System.Linq;
 
-public abstract class CommandParser
+public abstract class BaseChatCommand
 {
     protected readonly string[] _arguments;
 
     private readonly string _name;
 
-    public CommandParser(string chatMessage)
+    public BaseChatCommand(string chatMessage)
     {
         _arguments = chatMessage.Split(" ", StringSplitOptions.RemoveEmptyEntries);
 

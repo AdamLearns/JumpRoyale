@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class JumpCommand : CommandParser
+public class JumpCommand : BaseChatCommand
 {
     private int _power = 100;
 
