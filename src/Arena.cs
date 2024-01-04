@@ -461,8 +461,21 @@ public partial class Arena : Node2D
 		{
 			CallDeferred(nameof(HandleChangeCharacter), e.SenderId, lowercaseMessage);
 		}
-		else if (lowercaseMessage.StartsWith("jump") || lowercaseMessage.StartsWith("j ") || lowercaseMessage.Equals("j") || lowercaseMessage.StartsWith("l ") || lowercaseMessage.Equals("l") || lowercaseMessage.StartsWith("r ") || lowercaseMessage.Equals("r") || lowercaseMessage.StartsWith("u ") || lowercaseMessage.Equals("u"))
+		else if (lowercaseMessage.StartsWith("jump") || 
+			lowercaseMessage.StartsWith("j ") || 
+			lowercaseMessage.Equals("j") || 
+			lowercaseMessage.StartsWith("l ") || 
+			lowercaseMessage.Equals("l") || 
+			lowercaseMessage.StartsWith("r ") || 
+			lowercaseMessage.Equals("r") || 
+			lowercaseMessage.StartsWith("u ") || 
+			lowercaseMessage.Equals("u") || 
+			lowercaseMessage.StartsWith("ul ") || 
+			lowercaseMessage.Equals("ul") || 
+			lowercaseMessage.StartsWith("ur ") || 
+			lowercaseMessage.Equals("ur") )
 		{
+			/// Warning: the above list only exists until a List.Any is implemented for the check
 			HandleJump(e);
 		}
 	}
