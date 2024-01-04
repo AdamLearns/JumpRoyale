@@ -42,7 +42,7 @@ public class JumpCommand : BaseChatCommand
         return _allowedCommandAliases.Contains(Name);
     }
 
-    public void AdjustAngle()
+    private void AdjustAngle()
     {
         /// The command aliases are exceptions, where the angle is fixed, but we should be able
         /// to at least modify the power of those jump and we will do this by assigning the
