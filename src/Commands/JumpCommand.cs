@@ -21,8 +21,8 @@ public class JumpCommand : BaseChatCommand
     public JumpCommand(string chatMessage)
         : base(chatMessage)
     {
-        string angleFromCommand = _arguments.Length > 1 ? _arguments[1] : "0";
-        string powerFromCommand = _arguments.Length > 2 ? _arguments[2] : "100";
+        string angleFromCommand = arguments.Length > 1 ? arguments[1] : "0";
+        string powerFromCommand = arguments.Length > 2 ? arguments[2] : "100";
 
         if (int.TryParse(angleFromCommand, out int angle))
         {
