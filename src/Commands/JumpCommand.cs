@@ -26,9 +26,7 @@ public class JumpCommand : CommandParser
 
         if (int.TryParse(angleFromCommand, out int angle))
         {
-            /// We only have to clamp the user value at this point, because we override
-            /// that value to match the direction we want to jump in
-            Angle = Math.Clamp(angle, -90, 90);
+            Angle = angle;
         }
 
         if (int.TryParse(powerFromCommand, out int power))
@@ -52,9 +50,12 @@ public class JumpCommand : CommandParser
         if (_fixedAngleCommands.Contains(GetCommandName()))
         {
             /// The default Angle value is always 0, so we will only assign the Angle if user
-            /// has actually provided something, otherwise jump at maximum power (100)
+            /// has actually provided something, otherwise jump at maximum power (100). At
+            /// this point we can't have clamped angle, because we will lose 10 power
             Power = Angle != 0 ? Angle : 100;
         }
+
+        Angle = Math.Clamp(Angle, -90, 90);
 
         Angle = GetCommandName() switch
         {
