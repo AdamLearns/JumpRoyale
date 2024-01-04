@@ -558,7 +558,6 @@ public partial class Arena : Node2D
 
 		JumpCommand command = new(e.Message);
 
-		/// Drop the execution if the detected command was not present in the allowed aliases list
 		if (!command.IsValid())
 		{
 			return;
@@ -569,9 +568,13 @@ public partial class Arena : Node2D
 		jumper.CallDeferred(nameof(jumper.Jump), command.Angle, command.Power);
 	}
 
+    /// <summary>
+    /// Players are allowed to jump only if the game is still running of if there was at least
+    /// 5 seconds delay after the game has ended to prevent players from jumping off the
+    /// podium immediately due to stream delays or to just present the game winners
+    /// </summary>
 	private bool IsAllowedToJump()
 	{
-		/// Only the first 5 seconds of the Result Screen disallows the jump action
 		return _timeSinceGameEnd <= 0 || (DateTime.Now.Ticks - _timeSinceGameEnd) / TimeSpan.TicksPerMillisecond > 5000;
 	}
 

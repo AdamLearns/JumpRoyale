@@ -5,8 +5,17 @@ public class JumpCommand : BaseChatCommand
 {
     private int _power = 100;
 
+    /// <summary>
+    /// Angle extracted from the chat command. If there was no Angle provided in the arguments,
+    /// it will default to `0` and be overridden internally, based on the command alias.
+    /// This value is clamped between `-90` and `90`
+    /// </summary>
     public int Angle { get; set; } = 0;
 
+    /// <summary>
+    /// Jump power in form of "_percentage_" the players can apply as an argument in the chat
+    /// message. This value is clamped between `1` and `100`.
+    /// </summary>
     public int Power
     {
         get { return _power; }
