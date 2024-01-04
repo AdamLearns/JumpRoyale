@@ -569,7 +569,7 @@ public partial class Arena : Node2D
 	}
 
     /// <summary>
-    /// Players are allowed to jump only if the game is still running of if there was at least
+    /// Players are allowed to jump only if the game is still running or if there was at least
     /// 5 seconds delay after the game has ended to prevent players from jumping off the
     /// podium immediately due to stream delays or to just present the game winners
     /// </summary>
