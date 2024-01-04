@@ -6,13 +6,17 @@ public class JumpCommand : CommandParser
     private int _power = 100;
 
     public int Angle { get; set; } = 0;
+
     public int Power
     {
         get { return _power; }
         set { _power = Math.Clamp(value, 1, 100); }
     }
 
-    private readonly List<string> _allowedCommandAliases = new() { "jump", "j", "l", "u", "r" };
+    private readonly List<string> _allowedCommandAliases =
+        new() { "jump", "j", "l", "u", "r", "ul", "ur" };
+
+    private readonly List<string> _fixedAngleCommands = new() { "u", "ur", "ul" };
 
     public JumpCommand(string chatMessage)
         : base(chatMessage)
@@ -42,10 +46,10 @@ public class JumpCommand : CommandParser
 
     public void AdjustAngle()
     {
-        /// The "u" alias is an exception, where the angle is always UP, but we should be able
-        /// to at least modify the power of upwards jump and we will do this by assigning
-        /// the first argument as Power, since we are overriding Angle (Git: Issue #22)
-        if (GetCommandName() == "u")
+        /// The command aliases are exceptions, where the angle is fixed, but we should be able
+        /// to at least modify the power of those jump and we will do this by assigning the
+        /// first argument as Power, so we don't want to force the Angle to be present
+        if (_fixedAngleCommands.Contains(GetCommandName()))
         {
             /// The default Angle value is always 0, so we will only assign the Angle if user
             /// has actually provided something, otherwise jump at maximum power (100)
@@ -57,6 +61,8 @@ public class JumpCommand : CommandParser
             "jump" or "j" or "r" => Angle + 90,
             "l" => 90 - Angle,
             "u" => 90,
+            "ul" => 45,
+            "ur" => 135,
             _ => 90 /* fall back to upwards */
         };
     }
