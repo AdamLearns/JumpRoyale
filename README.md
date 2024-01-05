@@ -19,12 +19,11 @@ The only way to play is for Adam to be streaming the game. At that point, you ca
 - `join`: joins the game. Available at any time, although you'll only really stand a chance at winning if you join in the first ~45 seconds. 😉
 - `jump [angle=0] [power=100]`: jumps in the given angle with the specified power.
   - `angle` can be from `-90` to `90`.
-    - `-90`: ←
-    - `-45`: ↖
-    - `0`: ↑
-    - `45`: ↗︎
-    - `90`: →
   - `power` can be from `1` to `100`.
+
+| angle input | -90  | -45|0|45|90
+|---|---|---|---|---|---|
+| jump direction  |←|↖|↑|↗︎|→|
 
 Jumping is so important that there are lots of shortcuts for how to jump!
 
@@ -38,11 +37,22 @@ To bypass the same-message limitation on Twitch, add some garbage letters after 
 - `u a`: jump up again
 - `u bbbb`: jump up again
 
+Jumping in the same direction also works with garbage letters:
+
+- `l 5`
+- `l 5 aaaa`
+- `l 5 bbb`
+
+Additionally, you can alternate between `l` and `r` commands to jump up in place, avoiding twitch duplicate message restriction. Jumping left or right with no angle specified allows you to jump up.
+
+> [!tip]
+> If you are using 7TV chat extension, it has its own duplicate message block prevention, so no additional garbage in the chat message is needed
+
 ---
 
 ## Customizing your character
 
-`char <choice>` - change your character graphic. This is only for cosmetics and will be saved between the sessions.
+Sending `char <choice>` in the chat allows you to change your character graphic. This is only for cosmetics and will be saved between the sessions.
 
 > [!Note]
 > Character customization is not saved during the Result Screen
