@@ -635,16 +635,21 @@ public partial class Arena : Node2D
 
 	public override void _PhysicsProcess(double delta)
 	{
-		if (Input.IsActionJustPressed("ui_accept"))
-		{
-			GD.Print("Saving all players");
-			OnGameTimerDone();
-		}
-
 		ModifyPlayerScales();
 
 		MoveCamera();
 	}
+
+	public override void _UnhandledInput(InputEvent @event)
+	{
+		if (Input.IsActionJustPressed("ui_accept") && Input.IsPhysicalKeyPressed(Key.Alt))
+		{
+			DisplayServer.WindowSetMode(DisplayServer.WindowGetMode() == DisplayServer.WindowMode.Fullscreen
+							? DisplayServer.WindowMode.Maximized
+							: DisplayServer.WindowMode.Fullscreen);
+		}
+	}
+
 	private void ModifyPlayerScales()
 	{
 		if (gameDone)
