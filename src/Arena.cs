@@ -347,7 +347,8 @@ public partial class Arena : Node2D
 			var playerData = allPlayerData.players[userId];
 			var jumper = jumpers[userId];
 			var height = GetHeightFromYPosition(jumper.Position.Y);
-			text += $"\t{i + 1}: {playerData.Name}. Height reached: {height}. Games played: {playerData.NumPlays}. Wins: {playerData.Num1stPlaceWins}/{playerData.Num2ndPlaceWins}/{playerData.Num3rdPlaceWins}. Lifetime height: {playerData.TotalHeightAchieved}\n";
+			var totalHeight = Formatter.FormatBigNumber(playerData.TotalHeightAchieved);
+			text += $"\t{i + 1}: {playerData.Name}. Height reached: {height}. Games played: {playerData.NumPlays}. Wins: {playerData.Num1stPlaceWins}/{playerData.Num2ndPlaceWins}/{playerData.Num3rdPlaceWins}. Lifetime height: {totalHeight}\n";
 		}
 
 		text += "\n";
