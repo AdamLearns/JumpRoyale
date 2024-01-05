@@ -3,42 +3,43 @@ using Godot;
 
 public partial class LobbyOverlay : FlowContainer
 {
-	private const string LobbyTimerNodeName = "LobbyTimer";
-	private const string NumPlayersNodeName = "NumPlayers";
+    private const string LobbyTimerNodeName = "LobbyTimer";
+    private const string NumPlayersNodeName = "NumPlayers";
 
-	[Signal]
-	public delegate void TimerDoneEventHandler();
+    [Signal]
+    public delegate void TimerDoneEventHandler();
 
-	private int lobbyTimer = 30;
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
-	{
-		var arena = GetTree().Root.GetNode<Arena>("Arena");
+    private int _lobbyTimer = 30;
 
-		arena.PlayerCountChange += OnPlayerCountChange;
+    // Called when the node enters the scene tree for the first time.
+    public override void _Ready()
+    {
+        var arena = GetTree().Root.GetNode<Arena>("Arena");
 
-		_ = StartTimer();
-	}
+        arena.PlayerCountChange += OnPlayerCountChange;
 
-	public async Task StartTimer()
-	{
-		await ToSignal(GetTree().CreateTimer(1.0f), SceneTreeTimer.SignalName.Timeout);
+        _ = StartTimer();
+    }
 
-		lobbyTimer--;
-		GetNode<Label>(LobbyTimerNodeName).Text = $"Game starts in: {lobbyTimer}s";
+    public async Task StartTimer()
+    {
+        await ToSignal(GetTree().CreateTimer(1.0f), SceneTreeTimer.SignalName.Timeout);
 
-		if (lobbyTimer <= 0)
-		{
-			EmitSignal(SignalName.TimerDone);
-		}
-		else
-		{
-			_ = StartTimer();
-		}
-	}
+        _lobbyTimer--;
+        GetNode<Label>(LobbyTimerNodeName).Text = $"Game starts in: {_lobbyTimer}s";
 
-	public void OnPlayerCountChange(int numPlayers)
-	{
-		GetNode<Label>(NumPlayersNodeName).Text = $"Players: {numPlayers}";
-	}
+        if (_lobbyTimer <= 0)
+        {
+            EmitSignal(SignalName.TimerDone);
+        }
+        else
+        {
+            _ = StartTimer();
+        }
+    }
+
+    public void OnPlayerCountChange(int numPlayers)
+    {
+        GetNode<Label>(NumPlayersNodeName).Text = $"Players: {numPlayers}";
+    }
 }
