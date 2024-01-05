@@ -113,14 +113,18 @@ autoplay = "idle"
 position = Vector2(0, -13)
 shape = SubResource("RectangleShape2D_6u5om")
 
-[node name="Name" type="RichTextLabel" parent="."]
+[node name="Node2D" type="Node2D" parent="."]
+position = Vector2(0, -55)
+scale = Vector2(0.3, 0.3)
+
+[node name="Name" type="RichTextLabel" parent="Node2D"]
 texture_filter = 2
 offset_left = -1328.0
-offset_top = -69.0
+offset_top = -46.0
 offset_right = 1328.0
-offset_bottom = 85.0
+offset_bottom = 115.0
 theme = ExtResource("16_fsbtc")
-theme_override_font_sizes/normal_font_size = 24
+theme_override_font_sizes/normal_font_size = 100
 bbcode_enabled = true
 text = "[center]Name[/center]"
 scroll_active = false
