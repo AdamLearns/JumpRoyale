@@ -27,8 +27,8 @@ public partial class Arena : Node2D
 
 	int choice = 1;
 
-	bool gameDone = false;
-	long gameEndTime = 0;
+	private bool _hasGameEnded = false;
+	private long _timeSinceGameEnd = 0;
 
 	private const string LobbyOverlayNodeName = "LobbyOverlay";
 	private const string GameOverlayNodeName = "GameOverlay";
@@ -233,8 +233,10 @@ public partial class Arena : Node2D
 	private void OnGameTimerDone()
 	{
 		GetGameOverlay().Visible = false;
-		gameDone = true;
-		gameEndTime = DateTime.Now.Ticks;
+
+		_hasGameEnded = true;
+		
+		_timeSinceGameEnd = DateTime.Now.Ticks;
 
 		var winners = ComputeStats();
 		SaveAllPlayers();
@@ -460,8 +462,21 @@ public partial class Arena : Node2D
 		{
 			CallDeferred(nameof(HandleChangeCharacter), e.SenderId, lowercaseMessage);
 		}
-		else if (lowercaseMessage.StartsWith("jump") || lowercaseMessage.StartsWith("j ") || lowercaseMessage.Equals("j") || lowercaseMessage.StartsWith("l ") || lowercaseMessage.Equals("l") || lowercaseMessage.StartsWith("r ") || lowercaseMessage.Equals("r") || lowercaseMessage.StartsWith("u ") || lowercaseMessage.Equals("u"))
+		else if (lowercaseMessage.StartsWith("jump") || 
+			lowercaseMessage.StartsWith("j ") || 
+			lowercaseMessage.Equals("j") || 
+			lowercaseMessage.StartsWith("l ") || 
+			lowercaseMessage.Equals("l") || 
+			lowercaseMessage.StartsWith("r ") || 
+			lowercaseMessage.Equals("r") || 
+			lowercaseMessage.StartsWith("u ") || 
+			lowercaseMessage.Equals("u") || 
+			lowercaseMessage.StartsWith("ul ") || 
+			lowercaseMessage.Equals("ul") || 
+			lowercaseMessage.StartsWith("ur ") || 
+			lowercaseMessage.Equals("ur") )
 		{
+			/// Warning: the above list only exists until a List.Any is implemented for the check
 			HandleJump(e);
 		}
 	}
@@ -529,64 +544,39 @@ public partial class Arena : Node2D
 
 	private void HandleJump(MessageEventArgs e)
 	{
-		// Prevent jumps for 5 seconds after the game ends so that winners don't
-		// jump off the podiums immediately.
-		if (gameEndTime > 0 && (DateTime.Now.Ticks - gameEndTime) / TimeSpan.TicksPerMillisecond < 5000)
-		{
-			return;
-		}
+		string userId = e.SenderId;
 
-		string[] parts = e.Message.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-
-		if (parts.Length < 1)
-		{
-			return;
-		}
-		var command = parts[0].ToLower();
-
-		// Check the last part. If it's not a number, then just reject it entirely.
-		// This way, people can get around the duplicate-message problem on Twitch.
-		if (!int.TryParse(parts[^1], out _))
-		{
-			parts = parts.Take(parts.Length - 1).ToArray();
-		}
-
-		var angleString = parts.Length > 1 ? parts[1] : "0";
-		var powerString = parts.Length > 2 ? parts[2] : "100";
-
-		if (!int.TryParse(angleString, out int angle) || !int.TryParse(powerString, out int power))
-		{
-			return;
-		}
-		angle = Math.Clamp(angle, -90, 90);
-		if (command == "jump" || command == "j" || command == "r")
-		{
-			angle += 90;
-		}
-		else if (command == "l")
-		{
-			angle = 90 - angle;
-		}
-		else if (command == "u")
-		{
-			angle = 90;
-		}
-		else
-		{
-			return;
-		}
-		CallDeferred(nameof(JumpPlayer), e.SenderId, angle, power);
-	}
-
-	private void JumpPlayer(string userId, int angle, int power)
-	{
+		/// We don't have to go through the logic if the sender does not exist on the jumpers list
 		if (!jumpers.ContainsKey(userId))
+		{
+			return;
+		}
+		
+		if (!IsAllowedToJump())
+		{
+			return;
+		}
+
+		JumpCommand command = new(e.Message);
+
+		if (!command.IsValid())
 		{
 			return;
 		}
 
 		Jumper jumper = jumpers[userId];
-		jumper.Jump(angle, power);
+
+		jumper.CallDeferred(nameof(jumper.Jump), command.Angle, command.Power);
+	}
+
+	/// <summary>
+	/// Players are allowed to jump only if the game is still running or if 5
+	/// seconds have passed since the game ended (that way players don't jump
+	/// off the podiums due to a stream delay)
+	/// </summary>
+	private bool IsAllowedToJump()
+	{
+		return _timeSinceGameEnd <= 0 || (DateTime.Now.Ticks - _timeSinceGameEnd) / TimeSpan.TicksPerMillisecond > 5000;
 	}
 
 	private void AddPlayer(string userId, string userName, string hexColor, bool isPrivileged)
@@ -653,7 +643,7 @@ public partial class Arena : Node2D
 
 	private void ModifyPlayerScales()
 	{
-		if (gameDone)
+		if (_hasGameEnded)
 		{
 			return;
 		}
@@ -672,7 +662,7 @@ public partial class Arena : Node2D
 	private void MoveCamera()
 	{
 		// Iterate over jumpers and check for the highest player
-		if (jumpers.Count == 0 || gameDone)
+		if (jumpers.Count == 0 || _hasGameEnded)
 		{
 			return;
 		}
