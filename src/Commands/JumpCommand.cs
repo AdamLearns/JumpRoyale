@@ -9,6 +9,8 @@ public class JumpCommand : BaseChatCommand
     /// Angle extracted from the chat command. If there was no Angle provided in the arguments,
     /// it will default to `0` and be overridden internally, based on the command alias.
     /// This value is clamped between `-90` and `90`.
+    ///
+    /// Note that this may get interpreted as power, which is why we don't clamp it here.
     /// </summary>
     public int Angle { get; set; } = 0;
 
