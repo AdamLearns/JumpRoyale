@@ -635,44 +635,20 @@ public partial class Arena : Node2D
 
 	public override void _PhysicsProcess(double delta)
 	{
-        if (!Input.IsPhysicalKeyPressed(Key.Alt) && Input.IsActionJustPressed("ui_accept"))
-		{
-			GD.Print("Saving all players");
-			OnGameTimerDone();
-		}
-
 		ModifyPlayerScales();
 
 		MoveCamera();
 	}
 
-    private bool firstToggle = true;
-
-    public override void _UnhandledInput(InputEvent @event)
-    {
-        if (@event is InputEventKey eventKey)
-        {
-            if (eventKey.IsReleased() && eventKey.Keycode == Key.Enter)
-            {
-                if (Input.IsPhysicalKeyPressed(Key.Alt))
-                {
-                    // When pressing alt+enter, then toggle full screen mode with windowed mode:
-                    DisplayServer.WindowMode currentMode = DisplayServer.WindowGetMode();
-                    DisplayServer.WindowMode nextMode =
-                        currentMode == DisplayServer.WindowMode.Fullscreen
-                            ? DisplayServer.WindowMode.Windowed
-                            : DisplayServer.WindowMode.Fullscreen;
-                    DisplayServer.WindowSetMode(nextMode);
-                    // if it was the first toggle, set the window size explicitely, otherwise the window would be maximized:
-                    if (firstToggle)
-                    {
-                        DisplayServer.WindowSetSize(new Vector2I(1280, 720));
-                        firstToggle = false;
-                    }
-                }
-            }
-        }
-    }
+	public override void _UnhandledInput(InputEvent @event)
+	{
+		if (Input.IsActionJustPressed("ui_accept") && Input.IsPhysicalKeyPressed(Key.Alt))
+		{
+			DisplayServer.WindowSetMode(DisplayServer.WindowGetMode() == DisplayServer.WindowMode.Fullscreen
+							? DisplayServer.WindowMode.Maximized
+							: DisplayServer.WindowMode.Fullscreen);
+		}
+	}
 
 	private void ModifyPlayerScales()
 	{
