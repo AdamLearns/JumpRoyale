@@ -11,7 +11,8 @@ public partial class GameOverlay : VFlowContainer
     [Signal]
     public delegate void TimerDoneEventHandler();
 
-    private int _timerSeconds = 150;
+    private const int GAME_LENGTH = 150;
+    private int _timerSeconds = GAME_LENGTH;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -42,7 +43,8 @@ public partial class GameOverlay : VFlowContainer
         {
             var arena = GetTree().Root.GetNode<Arena>("Arena");
             var camera = arena.GetNode<Camera2D>("Camera");
-            camera.PositionSmoothingSpeed *= 2f;
+            var scaleFactor = _timerSeconds == GAME_LENGTH - 60 ? 3f : 2f;
+            camera.PositionSmoothingSpeed *= scaleFactor;
             GetNode<Label>(CameraScrollSpeedNodeName).Text = $"Camera speed: {camera.PositionSmoothingSpeed} px/s";
         }
 
