@@ -2,6 +2,16 @@
 
 A platformer controlled through Twitch chat to be played on my stream during short breaks.
 
+- [JumpRoyale](#jumproyale)
+  - [How to play](#how-to-play)
+  - [Customizing your character](#customizing-your-character)
+  - [Extras](#extras)
+  - [Background](#background)
+  - [Building, running, testing](#building-running-testing)
+  - [Credits](#credits)
+
+---
+
 ## How to play
 
 The only way to play is for Adam to be streaming the game. At that point, you can use the following commands in his [Twitch chat](https://twitch.tv/AdamLearnsLive):
@@ -27,6 +37,8 @@ To bypass the same-message limitation on Twitch, add some garbage letters after 
 - `u`: jump up
 - `u a`: jump up again
 - `u bbbb`: jump up again
+
+---
 
 ## Customizing your character
 
@@ -62,14 +74,20 @@ To bypass the same-message limitation on Twitch, add some garbage letters after 
   - If `color` isn't specified, it'll take the color of your Twitch name.
   - `color` is in the form `RGB` or `RRGGBB`, e.g. `color f00` to set it to red, `color f0f` to set it to pink.
 
+---
+
 ## Extras
 
 - You can **revive** yourself using channel points. This isn't guaranteed to work, nor should you feel good about winning if you use this feature. 😛
+
+---
 
 ## Background
 
 - Designed live (see [the design document](https://docs.google.com/document/d/1YoMtmxC9b5bVoKzm7LxIQ2DxAr3bq84uruarrXFOgQQ/edit))
 - Developed hastily in three days (although there'll probably be minor improvements made in the future... 👀)
+
+---
 
 ## Building, running, testing
 
@@ -92,6 +110,8 @@ To bypass the same-message limitation on Twitch, add some garbage letters after 
   - Same as "building", but click "Run" in Godot
 - Testing
   - The project was made in 3 days, which already felt like a breakneck pace. You think there were time for tests? 😓
+
+---
 
 ## Credits
 
