@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Godot;
 using TwitchChat;
 using TwitchLib.PubSub.Events;
@@ -450,6 +451,7 @@ public partial class Arena : Node2D
 
     private void OnMessage(object sender, MessageEventArgs e)
     {
+        Regex regex = new Regex(@"^[rlu][-]?\d");
         var lowercaseMessage = e.Message.ToLower();
         if (lowercaseMessage.StartsWith("join"))
         {
@@ -481,6 +483,7 @@ public partial class Arena : Node2D
             || lowercaseMessage.Equals("ul")
             || lowercaseMessage.StartsWith("ur ")
             || lowercaseMessage.Equals("ur")
+            || regex.IsMatch(lowercaseMessage)
         )
         {
             /// Warning: the above list only exists until a List.Any is implemented for the check
