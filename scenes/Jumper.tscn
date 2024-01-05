@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://dn80vo65nle0y" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_jump_1.png" id="10_ac3fu"]
 [ext_resource type="Texture2D" uid="uid://cr7baxkpawx43" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_land_0.png" id="11_3fxgy"]
 [ext_resource type="Texture2D" uid="uid://de5vceaa85fe0" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_land_1.png" id="12_bwbvy"]
+[ext_resource type="Theme" uid="uid://nfhtrrji7j2u" path="res://scenes/Jumper.tres" id="16_fsbtc"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_1dd66"]
 animations = [{
@@ -84,9 +85,6 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6u5om"]
 size = Vector2(14, 26)
 
-[sub_resource type="LabelSettings" id="LabelSettings_wa6ai"]
-font_size = 10
-
 [node name="Jumper" type="CharacterBody2D"]
 collision_layer = 2
 script = ExtResource("1_jn4ug")
@@ -115,11 +113,18 @@ autoplay = "idle"
 position = Vector2(0, -13)
 shape = SubResource("RectangleShape2D_6u5om")
 
-[node name="Name" type="Label" parent="."]
-offset_left = -115.0
-offset_top = -45.0
-offset_right = 116.0
-offset_bottom = -30.0
-text = "Name"
-label_settings = SubResource("LabelSettings_wa6ai")
-horizontal_alignment = 1
+[node name="Node2D" type="Node2D" parent="."]
+position = Vector2(0, -55)
+scale = Vector2(0.3, 0.3)
+
+[node name="Name" type="RichTextLabel" parent="Node2D"]
+texture_filter = 2
+offset_left = -1328.0
+offset_top = -46.0
+offset_right = 1328.0
+offset_bottom = 115.0
+theme = ExtResource("16_fsbtc")
+theme_override_font_sizes/normal_font_size = 100
+bbcode_enabled = true
+text = "[center]Name New[/center]"
+scroll_active = false
