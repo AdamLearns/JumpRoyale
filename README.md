@@ -87,7 +87,7 @@ To bypass the same-message limitation on Twitch, add some garbage letters after 
   - Install [DotNet](https://dotnet.microsoft.com/en-us/download)
   - Install [Godot ≥4.2](https://godotengine.org/download/windows/)
   - Clone this repo
-  - Generate a twitch token for your twitch account: https://twitchtokengenerator.com/. You only need the scopes "chat:read" and "chat:edit" for now. Copy the **access token** and set it:
+  - Generate a twitch token for your twitch account: <https://twitchtokengenerator.com/>. You only need the scopes "chat:read" and "chat:edit" for now. Copy the **access token** and set it:
     - `cd JumpRoyale`
     - `dotnet user-secrets set twitch_access_token <your access token>`
     - `dotnet user-secrets set twitch_channel_name <your channel name>`
@@ -105,5 +105,5 @@ To bypass the same-message limitation on Twitch, add some garbage letters after 
 
 ## Credits
 
-- Characters: https://muchopixels.itch.io/character-animation-asset-pack
-- World: https://pixelfrog-assets.itch.io/pixel-adventure-1
+- Characters: <https://muchopixels.itch.io/character-animation-asset-pack>
+- World: <https://pixelfrog-assets.itch.io/pixel-adventure-1>
