@@ -8,7 +8,7 @@ public class JumpCommand : BaseChatCommand
     /// <summary>
     /// Angle extracted from the chat command. If there was no Angle provided in the arguments,
     /// it will default to `0` and be overridden internally, based on the command alias.
-    /// This value is clamped between `-90` and `90`
+    /// This value is clamped between `-90` and `90`.
     /// </summary>
     public int Angle { get; set; } = 0;
 
@@ -58,7 +58,7 @@ public class JumpCommand : BaseChatCommand
         /// first argument as Power, so we don't want to force the Angle to be present
         if (_fixedAngleCommands.Contains(Name))
         {
-            /// The default Angle value is always 0, so we will only assign the Angle if user
+            /// The default Angle value is always 0, so we will only assign the Angle if the user
             /// has actually provided something, otherwise jump at maximum power (100). At
             /// this point we can't have clamped angle, because we will lose 10 power
             Power = Angle != 0 ? Angle : 100;

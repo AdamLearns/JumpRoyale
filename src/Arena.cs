@@ -568,11 +568,11 @@ public partial class Arena : Node2D
 		jumper.CallDeferred(nameof(jumper.Jump), command.Angle, command.Power);
 	}
 
-    /// <summary>
-    /// Players are allowed to jump only if the game is still running or if there was at least
-    /// 5 seconds delay after the game has ended to prevent players from jumping off the
-    /// podium immediately due to stream delays or to just present the game winners
-    /// </summary>
+	/// <summary>
+	/// Players are allowed to jump only if the game is still running or if 5
+	/// seconds have passed since the game ended (that way players don't jump
+	/// off the podiums due to a stream delay)
+	/// </summary>
 	private bool IsAllowedToJump()
 	{
 		return _timeSinceGameEnd <= 0 || (DateTime.Now.Ticks - _timeSinceGameEnd) / TimeSpan.TicksPerMillisecond > 5000;
