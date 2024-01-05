@@ -9,7 +9,7 @@ public partial class LobbyOverlay : FlowContainer
 	[Signal]
 	public delegate void TimerDoneEventHandler();
 
-	private int lobbyTimer = 30;
+	private int lobbyTimer = 40;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
