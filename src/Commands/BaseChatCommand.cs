@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// Base class for chat commands that provide command name and argument storage. Commands
@@ -18,9 +19,60 @@ public abstract class BaseChatCommand
 
     public BaseChatCommand(string chatMessage)
     {
-        arguments = chatMessage.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+        arguments = splitArguments(chatMessage);
 
         Name = arguments[0].ToLower();
+    }
+
+    // split arguments, e.g. make "r-12" into ["r", "-12"]
+    public static string[] splitArguments(string chatMessage)
+    {
+        List<string> result = new();
+        string tmpWord = "";
+        bool wasLetter = false;
+        bool wasDigit = false;
+
+        foreach (char c in chatMessage)
+        {
+            if (char.IsLetter(c))
+            {
+                if (wasDigit)
+                {
+                    result.Add(tmpWord);
+                    tmpWord = "";
+                }
+                tmpWord += c;
+                wasLetter = true;
+                wasDigit = false;
+            }
+            else if (char.IsDigit(c) || c == '-')
+            {
+                if (wasLetter)
+                {
+                    result.Add(tmpWord);
+                    tmpWord = "";
+                }
+                tmpWord += c;
+                wasDigit = true;
+                wasLetter = false;
+            }
+            else
+            {
+                if (wasLetter || wasDigit)
+                {
+                    result.Add(tmpWord);
+                    tmpWord = "";
+                }
+                wasDigit = false;
+                wasLetter = false;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(tmpWord))
+        {
+            result.Add(tmpWord);
+        }
+        return result.ToArray();
     }
 
     /// <summary>
