@@ -55,7 +55,7 @@ internal class JumpCommand
 
         Angle = direction switch
         {
-            "jump" or "j" or "r" => Angle + 90,
+            "j" or "r" => Angle + 90,
             "l" => 90 - Angle,
             "u" => 90,
             "ul" => 60,
