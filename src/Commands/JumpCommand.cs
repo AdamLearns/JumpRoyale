@@ -58,7 +58,7 @@ internal class JumpCommand
             "jump" or "j" or "r" => Angle + 90,
             "l" => 90 - Angle,
             "u" => 90,
-            "ul" => 30,
+            "ul" => 60,
             "ur" => 120,
             _ => 90 /* fall back to upwards */
         };
