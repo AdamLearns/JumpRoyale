@@ -13,8 +13,7 @@ internal class ChatCommandParser
 
         Name = _arguments[0];
 
-        // We don't need the name in the arguments anymore, that way we have the arguments
-        // stored separately from the name
+        // We don't need the name in the arguments anymore
         _arguments.RemoveAt(0);
     }
 
@@ -31,7 +30,7 @@ internal class ChatCommandParser
             .ToList()
             .ForEach(argument =>
             {
-                int? parsedArgument = ParseToNumber(argument);
+                int? parsedArgument = ParseToNumberOrNull(argument);
 
                 if (parsedArgument is null)
                 {
@@ -44,11 +43,7 @@ internal class ChatCommandParser
         return arguments.ToArray();
     }
 
-    /// <summary>
-    /// Tries to convert the given string into a number
-    /// </summary>
-    /// <returns>`null` when the conversion failed, number on success</returns>
-    private static int? ParseToNumber(string test)
+    private static int? ParseToNumberOrNull(string test)
     {
         if (!int.TryParse(test, out int parsedNumber))
         {
