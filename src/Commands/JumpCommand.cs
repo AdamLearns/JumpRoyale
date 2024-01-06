@@ -27,7 +27,7 @@ internal class JumpCommand
 
     private readonly List<string> _fixedAngleDirections = new() { "u", "ur", "ul" };
 
-    public JumpCommand(string direction, int? angle, int? power)
+    internal JumpCommand(string direction, int? angle, int? power)
     {
         Angle = angle ?? 0;
         Power = power ?? 100;
