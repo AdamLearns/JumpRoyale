@@ -451,6 +451,9 @@ public partial class Arena : Node2D
     private void OnMessage(object sender, MessageEventArgs e)
     {
         var lowercaseMessage = e.Message.ToLower();
+
+        ChatCommandParser command = new(e.Message);
+
         if (lowercaseMessage.StartsWith("join"))
         {
             CallDeferred(nameof(AddPlayer), e.SenderId, e.SenderName, e.HexColor, e.IsPrivileged);
@@ -483,8 +486,12 @@ public partial class Arena : Node2D
             || lowercaseMessage.Equals("ur")
         )
         {
-            /// Warning: the above list only exists until a List.Any is implemented for the check
-            HandleJump(e);
+            // TODO: enumerate through command aliases rather than hardcoding the if check
+
+            /// We will interpret the arguments as: 0-Angle / 1-Power
+            int?[] arguments = command.ArgumentsAsNumbers();
+
+            HandleJump(e.SenderId, command.Name, arguments[0], arguments[1]);
         }
     }
 
@@ -549,12 +556,10 @@ public partial class Arena : Node2D
         jumper.SetCharacter(choice);
     }
 
-    private void HandleJump(MessageEventArgs e)
+    private void HandleJump(string jumperId, string direction, int? angle, int? jumpPower)
     {
-        string userId = e.SenderId;
-
         /// We don't have to go through the logic if the sender does not exist on the jumpers list
-        if (!_jumpers.ContainsKey(userId))
+        if (!_jumpers.ContainsKey(jumperId))
         {
             return;
         }
@@ -564,14 +569,9 @@ public partial class Arena : Node2D
             return;
         }
 
-        JumpCommand command = new(e.Message);
+        JumpCommand command = new(direction, angle, jumpPower);
 
-        if (!command.IsValid())
-        {
-            return;
-        }
-
-        Jumper jumper = _jumpers[userId];
+        Jumper jumper = _jumpers[jumperId];
 
         jumper.CallDeferred(nameof(jumper.Jump), command.Angle, command.Power);
     }
