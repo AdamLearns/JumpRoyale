@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 
-internal class CommandParser
+internal class ChatCommandParser
 {
     public string Name { get; private set; }
 
     private readonly List<string> _arguments = new();
 
-    internal CommandParser(string chatMessage)
+    internal ChatCommandParser(string chatMessage)
     {
         _arguments = ParseChatMessage(chatMessage);
 
