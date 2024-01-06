@@ -3,6 +3,8 @@ using System.Linq;
 
 internal class ChatCommandParser
 {
+    private const int MaxArguments = 2;
+
     public string Name { get; private set; }
 
     private readonly List<string> _arguments = new();
@@ -39,6 +41,12 @@ internal class ChatCommandParser
 
                 arguments.Add(parsedArgument);
             });
+
+        /// Pad the arguments list with nulls, to always have at least nullable arguments
+        if (arguments.Count < MaxArguments)
+        {
+            arguments.AddRange(Enumerable.Repeat<int?>(null, MaxArguments));
+        }
 
         return arguments.ToArray();
     }
