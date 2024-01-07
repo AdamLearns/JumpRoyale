@@ -454,6 +454,9 @@ public partial class Arena : Node2D
 
         ChatCommandParser command = new(e.Message);
 
+        string[] stringArguments = command.ArgumentsAsStrings();
+        int?[] numericArguments = command.ArgumentsAsNumbers();
+
         if (lowercaseMessage.StartsWith("join"))
         {
             CallDeferred(nameof(AddPlayer), e.SenderId, e.SenderName, e.HexColor, e.IsPrivileged);
@@ -470,28 +473,9 @@ public partial class Arena : Node2D
         {
             CallDeferred(nameof(HandleChangeCharacter), e.SenderId, lowercaseMessage);
         }
-        else if (
-            lowercaseMessage.StartsWith("jump")
-            || lowercaseMessage.StartsWith("j ")
-            || lowercaseMessage.Equals("j")
-            || lowercaseMessage.StartsWith("l ")
-            || lowercaseMessage.Equals("l")
-            || lowercaseMessage.StartsWith("r ")
-            || lowercaseMessage.Equals("r")
-            || lowercaseMessage.StartsWith("u ")
-            || lowercaseMessage.Equals("u")
-            || lowercaseMessage.StartsWith("ul ")
-            || lowercaseMessage.Equals("ul")
-            || lowercaseMessage.StartsWith("ur ")
-            || lowercaseMessage.Equals("ur")
-        )
+        else if (CommandAliasProvider.JumpCommandAliases.Any(alias => lowercaseMessage.StartsWith(alias)))
         {
-            // TODO: enumerate through command aliases rather than hardcoding the if check
-
-            /// We will interpret the arguments as: 0-Angle / 1-Power
-            int?[] arguments = command.ArgumentsAsNumbers();
-
-            HandleJump(e.SenderId, command.Name, arguments[0], arguments[1]);
+            HandleJump(e.SenderId, command.Name, numericArguments[0], numericArguments[1]);
         }
     }
 
