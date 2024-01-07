@@ -83,8 +83,8 @@ internal class ChatCommandParser
                 }
 
                 tmpWord += c;
-                wasLetter = true;
                 wasDigit = false;
+                wasLetter = true;
             }
             else if (char.IsDigit(c) || c == '-')
             {
