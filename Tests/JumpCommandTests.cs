@@ -118,8 +118,6 @@ namespace Tests
         /// Returns the processed Jump Command from the parsed chat command. The nullable is
         /// casted just for the sake of these tests
         /// </summary>
-        /// <param name="commandInput"></param>
-        /// <returns></returns>
         private static Tuple<JumpCommand, int[], string> GetJumpFromCommand(string commandInput)
         {
             ChatCommandParser command = new(commandInput);
