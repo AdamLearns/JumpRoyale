@@ -24,27 +24,19 @@ internal class ChatCommandParser
         return PadList(_arguments, null).ToArray();
     }
 
+    /// <summary>
+    /// Tries to parse detected arguments to numbers (or nulls) and returns them in a padded
+    /// array. The padding values are nulls for easier defaulting
+    /// </summary>
     public int?[] ArgumentsAsNumbers()
     {
-        List<int?> arguments = new();
+        List<int?> arguments = (
+            from argument in _arguments
+            let parsedArgument = ParseToNumberOrNull(argument)
+            select parsedArgument
+        ).ToList();
 
-        _arguments
-            .ToList()
-            .ForEach(argument =>
-            {
-                int? parsedArgument = ParseToNumberOrNull(argument);
-
-                if (parsedArgument is null)
-                {
-                    return;
-                }
-
-                arguments.Add(parsedArgument);
-            });
-
-        arguments = PadList(arguments, null);
-
-        return arguments.ToArray();
+        return PadList(arguments, null).ToArray();
     }
 
     private static int? ParseToNumberOrNull(string test)
@@ -124,11 +116,9 @@ internal class ChatCommandParser
             result.Add(tmpWord);
         }
 
-        /// The dummy argument is required in case nothing was detected, e.g. the user provided
-        /// something like ";" or any other non-letter and non-digit character. This is just
-        /// a failsafe to prevent out-of-bounds access in the constructor
-        if (result.Count == 0)
+        if (!result.Any())
         {
+            /// Just a failsafe in case nothing was caught and to have reference for Name
             result.Add("");
         }
 
