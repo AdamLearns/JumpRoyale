@@ -34,7 +34,7 @@ namespace Tests
         [CSTestFunction]
         public static Result CanFallbackToDefaults()
         {
-            List<string> commandInputs = new() { "j", "l", "r" };
+            List<string> commandInputs = new() { "j", "l", "r", "r r" };
 
             foreach (string input in commandInputs)
             {
@@ -63,7 +63,8 @@ namespace Tests
         [CSTestFunction]
         public static Result CanUseFixedAngle()
         {
-            List<string> commandInputs = new() { "u", "u45", "ll", "lll", "rr", "rr65", "rrr", "rrr 15", };
+            List<string> commandInputs =
+                new() { "u u", "u", "u45", "ll", "lll", "rr", "rr65", "rrr", "rrr 15", "ll50l" };
 
             foreach (string input in commandInputs)
             {
@@ -98,7 +99,7 @@ namespace Tests
         [CSTestFunction]
         public static Result CanAdjustPowerOfFixedAngleJumps()
         {
-            (JumpCommand jump, int[] arguments, string commandName) = GetJumpFromCommand("ll30");
+            (JumpCommand jump, _, _) = GetJumpFromCommand("ll30");
 
             if (jump.Power != 30)
             {
