@@ -106,7 +106,6 @@ namespace Tests
         /// This test ensures that when we send just a matching command, we won't get any
         /// extra arguments on the arguments list
         /// </summary>
-        /// <returns></returns>
         [CSTestFunction]
         public static Result CanPadStringArgumentsWithNulls()
         {
@@ -148,24 +147,54 @@ namespace Tests
         /// strings (just letters). For example, `glow` command can change the particle
         /// color and it takes Hex input from the user, which is a mixed type
         /// </summary>
-        /// <returns></returns>
         [CSTestFunction]
         public static Result CanExtractArgumentOfMixedType()
         {
-            List<string> expectedOutputs = new() { "09B0D9", "BDFF00" };
+            List<string> expectedOutputs = new() { "09B0D9", "BDFF00", "123456", "f02", "f02bc6" };
 
             foreach (string output in expectedOutputs)
             {
-                ChatCommandParser command = new($"glow {output}");
+                // Just test for both non-space and space
+                List<string> commandInputs = new() { $"glow {output}", $"glow{output}" };
 
-                string[] arguments = command.ArgumentsAsStrings();
-
-                if (arguments[0] != output)
+                foreach (string input in commandInputs)
                 {
-                    return new Result(
-                        false,
-                        $"Expected to extract ({output}), got ({arguments[0]}, {arguments[1]}) instead."
-                    );
+                    ChatCommandParser command = new(input);
+
+                    string[] arguments = command.ArgumentsAsStrings();
+
+                    if (arguments[0] != output)
+                    {
+                        return new Result(
+                            false,
+                            $"Expected to extract ({output}) from ({input}), got 1:({arguments[0]}) / 2:({arguments[1]}) instead."
+                        );
+                    }
+                }
+            }
+
+            return Result.Success;
+        }
+
+        [CSTestFunction]
+        public static Result RejectsInvalidGlowColors()
+        {
+            List<string> invalidColors = new() { "1234", "90 8da", "ffdd1", "v90909", "8888888", "l", "2" };
+
+            foreach (string color in invalidColors)
+            {
+                List<string> commandInputs = new() { $"glow {color}", $"glow{color}" };
+
+                foreach (string input in commandInputs)
+                {
+                    ChatCommandParser command = new(input);
+
+                    string[] arguments = command.ArgumentsAsStrings();
+
+                    if (arguments[0] is not null)
+                    {
+                        return new Result(false, $"Expected invalid glow to become null, ({arguments[0]}) given");
+                    }
                 }
             }
 
