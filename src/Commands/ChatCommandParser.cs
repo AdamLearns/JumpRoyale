@@ -21,7 +21,7 @@ internal class ChatCommandParser
 
     public string[] ArgumentsAsStrings()
     {
-        return _arguments.ToArray();
+        return PadList(_arguments, null).ToArray();
     }
 
     public int?[] ArgumentsAsNumbers()
@@ -42,11 +42,7 @@ internal class ChatCommandParser
                 arguments.Add(parsedArgument);
             });
 
-        /// Pad the arguments list with nulls, to always have at least nullable arguments
-        if (arguments.Count < MaxArguments)
-        {
-            arguments.AddRange(Enumerable.Repeat<int?>(null, MaxArguments));
-        }
+        arguments = PadList(arguments, null);
 
         return arguments.ToArray();
     }
@@ -59,6 +55,21 @@ internal class ChatCommandParser
         }
 
         return parsedNumber;
+    }
+
+    /// <summary>
+    /// Pad the arguments list with a filler (preferably a nullable), to always have nullable arguments
+    /// </summary>
+    /// <param name="list"></param>
+    /// <param name="padValue">"Filler" to add if the arguments count is below set Maximum</param>
+    private static List<T> PadList<T>(List<T> list, T padValue)
+    {
+        if (list.Count < MaxArguments)
+        {
+            list.AddRange(Enumerable.Repeat(padValue, MaxArguments));
+        }
+
+        return list;
     }
 
     private static List<string> ParseChatMessage(string chatMessage)
