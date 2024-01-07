@@ -19,7 +19,7 @@ public partial class TestResult : Control
     [Export]
     private VBoxContainer _methodList;
 
-    private List<(MethodResult, TestFunction)> _functions = new();
+    private readonly List<(MethodResult, TestFunction)> _functions = new();
     private string _typeNameStr;
 
     /// <inheritdoc/>
@@ -56,10 +56,7 @@ public partial class TestResult : Control
             numSuccess += function.Result.IsSuccess ? 1 : 0;
         }
 
-        _typeName.Text = string.Format(
-            TYPE_NAME_FORMAT,
-            _typeNameStr + $" ({numSuccess}/{_functions.Count})"
-        );
+        _typeName.Text = string.Format(TYPE_NAME_FORMAT, _typeNameStr + $" ({numSuccess}/{_functions.Count})");
         if (numSuccess == _functions.Count)
         {
             _typeName.Modulate = new Color(0, 1, 0);
