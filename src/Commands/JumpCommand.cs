@@ -25,7 +25,7 @@ internal class JumpCommand
         private set { _power = Math.Clamp(value, 1, 100); }
     }
 
-    private readonly List<string> _fixedAngleDirections = new() { "u", "ur", "ul" };
+    private readonly List<string> _fixedAngleDirections = new() { "u", "ll", "lll", "jj", "rr", "jjj", "rrr" };
 
     internal JumpCommand(string direction, int? angle, int? power)
     {
