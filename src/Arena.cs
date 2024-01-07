@@ -473,7 +473,7 @@ public partial class Arena : Node2D
         {
             CallDeferred(nameof(HandleChangeCharacter), e.SenderId, lowercaseMessage);
         }
-        else if (CommandAliasProvider.JumpCommandAliases.Any(alias => lowercaseMessage.StartsWith(alias)))
+        else if (CommandAliasProvider.JumpCommandAliases.Any(alias => command.Name.StartsWith(alias)))
         {
             HandleJump(e.SenderId, command.Name, numericArguments[0], numericArguments[1]);
         }
