@@ -58,8 +58,10 @@ internal class JumpCommand
             "j" or "r" => Angle + 90,
             "l" => 90 - Angle,
             "u" => 90,
-            "ul" => 60,
-            "ur" => 120,
+            "ll" => 60, /*           Warning:         */
+            "lll" => 30, /*            Experimental   */
+            "rr" or "jj" => 120, /*      Commands     */
+            "rrr" or "jjj" => 150, /*            :)   */
             _ => 90 /* fall back to upwards */
         };
 
