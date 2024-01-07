@@ -74,6 +74,7 @@ internal class ChatCommandParser
 
     private static List<string> ParseChatMessage(string chatMessage)
     {
+        // TODO: find a way to capture mixed values, like Hex (e.g. glow BDFF00)
         List<string> result = new();
         string tmpWord = "";
         bool wasLetter = false;
@@ -121,6 +122,14 @@ internal class ChatCommandParser
         if (!string.IsNullOrEmpty(tmpWord))
         {
             result.Add(tmpWord);
+        }
+
+        /// The dummy argument is required in case nothing was detected, e.g. the user provided
+        /// something like ";" or any other non-letter and non-digit character. This is just
+        /// a failsafe to prevent out-of-bounds access in the constructor
+        if (result.Count == 0)
+        {
+            result.Add("");
         }
 
         return result;
