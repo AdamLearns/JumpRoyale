@@ -64,8 +64,5 @@ internal class JumpCommand
             "rrr" or "jjj" => 150, /*            :)   */
             _ => 90 /* fall back to upwards */
         };
-
-        // TODO: Consider testing other fixed-angle commands: Dash Left / Right (dl/dr)
-        // Angle: 80 or 75
     }
 }
