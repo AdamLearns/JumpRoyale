@@ -177,7 +177,7 @@ namespace Tests
         }
 
         [CSTestFunction]
-        public static Result RejectsInvalidGlowColors()
+        public static Result CanRejectInvalidGlowColors()
         {
             List<string> invalidColors = new() { "1234", "90 8da", "ffdd1", "v90909", "8888888", "l", "2" };
 
