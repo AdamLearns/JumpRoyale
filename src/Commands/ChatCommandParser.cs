@@ -69,45 +69,36 @@ internal class ChatCommandParser
         // TODO: find a way to capture mixed values, like Hex (e.g. glow BDFF00)
         List<string> result = new();
         string tmpWord = "";
-        bool wasLetter = false;
         bool wasDigit = false;
+        bool wasLetter = false;
+
+        void HandleNextLetter(char? letter, bool condition, bool ifWasDigit, bool ifWasLetter)
+        {
+            if (condition)
+            {
+                result.Add(tmpWord);
+
+                tmpWord = "";
+            }
+
+            tmpWord += letter;
+            wasDigit = ifWasDigit;
+            wasLetter = ifWasLetter;
+        }
 
         foreach (char c in chatMessage)
         {
             if (char.IsLetter(c))
             {
-                if (wasDigit)
-                {
-                    result.Add(tmpWord);
-                    tmpWord = "";
-                }
-
-                tmpWord += c;
-                wasDigit = false;
-                wasLetter = true;
+                HandleNextLetter(c, wasDigit, false, true);
             }
             else if (char.IsDigit(c) || c == '-')
             {
-                if (wasLetter)
-                {
-                    result.Add(tmpWord);
-                    tmpWord = "";
-                }
-
-                tmpWord += c;
-                wasDigit = true;
-                wasLetter = false;
+                HandleNextLetter(c, wasLetter, true, false);
             }
             else
             {
-                if (wasLetter || wasDigit)
-                {
-                    result.Add(tmpWord);
-                    tmpWord = "";
-                }
-
-                wasDigit = false;
-                wasLetter = false;
+                HandleNextLetter(null, wasLetter || wasDigit, false, false);
             }
         }
 
