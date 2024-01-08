@@ -168,9 +168,10 @@ Tests fail, with the following returns:
 - or when Exception was thrown somewhere
 
 > [!caution]
-> Unfortunately, if any of the tests throws an exception, it won't get caught and you will be left with a vague message:
-> ![exception](https://gist.github.com/assets/7021295/354a7763-9fbf-4578-a6ef-e472113f862a)
+> Unfortunately, if any of the tests throws an exception, it won't get caught and you will be left with a vague message (screenshot below)
 > Mono exceptions are not logged, the suggestion is to print errors instead (thanks, Godot)
+
+![exception](https://gist.github.com/assets/7021295/354a7763-9fbf-4578-a6ef-e472113f862a)
 
 #### Running Tests
 
