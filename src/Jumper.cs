@@ -15,6 +15,9 @@ public partial class Jumper : CharacterBody2D
 
     public PlayerData playerData;
 
+    private Timer _fontVisibilityTimer;
+    private ulong _fontVisibilityTimerStartTime;
+
     public void Init(int x, int y, string userName, PlayerData playerData)
     {
         Position = new Vector2(x, y);
@@ -97,8 +100,54 @@ public partial class Jumper : CharacterBody2D
             _jumpVelocity.Y = Mathf.Sin(Mathf.DegToRad(angle + 180));
             _jumpVelocity = _jumpVelocity.Normalized() * (float)normalizedPower;
             playerData.NumJumps++;
+            setNameTransparency(1f);
         }
+        setupTimer();
     }
+
+    private void setupTimer()
+    {
+        // how long until the text disappears completely:
+        const ulong totalTimeMs = 10000;
+        const float maxSteps = 50f;
+        this._fontVisibilityTimerStartTime = Time.GetTicksMsec();
+
+        GetNode<RichTextLabel>(NameNodeName).Visible = true;
+        if (this._fontVisibilityTimer != null)
+        {
+            this.RemoveChild(this._fontVisibilityTimer);
+        }
+        this._fontVisibilityTimer = new()
+        {
+            WaitTime = totalTimeMs / 1000f / maxSteps,
+            OneShot = false,
+            Autostart = false
+        };
+        _fontVisibilityTimer.Timeout += () =>
+        {
+            ulong now = Time.GetTicksMsec();
+            ulong diffMs = now - this._fontVisibilityTimerStartTime;
+            float color = 0f;
+            float diff = (float)diffMs / (float)totalTimeMs;
+
+            if (diffMs >= totalTimeMs)
+            {
+                color = 0f;
+                _fontVisibilityTimer.Stop();
+            }
+            else
+            {
+                color = 1 - diff;
+            }
+            GD.Print(string.Format("timer: now={0}, diffMs={1}; diff/total={2}; color={3}", now, diffMs, diff, color));
+            setNameTransparency(color);
+        };
+        this.AddChild(_fontVisibilityTimer);
+        _fontVisibilityTimer.Start();
+    }
+
+    private void setNameTransparency(float alpha) =>
+        GetNode<RichTextLabel>(NameNodeName).Modulate = new Color(1, 1, 1, alpha);
 
     public void SetColor(string hexColor)
     {
