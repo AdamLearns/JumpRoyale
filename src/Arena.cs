@@ -542,12 +542,6 @@ public partial class Arena : Node2D
 
     private void HandleJump(string jumperId, string direction, int? angle, int? jumpPower)
     {
-        /// We don't have to go through the logic if the sender does not exist on the jumpers list
-        if (!_jumpers.ContainsKey(jumperId))
-        {
-            return;
-        }
-
         if (!IsAllowedToJump())
         {
             return;
