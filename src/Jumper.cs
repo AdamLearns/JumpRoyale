@@ -87,6 +87,8 @@ public partial class Jumper : CharacterBody2D
         Jump(rng.RandiRange(45, 135), rng.RandiRange(10, 100));
     }
 
+    private bool _lastJumpZeroAngle = false;
+
     public void Jump(int angle, int power)
     {
         if (IsOnFloor())
@@ -97,6 +99,7 @@ public partial class Jumper : CharacterBody2D
             _jumpVelocity.Y = Mathf.Sin(Mathf.DegToRad(angle + 180));
             _jumpVelocity = _jumpVelocity.Normalized() * (float)normalizedPower;
             playerData.NumJumps++;
+            _lastJumpZeroAngle = angle == 90; // 0 in the command is expressed here as 90.
         }
     }
 
@@ -126,7 +129,10 @@ public partial class Jumper : CharacterBody2D
         if (_jumpVelocity != Vector2.Zero)
         {
             velocity = _jumpVelocity;
-            sprite.FlipH = velocity.X < 0;
+            if (!this._lastJumpZeroAngle)
+            {
+                sprite.FlipH = velocity.X < 0;
+            }
             _jumpVelocity = Vector2.Zero;
         }
 
