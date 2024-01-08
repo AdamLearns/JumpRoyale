@@ -115,16 +115,15 @@ shape = SubResource("RectangleShape2D_6u5om")
 
 [node name="Node2D" type="Node2D" parent="."]
 position = Vector2(0, -55)
-scale = Vector2(0.3, 0.3)
 
 [node name="Name" type="RichTextLabel" parent="Node2D"]
 texture_filter = 2
 offset_left = -1328.0
-offset_top = -46.0
+offset_top = -14.0
 offset_right = 1328.0
-offset_bottom = 115.0
+offset_bottom = 140.0
 theme = ExtResource("16_fsbtc")
-theme_override_font_sizes/normal_font_size = 100
+theme_override_font_sizes/normal_font_size = 24
 bbcode_enabled = true
-text = "[center]Name New[/center]"
+text = "[center]Name g New[/center]"
 scroll_active = false
