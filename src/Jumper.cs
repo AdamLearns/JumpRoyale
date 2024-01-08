@@ -139,7 +139,6 @@ public partial class Jumper : CharacterBody2D
             {
                 color = 1 - diff;
             }
-            GD.Print(string.Format("timer: now={0}, diffMs={1}; diff/total={2}; color={3}", now, diffMs, diff, color));
             setNameTransparency(color);
         };
         this.AddChild(_fontVisibilityTimer);
@@ -148,6 +147,12 @@ public partial class Jumper : CharacterBody2D
 
     private void setNameTransparency(float alpha) =>
         GetNode<RichTextLabel>(NameNodeName).Modulate = new Color(1, 1, 1, alpha);
+
+    public void disableTimer()
+    {
+        _fontVisibilityTimer.Stop();
+        setNameTransparency(1f);
+    }
 
     public void SetColor(string hexColor)
     {
