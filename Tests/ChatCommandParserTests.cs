@@ -47,7 +47,7 @@ namespace Tests
         }
 
         /// <summary>
-        /// This tests ensures that both command formats work, where the initial space is omitted
+        /// This test ensures that both command formats work, where the initial space is omitted
         /// and the argument is extracted properly
         /// </summary>
         [CSTestFunction]
