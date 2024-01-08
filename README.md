@@ -171,7 +171,7 @@ Tests fail, with the following returns:
 > Unfortunately, if any of the tests throws an exception, it won't get caught and you will be left with a vague message (screenshot below)
 > Mono exceptions are not logged, the suggestion is to print errors instead (thanks, Godot)
 
-![exception](https://gist.github.com/assets/7021295/354a7763-9fbf-4578-a6ef-e472113f862a)
+![exception](https://github.com/DarkStoorM/JumpRoyale/assets/7021295/28fc2adf-ca5f-46c5-80ff-197071591117)
 
 #### Running Tests
 
