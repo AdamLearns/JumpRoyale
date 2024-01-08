@@ -450,32 +450,54 @@ public partial class Arena : Node2D
 
     private void OnMessage(object sender, MessageEventArgs e)
     {
-        var lowercaseMessage = e.Message.ToLower();
-
-        ChatCommandParser command = new(e.Message);
+        ChatCommandParser command = new(e.Message.ToLower());
 
         string[] stringArguments = command.ArgumentsAsStrings();
         int?[] numericArguments = command.ArgumentsAsNumbers();
 
-        if (lowercaseMessage.StartsWith("join"))
+        // TODO: restructure command method arguments!
+
+        /// Join is the only command, that can be executed by everyone, whether joined or not.
+        /// All the remaining commands are only available to those who joined the game
+        if (CommandAliasProvider.MatchesJoinCommand(command.Name))
         {
             CallDeferred(nameof(AddPlayer), e.SenderId, e.SenderName, e.HexColor, e.IsPrivileged);
+            return;
         }
-        else if (lowercaseMessage.StartsWith("glow"))
+
+        if (!_jumpers.ContainsKey(e.SenderId))
         {
-            CallDeferred(nameof(HandleGlow), e.SenderId, lowercaseMessage, e.HexColor, e.IsPrivileged);
+            return;
         }
-        else if (lowercaseMessage.StartsWith("unglow"))
+
+        /// Important: when working with Aliases that collide with each other, remember to use the
+        /// proper order, e.g. Jump has `u` alias, and `unglow` would match it if it was first
+        /// on the cases list. Ultimately, there should be exact command name match instead
+        switch (command.Name)
         {
-            CallDeferred(nameof(HandleUnglow), e.SenderId);
-        }
-        else if (lowercaseMessage.StartsWith("char"))
-        {
-            CallDeferred(nameof(HandleChangeCharacter), e.SenderId, lowercaseMessage);
-        }
-        else if (CommandAliasProvider.JumpCommandAliases.Any(alias => command.Name.StartsWith(alias)))
-        {
-            HandleJump(e.SenderId, command.Name, numericArguments[0], numericArguments[1]);
+            #region Commands For Everyone
+
+            case string name when CommandAliasProvider.MatchesUnglowCommand(command.Name):
+                CallDeferred(nameof(HandleUnglow), e.SenderId);
+                break;
+
+            case string name when CommandAliasProvider.MatchesJumpCommand(command.Name):
+                HandleJump(e.SenderId, command.Name, numericArguments[0], numericArguments[1]);
+                break;
+
+            case string name when CommandAliasProvider.MatchesCharacterChangeCommand(command.Name):
+                CallDeferred(nameof(HandleChangeCharacter), e.SenderId, command.Name);
+                break;
+
+            #endregion
+
+            #region Commands For Mods, VIPs, Subs
+
+            case string name when CommandAliasProvider.MatchesGlowCommand(command.Name, e.IsPrivileged):
+                CallDeferred(nameof(HandleGlow), e.SenderId, command.Name, e.HexColor, e.IsPrivileged);
+                break;
+
+            #endregion
         }
     }
 
