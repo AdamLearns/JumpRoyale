@@ -494,27 +494,20 @@ public partial class Arena : Node2D
             #region Commands For Mods, VIPs, Subs
 
             case string name when CommandAliasProvider.MatchesGlowCommand(command.Name, e.IsPrivileged):
-                CallDeferred(nameof(HandleGlow), command.Name, e.HexColor);
+                CallDeferred(nameof(HandleGlow), e.SenderId, stringArguments[0], e.HexColor);
                 break;
 
             #endregion
         }
     }
 
-    private void HandleGlow(string senderId, string message, string hexColor)
+    private void HandleGlow(string senderId, string userHexColor, string twitchChatHexColor)
     {
+        string glowColor = userHexColor is not null ? userHexColor : twitchChatHexColor;
+
         Jumper jumper = _jumpers[senderId];
 
-        string[] parts = message.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-
-        if (parts.Length == 1)
-        {
-            jumper.SetGlow(hexColor);
-        }
-        else
-        {
-            jumper.SetGlow(parts[1]);
-        }
+        jumper.SetGlow(glowColor);
     }
 
     private void HandleUnglow(string userId)
