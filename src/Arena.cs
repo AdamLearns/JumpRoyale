@@ -494,20 +494,15 @@ public partial class Arena : Node2D
             #region Commands For Mods, VIPs, Subs
 
             case string name when CommandAliasProvider.MatchesGlowCommand(command.Name, e.IsPrivileged):
-                CallDeferred(nameof(HandleGlow), e.SenderId, command.Name, e.HexColor, e.IsPrivileged);
+                CallDeferred(nameof(HandleGlow), e.SenderId, command.Name, e.HexColor);
                 break;
 
             #endregion
         }
     }
 
-    private void HandleGlow(string senderId, string message, string hexColor, bool isPrivileged)
+    private void HandleGlow(string senderId, string message, string hexColor)
     {
-        if (!isPrivileged)
-        {
-            return;
-        }
-
         var userId = senderId;
         if (!_jumpers.ContainsKey(userId))
         {
