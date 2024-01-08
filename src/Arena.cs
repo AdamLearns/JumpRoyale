@@ -456,6 +456,7 @@ public partial class Arena : Node2D
         int?[] numericArguments = command.ArgumentsAsNumbers();
 
         // TODO: restructure command method arguments!
+        // TODO: move deferred calls to the commands instead to allow passing nullables
 
         /// Join is the only command, that can be executed by everyone, whether joined or not.
         /// All the remaining commands are only available to those who joined the game
