@@ -384,17 +384,25 @@ public partial class Arena : Node2D
             var playerData = jumper.playerData;
             playerData.NumPlays++;
             playerData.TotalHeightAchieved += GetHeightFromYPosition(jumper.Position.Y);
+            var showName = false;
             if (winners.Length > 0 && winners[0] == playerData.UserId)
             {
                 playerData.Num1stPlaceWins++;
+                showName = true;
             }
             else if (winners.Length > 1 && winners[1] == playerData.UserId)
             {
                 playerData.Num2ndPlaceWins++;
+                showName = true;
             }
             else if (winners.Length > 2 && winners[2] == playerData.UserId)
             {
                 playerData.Num3rdPlaceWins++;
+                showName = true;
+            }
+            if (showName)
+            {
+                jumper.disableTimer();
             }
         }
 
@@ -649,6 +657,10 @@ public partial class Arena : Node2D
                     ? DisplayServer.WindowMode.Maximized
                     : DisplayServer.WindowMode.Fullscreen
             );
+        }
+        if (Input.IsPhysicalKeyPressed(Key.W) && Input.IsPhysicalKeyPressed(Key.Ctrl))
+        {
+            this.OnGameTimerDone();
         }
     }
 
