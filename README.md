@@ -174,6 +174,14 @@ Tests fail, with the following returns:
 
 #### Running Tests
 
+- build the project
+- click `Load Tests`
+- click `Run`
+
+![testing](https://github.com/DarkStoorM/JumpRoyale/assets/7021295/f1ec0fd9-c0c3-4faf-a2f4-7cee04c4e897)
+
+![results](https://github.com/DarkStoorM/JumpRoyale/assets/7021295/01765824-814c-4158-8e29-519ea1620d6a)
+
 ---
 
 ## Credits
