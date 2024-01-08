@@ -512,12 +512,8 @@ public partial class Arena : Node2D
 
     private void HandleUnglow(string userId)
     {
-        if (!_jumpers.ContainsKey(userId))
-        {
-            return;
-        }
-
         Jumper jumper = _jumpers[userId];
+
         jumper.DisableGlow();
     }
 
