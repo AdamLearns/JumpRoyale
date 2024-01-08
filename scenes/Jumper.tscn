@@ -116,6 +116,8 @@ shape = SubResource("RectangleShape2D_6u5om")
 [node name="Node2D" type="Node2D" parent="."]
 position = Vector2(0, -55)
 
+[node name="TextVisibleTimer" type="Timer" parent="Node2D"]
+
 [node name="Name" type="RichTextLabel" parent="Node2D"]
 texture_filter = 2
 offset_left = -1328.0
