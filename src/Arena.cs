@@ -519,11 +519,6 @@ public partial class Arena : Node2D
 
     private void HandleChangeCharacter(string userId, string message)
     {
-        if (!_jumpers.ContainsKey(userId))
-        {
-            return;
-        }
-
         RandomNumberGenerator rng = new RandomNumberGenerator();
         int choice = rng.RandiRange(1, 18);
 
