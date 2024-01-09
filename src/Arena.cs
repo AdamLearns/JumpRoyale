@@ -132,11 +132,9 @@ public partial class Arena : Node2D
         jumper.DisableGlow();
     }
 
-    private static void HandleChangeCharacter(Jumper jumper, int? userChoice)
+    private void HandleChangeCharacter(Jumper jumper, int? userChoice)
     {
-        RandomNumberGenerator rng = new RandomNumberGenerator();
-
-        int choice = userChoice ?? rng.RandiRange(1, 18);
+        int choice = userChoice ?? _rng.RandiRange(1, 18);
 
         choice = Math.Clamp(choice, 1, 18);
 
@@ -161,7 +159,7 @@ public partial class Arena : Node2D
     {
         var background = GetNode<Sprite2D>("Background");
         var colors = new string[] { "Blue", "Brown", "Gray", "Green", "Pink", "Purple", "Yellow" };
-        var color = colors[new RandomNumberGenerator().RandiRange(0, colors.Length - 1)];
+        var color = colors[_rng.RandiRange(0, colors.Length - 1)];
         background.Texture = ResourceLoader.Load<Texture2D>($"res://assets/sprites/backgrounds/{color}.png");
     }
 
@@ -255,9 +253,8 @@ public partial class Arena : Node2D
         int platformEndY = _ceilingHeight + 4;
         for (int y = platformStartY; y >= platformEndY; y--)
         {
-            RandomNumberGenerator rng = new RandomNumberGenerator();
-            int width = rng.RandiRange(3, 15);
-            int startX = rng.RandiRange(2, _widthInTiles - width - 2);
+            int width = _rng.RandiRange(3, 15);
+            int startX = _rng.RandiRange(2, _widthInTiles - width - 2);
             AddPlatform(startX, y, width);
         }
 
@@ -269,22 +266,21 @@ public partial class Arena : Node2D
             float difficultyFactor = (float)Math.Min(0, y) / lowestY;
 
             // Rarely, make a solid block to add some variety
-            RandomNumberGenerator rng = new RandomNumberGenerator();
-            int r = rng.RandiRange(0, 100);
+            int r = _rng.RandiRange(0, 100);
             if (r < 6 + difficultyFactor * 40)
             {
                 int blockWidth = 2 + (int)(difficultyFactor * 24);
-                int blockX = rng.RandiRange(2, _widthInTiles - 1 - blockWidth);
+                int blockX = _rng.RandiRange(2, _widthInTiles - 1 - blockWidth);
                 DrawRectangleOfTiles(blockX, y + 1, blockWidth, blockWidth, new Vector2I(12, 1));
             }
 
-            r = rng.RandiRange(0, 100);
+            r = _rng.RandiRange(0, 100);
             if (r > (70 - difficultyFactor * 60))
             {
                 continue;
             }
-            int width = rng.RandiRange(3, 15 - (int)Math.Round(6 * difficultyFactor));
-            int startX = rng.RandiRange(2, _widthInTiles - width - 2);
+            int width = _rng.RandiRange(3, 15 - (int)Math.Round(6 * difficultyFactor));
+            int startX = _rng.RandiRange(2, _widthInTiles - width - 2);
             AddPlatform(startX, y, width);
         }
 
@@ -345,7 +341,6 @@ public partial class Arena : Node2D
             }
         }
 
-        var rng = new RandomNumberGenerator();
         var viewport = GetViewportRect();
         var xPadding = 100;
 
@@ -355,8 +350,8 @@ public partial class Arena : Node2D
             var jumper = _jumpers.ElementAt(i).Value;
 
             jumper.Position = new Vector2(
-                rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding),
-                rng.RandiRange((int)(viewport.Size.Y / 2), (int)viewport.Size.Y - 100)
+                _rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding),
+                _rng.RandiRange((int)(viewport.Size.Y / 2), (int)viewport.Size.Y - 100)
             );
             jumper.Scale = new Vector2(1, 1);
             jumper.Velocity = new Vector2(0, 0);
