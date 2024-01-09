@@ -63,6 +63,98 @@ public partial class Arena : Node2D
         LoadPlayerData();
     }
 
+    private void HandleCommands(string message, string senderId, string senderName, string hexColor, bool isPrivileged)
+    {
+        ChatCommandParser command = new(message.ToLower());
+
+        string[] stringArguments = command.ArgumentsAsStrings();
+        int?[] numericArguments = command.ArgumentsAsNumbers();
+
+        // Join is the only command, that can be executed by everyone, whether joined or not.
+        // All the remaining commands are only available to those who joined the game
+        if (CommandAliasProvider.MatchesJoinCommand(command.Name))
+        {
+            AddPlayer(senderId, senderName, hexColor, isPrivileged);
+            return;
+        }
+
+        if (!_jumpers.ContainsKey(senderId))
+        {
+            return;
+        }
+
+        Jumper jumper = _jumpers[senderId];
+
+        // Important: when working with Aliases that collide with each other, remember to use the
+        // proper order, e.g. Jump has `u` alias, and it would match `unglow` if it was first
+        // on the cases list. Ultimately, there should be exact command name match instead
+        switch (command.Name)
+        {
+            #region Commands For Everyone (active)
+
+            case string when CommandAliasProvider.MatchesUnglowCommand(command.Name):
+                HandleUnglow(jumper);
+                break;
+
+            case string when CommandAliasProvider.MatchesJumpCommand(command.Name):
+                HandleJump(jumper, command.Name, numericArguments[0], numericArguments[1]);
+                break;
+
+            case string when CommandAliasProvider.MatchesCharacterChangeCommand(command.Name):
+                HandleChangeCharacter(jumper, numericArguments[0]);
+                break;
+
+            #endregion
+
+            #region Commands For Mods, VIPs, Subs
+
+            case string when CommandAliasProvider.MatchesGlowCommand(command.Name, isPrivileged):
+                HandleGlow(jumper, stringArguments[0], hexColor);
+                break;
+
+            #endregion
+        }
+    }
+
+    #region Command Handles
+
+    private static void HandleGlow(Jumper jumper, string userHexColor, string twitchChatHexColor)
+    {
+        string glowColor = userHexColor is not null ? userHexColor : twitchChatHexColor;
+
+        jumper.SetGlow(glowColor);
+    }
+
+    private static void HandleUnglow(Jumper jumper)
+    {
+        jumper.DisableGlow();
+    }
+
+    private static void HandleChangeCharacter(Jumper jumper, int? userChoice)
+    {
+        RandomNumberGenerator rng = new RandomNumberGenerator();
+
+        int choice = userChoice ?? rng.RandiRange(1, 18);
+
+        choice = Math.Clamp(choice, 1, 18);
+
+        jumper.SetCharacter(choice);
+    }
+
+    private void HandleJump(Jumper jumper, string direction, int? angle, int? jumpPower)
+    {
+        if (!IsAllowedToJump())
+        {
+            return;
+        }
+
+        JumpCommand command = new(direction, angle, jumpPower);
+
+        jumper.Jump(command.Angle, command.Power);
+    }
+
+    #endregion
+
     private void SetBackground()
     {
         var background = GetNode<Sprite2D>("Background");
@@ -450,93 +542,10 @@ public partial class Arena : Node2D
 
     private void OnMessage(object sender, MessageEventArgs e)
     {
-        ChatCommandParser command = new(e.Message.ToLower());
-
-        string[] stringArguments = command.ArgumentsAsStrings();
-        int?[] numericArguments = command.ArgumentsAsNumbers();
-
-        // TODO: restructure command method arguments!
-        // TODO: move deferred calls to the commands instead to allow passing nullables
-
-        /// Join is the only command, that can be executed by everyone, whether joined or not.
-        /// All the remaining commands are only available to those who joined the game
-        if (CommandAliasProvider.MatchesJoinCommand(command.Name))
-        {
-            CallDeferred(nameof(AddPlayer), e.SenderId, e.SenderName, e.HexColor, e.IsPrivileged);
-            return;
-        }
-
-        if (!_jumpers.ContainsKey(e.SenderId))
-        {
-            return;
-        }
-
-        Jumper jumper = _jumpers[e.SenderId];
-
-        /// Important: when working with Aliases that collide with each other, remember to use the
-        /// proper order, e.g. Jump has `u` alias, and it would match `unglow` if it was first
-        /// on the cases list. Ultimately, there should be exact command name match instead
-        switch (command.Name)
-        {
-            #region Commands For Everyone
-
-            case string when CommandAliasProvider.MatchesUnglowCommand(command.Name):
-                HandleUnglow(jumper);
-                break;
-
-            case string when CommandAliasProvider.MatchesJumpCommand(command.Name):
-                HandleJump(jumper, command.Name, numericArguments[0], numericArguments[1]);
-                break;
-
-            case string when CommandAliasProvider.MatchesCharacterChangeCommand(command.Name):
-                HandleChangeCharacter(jumper, numericArguments[0]);
-                break;
-
-            #endregion
-
-            #region Commands For Mods, VIPs, Subs
-
-            case string when CommandAliasProvider.MatchesGlowCommand(command.Name, e.IsPrivileged):
-                HandleGlow(jumper, stringArguments[0], e.HexColor);
-                break;
-
-            #endregion
-        }
-    }
-
-    private void HandleGlow(Jumper jumper, string userHexColor, string twitchChatHexColor)
-    {
-        string glowColor = userHexColor is not null ? userHexColor : twitchChatHexColor;
-
-        jumper.CallDeferred(nameof(jumper.SetGlow), glowColor);
-    }
-
-    private void HandleUnglow(Jumper jumper)
-    {
-        jumper.CallDeferred(nameof(jumper.DisableGlow));
-    }
-
-    private void HandleChangeCharacter(Jumper jumper, int? userChoice)
-    {
-        RandomNumberGenerator rng = new RandomNumberGenerator();
-
-        int choice = userChoice ?? rng.RandiRange(1, 18);
-
-        choice = Math.Clamp(choice, 1, 18);
-
-        jumper.CallDeferred(nameof(jumper.SetCharacter), choice);
-    }
-
-    private void HandleJump(Jumper jumper, string direction, int? angle, int? jumpPower)
-    {
-        if (!IsAllowedToJump())
-        {
-            return;
-        }
-
-        JumpCommand command = new(direction, angle, jumpPower);
-
-        jumper.CallDeferred(nameof(jumper.Jump), command.Angle, command.Power);
+        // This is kind of a workaround for now to have a top level Defer and be able to pass
+        // objects around inside, which just can't be converted to Godot's Variant. We
+        // still have pull the required data separately, because `e` is an object :(
+        CallDeferred(nameof(HandleCommands), e.Message, e.SenderId, e.SenderName, e.HexColor, e.IsPrivileged);
     }
 
     /// <summary>
