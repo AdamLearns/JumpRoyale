@@ -65,6 +65,14 @@ public partial class Arena : Node2D
         LoadPlayerData();
     }
 
+    private void OnMessage(object sender, MessageEventArgs e)
+    {
+        // This is kind of a workaround for now to have a top level Defer and be able to pass
+        // objects around inside, which just can't be converted to Godot's Variant. We
+        // still have pull the required data separately, because `e` is an object :(
+        CallDeferred(nameof(HandleCommands), e.Message, e.SenderId, e.SenderName, e.HexColor, e.IsPrivileged);
+    }
+
     private void HandleCommands(string message, string senderId, string senderName, string hexColor, bool isPrivileged)
     {
         ChatCommandParser command = new(message.ToLower());
@@ -154,6 +162,18 @@ public partial class Arena : Node2D
     }
 
     #endregion
+
+
+
+    /// <summary>
+    /// Players are allowed to jump only if the game is still running or if 5
+    /// seconds have passed since the game ended (that way players don't jump
+    /// off the podiums due to a stream delay)
+    /// </summary>
+    private bool IsAllowedToJump()
+    {
+        return _timeSinceGameEnd <= 0 || (DateTime.Now.Ticks - _timeSinceGameEnd) / TimeSpan.TicksPerMillisecond > 5000;
+    }
 
     private void SetBackground()
     {
@@ -535,24 +555,6 @@ public partial class Arena : Node2D
                 break;
             }
         }
-    }
-
-    private void OnMessage(object sender, MessageEventArgs e)
-    {
-        // This is kind of a workaround for now to have a top level Defer and be able to pass
-        // objects around inside, which just can't be converted to Godot's Variant. We
-        // still have pull the required data separately, because `e` is an object :(
-        CallDeferred(nameof(HandleCommands), e.Message, e.SenderId, e.SenderName, e.HexColor, e.IsPrivileged);
-    }
-
-    /// <summary>
-    /// Players are allowed to jump only if the game is still running or if 5
-    /// seconds have passed since the game ended (that way players don't jump
-    /// off the podiums due to a stream delay)
-    /// </summary>
-    private bool IsAllowedToJump()
-    {
-        return _timeSinceGameEnd <= 0 || (DateTime.Now.Ticks - _timeSinceGameEnd) / TimeSpan.TicksPerMillisecond > 5000;
     }
 
     private void AddPlayer(string userId, string userName, string hexColor, bool isPrivileged)
