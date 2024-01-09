@@ -46,6 +46,8 @@ public partial class Arena : Node2D
 
     private AllPlayerData _allPlayerData = new AllPlayerData();
 
+    private RandomNumberGenerator _rng = new();
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
@@ -565,12 +567,12 @@ public partial class Arena : Node2D
             return;
         }
 
-        RandomNumberGenerator rng = new RandomNumberGenerator();
-        int randomCharacterChoice = rng.RandiRange(1, 18);
+        int randomCharacterChoice = _rng.RandiRange(1, 18);
 
-        var playerData = _allPlayerData.players.ContainsKey(userId)
+        PlayerData playerData = _allPlayerData.players.ContainsKey(userId)
             ? _allPlayerData.players[userId]
             : new PlayerData(hexColor, randomCharacterChoice);
+
         _allPlayerData.players[userId] = playerData;
 
         // Even if the player already existed, we may need to update their name.
@@ -583,11 +585,14 @@ public partial class Arena : Node2D
         }
 
         Jumper jumper = JumperScene.Instantiate() as Jumper;
+        Rect2 viewport = GetViewportRect();
         int tileHeight = TileSetToUse.TileSize.Y;
-        var viewport = GetViewportRect();
-        int y = ((int)(viewport.Size.Y / tileHeight) - 1 - WallHeight) * tileHeight;
         int xPadding = TileSetToUse.TileSize.X * 3;
-        jumper.Init(rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding), y, userName, playerData);
+        int x = _rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding);
+        int y = ((int)(viewport.Size.Y / tileHeight) - 1 - WallHeight) * tileHeight;
+
+        jumper.Init(x, y, userName, playerData);
+
         AddChild(jumper);
 
         _jumpers.Add(userId, jumper);
