@@ -471,6 +471,8 @@ public partial class Arena : Node2D
             return;
         }
 
+        Jumper jumper = _jumpers[e.SenderId];
+
         /// Important: when working with Aliases that collide with each other, remember to use the
         /// proper order, e.g. Jump has `u` alias, and it would match `unglow` if it was first
         /// on the cases list. Ultimately, there should be exact command name match instead
@@ -479,15 +481,15 @@ public partial class Arena : Node2D
             #region Commands For Everyone
 
             case string when CommandAliasProvider.MatchesUnglowCommand(command.Name):
-                HandleUnglow(e.SenderId);
+                HandleUnglow(jumper);
                 break;
 
             case string when CommandAliasProvider.MatchesJumpCommand(command.Name):
-                HandleJump(e.SenderId, command.Name, numericArguments[0], numericArguments[1]);
+                HandleJump(jumper, command.Name, numericArguments[0], numericArguments[1]);
                 break;
 
             case string when CommandAliasProvider.MatchesCharacterChangeCommand(command.Name):
-                HandleChangeCharacter(e.SenderId, numericArguments[0]);
+                HandleChangeCharacter(jumper, numericArguments[0]);
                 break;
 
             #endregion
@@ -495,30 +497,26 @@ public partial class Arena : Node2D
             #region Commands For Mods, VIPs, Subs
 
             case string when CommandAliasProvider.MatchesGlowCommand(command.Name, e.IsPrivileged):
-                HandleGlow(e.SenderId, stringArguments[0], e.HexColor);
+                HandleGlow(jumper, stringArguments[0], e.HexColor);
                 break;
 
             #endregion
         }
     }
 
-    private void HandleGlow(string senderId, string userHexColor, string twitchChatHexColor)
+    private void HandleGlow(Jumper jumper, string userHexColor, string twitchChatHexColor)
     {
         string glowColor = userHexColor is not null ? userHexColor : twitchChatHexColor;
-
-        Jumper jumper = _jumpers[senderId];
 
         jumper.CallDeferred(nameof(jumper.SetGlow), glowColor);
     }
 
-    private void HandleUnglow(string userId)
+    private void HandleUnglow(Jumper jumper)
     {
-        Jumper jumper = _jumpers[userId];
-
         jumper.CallDeferred(nameof(jumper.DisableGlow));
     }
 
-    private void HandleChangeCharacter(string userId, int? userChoice)
+    private void HandleChangeCharacter(Jumper jumper, int? userChoice)
     {
         RandomNumberGenerator rng = new RandomNumberGenerator();
 
@@ -526,12 +524,10 @@ public partial class Arena : Node2D
 
         choice = Math.Clamp(choice, 1, 18);
 
-        Jumper jumper = _jumpers[userId];
-
         jumper.CallDeferred(nameof(jumper.SetCharacter), choice);
     }
 
-    private void HandleJump(string jumperId, string direction, int? angle, int? jumpPower)
+    private void HandleJump(Jumper jumper, string direction, int? angle, int? jumpPower)
     {
         if (!IsAllowedToJump())
         {
@@ -539,8 +535,6 @@ public partial class Arena : Node2D
         }
 
         JumpCommand command = new(direction, angle, jumpPower);
-
-        Jumper jumper = _jumpers[jumperId];
 
         jumper.CallDeferred(nameof(jumper.Jump), command.Angle, command.Power);
     }
