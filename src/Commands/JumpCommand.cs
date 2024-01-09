@@ -37,20 +37,20 @@ internal class JumpCommand
 
     private void AdjustAngle(string direction)
     {
-        /// There are commands, which imply in which direction we would like to jump without
-        /// providing an angle. We don't want to explicitly specify an angle to jump
-        /// straight up, which is inconvenient when avoiding duplicate messages
+        // There are commands, which imply in which direction we would like to jump without
+        // providing an angle. We don't want to explicitly specify an angle to jump
+        // straight up, which is inconvenient when avoiding duplicate messages
         if (_fixedAngleDirections.Contains(direction))
         {
-            /// Players may still want to specify their own Power when jumping at fixed-angle, so
-            /// we can get around this by interpreting the first parameter as Power without
-            /// having to specify Angle, then Power to read the second parameter
+            // Players may still want to specify their own Power when jumping at fixed-angle, so
+            // we can get around this by interpreting the first parameter as Power without
+            // having to specify Angle, then Power to read the second parameter
             Power = Angle != 0 ? Angle : 100;
         }
 
-        /// Important: the reason why this value is not clamped in the property itself is that we
-        /// have commands, which have implied angle and only accept Power as parameter, which
-        /// we read from Angle and we can't clamp this value, otherwise we lose 10 Power
+        // Important: the reason why this value is not clamped in the property itself is that we
+        // have commands, which have implied angle and only accept Power as parameter, which
+        // we read from Angle and we can't clamp this value, otherwise we lose 10 Power
         Angle = Math.Clamp(Angle, -90, 90);
 
         Angle = direction switch
