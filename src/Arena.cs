@@ -121,6 +121,19 @@ public partial class Arena : Node2D
                 break;
 
             #endregion
+
+            // Adding a new command:
+            // - make a new case, decide if it needs the isPrivileged argument
+            // - create a new dictionary of aliases inside the provider
+            // - make a new command-specific matcher inside the provider
+            // - create a new method for the logic (no defers needed!), for example:
+            //
+            // -- Assume there is a command, that pushes a random player "left" or "right"
+            //    where the command format is: push [direction] // <- random if null
+            //    (this is purely theoretical, assuming the player picked up a collectable for this)
+            // case string when CommandAliasProvider.MatchesPushCommand(command.Name):
+            //     HandlePush(stringArguments[0]);
+            //     break;
         }
     }
 
