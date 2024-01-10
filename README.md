@@ -21,7 +21,17 @@ The only way to play is for Adam to be streaming the game. At that point, you ca
 
 - `join`: joins the game. Available at any time, although you'll only really stand a chance at winning if you join in the first ~45 seconds. 😉
 
-To jump, you have to send one of the following commands in the chat: `l`, `u`, `r` (also `j` as alias).
+To jump, you have to send one of the following commands in the chat: `l`, `u`, `r` (also `j` as alias). Optionally, you can adjust your angle and jump power.
+
+Jump commands are currently accepted in the following format:
+
+- `<direction> [angle] [power]` - where default values for `angle` and `power` are `0` and `100` respectively
+  - `angle` can be from `-90` to `90`.
+  - `power` can be from `1` to `100`.
+
+Both `angle` and `power` implicitly have a default value, so you don't have to type them in the chat. Omitting `angle` will make you jump up, omitting `power` will make you jump at maximum power. Commands were shortened to one character to make it easier to play.
+
+Quick help:
 
 - `l` - jump left, if `angle` is greater than `0`, e.g. `l 45` to jump ↖
 - `r` or `j` - jump right, if `angle` is greater than `0`, e.g. `j 45` or `r 45` to jump ↗︎
@@ -34,12 +44,6 @@ There are additional fixed-angle commands used as shortcuts:
 - `lll` - as`l 60`
 - `ll` - as `l 30`
 
-Jump commands are currently accepted in the following format:
-
-- `<direction> [angle] [power]` - where default values for `angle` and `power` are `0` and `100` respectively
-  - `angle` can be from `-90` to `90`.
-  - `power` can be from `1` to `100`.
-
 | angle input    | -90 | -45 | 0   | 45  | 90  |
 | -------------- | --- | --- | --- | --- | --- |
 | jump direction | ←   | ↖   | ↑   | ↗︎   | →   |
@@ -47,7 +51,7 @@ Jump commands are currently accepted in the following format:
 > [!note]
 > While `angle` is clamped between `-90` and `90`, that does not mean you have to put negative numbers in. This syntax was left in since `j` became an alias - you can use `j -30` to jump left or `j 30` to jump right! Sometimes it's more convenient to stay on the `j` key, so this might be a more preferred way to some players
 
-To bypass the same-message limitation on Twitch, add some garbage letters after commands that you want to repeat:
+To bypass duplicate message warning on Twitch, add some garbage letters after commands that you want to repeat:
 
 - `u`: jump up
 - `u a`: jump up again
@@ -59,12 +63,17 @@ Jumping in the same direction also works with garbage letters:
 - `l 5 aaaa`
 - `l 5 bbb`
 
+This also works if you add them right after the command name, but only without space:
+
+- `lk30` - interpreted as `l 30`
+- `rrr50` - interpreted as `rrr 50`
+
 ### Tips
 
 > [!tip]
 > Most important: you don't need to put `space` between the command and `angle`, you can simply send `l30` to jump 30 degrees to the left (mind the angle input above: `0` degrees = `up`)
 
-Other tips:
+Additional tips:
 
 - you can alternate between `l` and `r` commands to jump up in place, avoiding twitch duplicate message restriction. Jumping left or right with no angle specified allows you to jump up
 - if you are using 7TV chat extension, it has its own duplicate message block prevention, so no additional garbage in the chat message is needed
@@ -168,7 +177,7 @@ To pass a test, methods must return one of the following:
 - `new Result()` - overloads available, `bool`, `string`
 - `Result.Success`
 
-Tests fail, with the following returns:
+Tests fail with the following returns:
 
 - `new Result(false)`
 - `Result.Failure`
