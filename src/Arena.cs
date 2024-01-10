@@ -88,19 +88,17 @@ public partial class Arena : Node2D
             return;
         }
 
-        if (!_jumpers.ContainsKey(senderId))
+        if (!_jumpers.TryGetValue(senderId, out Jumper jumper))
         {
             return;
         }
-
-        Jumper jumper = _jumpers[senderId];
 
         // Important: when working with Aliases that collide with each other, remember to use the
         // proper order, e.g. Jump has `u` alias and if it was first on the list, it would
         // execute if `unglow` was sent in the chat, because we don't use exact matching
         switch (command.Name)
         {
-            #region Commands For Everyone (active)
+            #region Commands for all Chatters (active)
 
             case string when CommandAliasProvider.MatchesUnglowCommand(command.Name):
                 HandleUnglow(jumper);
