@@ -88,7 +88,9 @@ namespace Tests
                     "jjjj",
                     "rrrr",
                     "llll",
-                    "rrl42"
+                    "rrl42",
+                    "u u",
+                    "u uu7"
                 };
 
             foreach (string command in commandsWithTypos)
