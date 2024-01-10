@@ -108,9 +108,36 @@ namespace Tests
         }
 
         /// <summary>
+        /// This test makes sure that we can still make a typo when sending a chat command
+        /// and still get it to parse the provided value as Angle. Because the left side
+        /// is being matched, the right side of the command can contain a typo
+        /// </summary>
+        [CSTestFunction]
+        public static Result CanADjustAngleWithTypoedCommands()
+        {
+            List<string> commands = new() { "lk5", "rkl-5", "la 5", "jk -5", "l 5 l", "l5 ldfs" };
+
+            foreach (string command in commands)
+            {
+                (JumpCommand jump, _, _) = GetJumpFromCommand(command);
+
+                if (jump.Angle != 85)
+                {
+                    return new Result(
+                        false,
+                        $"Expected jump angle to be ({85}), ({jump.Angle}) given. Message: ({command})"
+                    );
+                }
+            }
+
+            return Result.Success;
+        }
+
+        /// <summary>
         /// Returns the processed Jump Command from the parsed chat command. The nullable is
         /// casted just for the sake of these tests
         /// </summary>
+        /// <returns>JumpCommand instance, numeric arguments from command, Command Name</returns>
         private static Tuple<JumpCommand, int[], string> GetJumpFromCommand(string commandInput)
         {
             ChatCommandParser command = new(commandInput);
@@ -119,6 +146,7 @@ namespace Tests
 
             JumpCommand jump = new(command.Name, arguments[0], arguments[1]);
 
+            // Note: arguments are interpreted as Angle/Power values
             return new(jump, new[] { arguments[0] ?? 0, arguments[1] ?? 100 }, command.Name);
         }
     }
