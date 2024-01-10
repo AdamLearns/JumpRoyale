@@ -26,6 +26,10 @@ window/stretch/mode="viewport"
 
 project/assembly_name="Jump Royale"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/GDMUT/plugin.cfg")
+
 [input]
 
 ui_left={

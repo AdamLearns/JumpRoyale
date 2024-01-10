@@ -10,5 +10,20 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
     <PackageReference Include="TwitchLib" Version="3.5.3" />
+    <!--
+      Prepare StyleCop, but don't enable it for now, this
+      will cause a massive change within the codebase -
+      style-wise, not logic-wise and not automatically, this
+      gives a wider range of style rules for consistency
+
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="9.12.0.78982">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    -->
   </ItemGroup>
 </Project>

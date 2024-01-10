@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://dstbxq6v3bavo"]
+
+[ext_resource type="Script" path="res://addons/GDMUT/TestResult.cs" id="1_oamte"]
+
+[node name="TestResult" type="VBoxContainer" node_paths=PackedStringArray("_typeName", "_methodList")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -3.0
+offset_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_oamte")
+_typeName = NodePath("Type")
+_methodList = NodePath("MethodList")
+
+[node name="Type" type="RichTextLabel" parent="."]
+layout_mode = 2
+bbcode_enabled = true
+text = "Type name"
+fit_content = true
+
+[node name="MethodList" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
