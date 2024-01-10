@@ -23,9 +23,16 @@ The only way to play is for Adam to be streaming the game. At that point, you ca
 
 To jump, you have to send one of the following commands in the chat: `l`, `u`, `r` (also `j` as alias).
 
-- `l` - jump left if `angle` is greater than `0`, e.g. `l 45` to jump ↖
+- `l` - jump left, if `angle` is greater than `0`, e.g. `l 45` to jump ↖
 - `r` or `j` - jump right, if `angle` is greater than `0`, e.g. `j 45` or `r 45` to jump ↗︎
-- `u` - jump up, **does not require `angle`**, but allows specifying `power` for weaker jumps
+- `u` - jump up, **does not require `angle`**, but allows specifying `power` for weaker jumps, e.g. `u 50`
+
+There are additional fixed-angle commands used as shortcuts:
+
+- `rrr` or `jjj` - as `r 60` or `j 60`
+- `rr` or `jj` - as `r 30` or `j 30`
+- `lll` - as`l 60`
+- `ll` - as `l 30`
 
 Jump commands are currently accepted in the following format:
 
