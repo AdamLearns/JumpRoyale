@@ -22,7 +22,7 @@ internal class ChatCommandParser
 
     public string[] ArgumentsAsStrings()
     {
-        return PadList(_arguments, null).ToArray();
+        return PadListWithNullables(_arguments, null).ToArray();
     }
 
     /// <summary>
@@ -37,7 +37,7 @@ internal class ChatCommandParser
             select parsedArgument
         ).ToList();
 
-        return PadList(arguments, null).ToArray();
+        return PadListWithNullables(arguments, null).ToArray();
     }
 
     private static int? ParseToNumberOrNull(string test)
@@ -51,11 +51,12 @@ internal class ChatCommandParser
     }
 
     /// <summary>
-    /// Pad the arguments list with nulls to always have nullable arguments for easier defaulting
+    /// Pad the arguments so the commands can imply their own default value in case a null was
+    /// present at requested position
     /// </summary>
     /// <param name="list"></param>
     /// <param name="padValue">"Filler" to add if the arguments count is below set Maximum</param>
-    private static List<T> PadList<T>(List<T> list, T padValue)
+    private static List<T> PadListWithNullables<T>(List<T> list, T padValue)
     {
         if (list.Count < MaxArguments)
         {
