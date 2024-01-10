@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 internal class JumpCommand
 {
@@ -40,7 +41,7 @@ internal class JumpCommand
         // There are commands, which imply in which direction we would like to jump without
         // providing an angle. We don't want to explicitly specify an angle to jump
         // straight up, which is inconvenient when avoiding duplicate messages
-        if (_fixedAngleDirections.Contains(direction))
+        if (MatchesFixedAngleAlias(direction))
         {
             // Players may still want to specify their own Power when jumping at fixed-angle, so
             // we can get around this by interpreting the first parameter as Power without
@@ -53,16 +54,32 @@ internal class JumpCommand
         // we read from Angle and we can't clamp this value, otherwise we lose 10 Power
         Angle = Math.Clamp(Angle, -90, 90);
 
-        Angle = direction switch
+        Angle = AngleFromDirectionCommand(direction, Angle);
+    }
+
+    public static int AngleFromDirectionCommand(string direction, int? angleFromUser, bool shouldThrow = false)
+    {
+        int angle = angleFromUser ?? 0;
+
+        // Predefined set of angles for available jump commands. Experimental commands were
+        // defined just as repeated letters for easier typing. The pattern matching has
+        // been changed to allow typos and garbage and still allow changing the angle
+        return direction switch
         {
-            "j" or "r" => Angle + 90,
-            "l" => 90 - Angle,
-            "u" => 90,
-            "ll" => 60, /*           Warning:         */
-            "lll" => 30, /*            Experimental   */
-            "rr" or "jj" => 120, /*      Commands     */
-            "rrr" or "jjj" => 150, /*            :)   */
-            _ => 90 /* fall back to upwards */
+            // Warning: experimental commands - rrr/rr/lll/ll :)
+            string when direction.StartsWith("rrr") || direction.StartsWith("jjj") => 150,
+            string when direction.StartsWith("rr") || direction.StartsWith("jj") => 120,
+            string when direction.StartsWith("lll") => 30,
+            string when direction.StartsWith("ll") => 60,
+            string when direction.StartsWith("j") || direction.StartsWith("r") => angle + 90,
+            string when direction.StartsWith("l") => 90 - angle,
+            string when direction.StartsWith("u") => 90,
+            _ => !shouldThrow ? 90 : throw new Exception($"Unhandled direction command: ({direction})")
         };
+    }
+
+    private bool MatchesFixedAngleAlias(string direction)
+    {
+        return _fixedAngleDirections.Any(alias => direction.StartsWith(alias));
     }
 }
