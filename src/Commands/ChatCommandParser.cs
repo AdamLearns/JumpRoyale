@@ -4,6 +4,10 @@ using System.Text.RegularExpressions;
 
 internal class ChatCommandParser
 {
+    /// <summary>
+    /// Maximum amount of arguments returned by the parser. This value is used for arguments
+    /// list padding with nulls
+    /// </summary>
     private const int MaxArguments = 2;
 
     public string Name { get; private set; }
