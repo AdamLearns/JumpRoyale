@@ -96,8 +96,8 @@ public partial class Arena : Node2D
         Jumper jumper = _jumpers[senderId];
 
         // Important: when working with Aliases that collide with each other, remember to use the
-        // proper order, e.g. Jump has `u` alias, and it would match `unglow` if it was first
-        // on the cases list. Ultimately, there should be exact command name match instead
+        // proper order, e.g. Jump has `u` alias and if it was first on the list, it would
+        // execute if `unglow` was sent in the chat, because we don't use exact matching
         switch (command.Name)
         {
             #region Commands For Everyone (active)
