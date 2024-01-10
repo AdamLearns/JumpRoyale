@@ -68,17 +68,9 @@ namespace Tests
 
             foreach (string input in commandInputs)
             {
-                (JumpCommand jump, int[] arguments, string commandName) = GetJumpFromCommand(input);
+                (JumpCommand jump, _, string commandName) = GetJumpFromCommand(input);
 
-                int expectedAngle = commandName switch
-                {
-                    "u" => 90,
-                    "ll" => 60,
-                    "lll" => 30,
-                    "rr" or "jj" => 120,
-                    "rrr" or "jjj" => 150,
-                    _ => throw new Exception()
-                };
+                int expectedAngle = JumpCommand.AngleFromDirectionCommand(commandName, 0, true);
 
                 if (jump.Angle != expectedAngle)
                 {
