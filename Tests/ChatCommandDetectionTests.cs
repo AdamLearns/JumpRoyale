@@ -13,26 +13,18 @@ namespace Tests
 
             // Arguments have already been tested by Command Parser
 
-            try
+            return command.Name switch
             {
-                return command.Name switch
-                {
-                    string when CommandMatcher.MatchesJoin(command.Name, isPrivileged) => new(command.Name, true),
-                    string when CommandMatcher.MatchesUnglow(command.Name, isPrivileged) => new(command.Name, true),
-                    string when CommandMatcher.MatchesJump(command.Name, isPrivileged) => new(command.Name, true),
-                    string when CommandMatcher.MatchesCharacterChange(command.Name, isPrivileged)
-                        => new(command.Name, true),
-                    string when CommandMatcher.MatchesGlow(command.Name, isPrivileged) => new(command.Name, true),
-                    // null is here just to check if there were cases when nothing was caught by
-                    // pattern matching
-                    _ => new(null, false),
-                };
-            }
-            catch (Exception)
-            {
-                GD.Print("eeeeeeee");
-                throw;
-            }
+                string when CommandMatcher.MatchesJoin(command.Name, isPrivileged) => new(command.Name, true),
+                string when CommandMatcher.MatchesUnglow(command.Name, isPrivileged) => new(command.Name, true),
+                string when CommandMatcher.MatchesJump(command.Name, isPrivileged) => new(command.Name, true),
+                string when CommandMatcher.MatchesCharacterChange(command.Name, isPrivileged)
+                    => new(command.Name, true),
+                string when CommandMatcher.MatchesGlow(command.Name, isPrivileged) => new(command.Name, true),
+                // null is here just to check if there were cases when nothing was caught by
+                // pattern matching
+                _ => new(null, false),
+            };
         }
 
         [CSTestFunction]
