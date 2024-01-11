@@ -114,7 +114,7 @@ public partial class Arena : Node2D
 
             #endregion
 
-            #region Commands For Mods, VIPs, Subs
+            #region Commands for Mods, VIPs, Subs
 
             case string when CommandMatcher.MatchesGlow(command.Name, isPrivileged):
                 HandleGlow(jumper, stringArguments[0], hexColor);
