@@ -45,6 +45,11 @@ public partial class Jumper : CharacterBody2D
         GD.Print("Choice: " + choice + " Gender: " + gender + " Char: " + charNumber + " Clothing: " + clothingNumber);
         var sprite = GetNode<AnimatedSprite2D>(SpriteNodeName);
         sprite.SpriteFrames = SpriteFrameCreator.getInstance().GetSpriteFrames(gender, charNumber, clothingNumber);
+
+        if (IsOnFloor())
+        {
+            sprite.Play(JumperAnimations.AnimationIdle);
+        }
     }
 
     public void SetGlow(string colorString)
