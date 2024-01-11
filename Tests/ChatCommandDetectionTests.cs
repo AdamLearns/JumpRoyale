@@ -121,5 +121,25 @@ namespace Tests
 
             return Result.Success;
         }
+
+        [CSTestFunction]
+        public static Result CanRejectUnprivilegedUsers()
+        {
+            // Glow is currently a sub-only command, this will throw in the future if
+            // the design changes, so there should probably be a different way for
+            // checking this
+
+            // Also warning: this does not test the current command matching functionality,
+            // this is here only to check if the CommandMatcher can filter the commands
+            // if the passed argument (isPrivileged) happened to be `false`
+            (string caughtCommand, _) = CommandNameMatcher("glow", false);
+
+            if (caughtCommand is not null)
+            {
+                return new Result(false, $"Managed to match a privileged command with unprivileged user.");
+            }
+
+            return Result.Success;
+        }
     }
 }
