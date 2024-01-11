@@ -108,13 +108,44 @@ namespace Tests
         }
 
         /// <summary>
+        /// This is only for fixed-angle commands
+        /// </summary>
+        [CSTestFunction]
+        public static Result CanAdjustPowerOnTypoedCommands()
+        {
+            List<string> commands = new() { "ujk50", "rrl20", "lll20", "rrr100" };
+
+            foreach (string command in commands)
+            {
+                ChatCommandParser parsedCommand = new(command);
+
+                int?[] arguments = parsedCommand.ArgumentsAsNumbers();
+
+                JumpCommand jump = new(command, arguments[0], arguments[1]);
+
+                if (jump.Power != arguments[0])
+                {
+                    return new Result(
+                        false,
+                        $"Failed to adjust the power from typo-ed command: ({command}). Asked for: ({arguments[0]}), result: ({jump.Power})"
+                    );
+                }
+            }
+
+            return Result.Success;
+        }
+
+        /// <summary>
         /// This test makes sure that we can still make a typo when sending a chat command
         /// and still get it to parse the provided value as Angle. Because the left side
         /// is being matched, the right side of the command can contain a typo
         /// </summary>
         [CSTestFunction]
-        public static Result CanADjustAngleWithTypoedCommands()
+        public static Result CanAdjustAngleWithTypoedCommands()
         {
+            // "l l 5" will cause the test to fail, because the argument extractor will interpret
+            // the first string as command name and the rest will be interpreted as arguments,
+            // so the second string will default to "JUMP UP" (90 angle)
             List<string> commands = new() { "lk5", "rkl-5", "la 5", "jk -5", "l 5 l", "l5 ldfs" };
 
             foreach (string command in commands)

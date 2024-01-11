@@ -94,34 +94,6 @@ namespace Tests
             return Result.Success;
         }
 
-        /// <summary>
-        /// This is only for fixed-angle commands
-        /// </summary>
-        [CSTestFunction]
-        public static Result CanAdjustPowerOnTypoedCommands()
-        {
-            List<string> commands = new() { "ujk50", "rrl20", "lll20", "rrr100" };
-
-            foreach (string command in commands)
-            {
-                ChatCommandParser parsedCommand = new(command);
-
-                int?[] arguments = parsedCommand.ArgumentsAsNumbers();
-
-                JumpCommand jump = new(command, arguments[0], arguments[1]);
-
-                if (jump.Power != arguments[0])
-                {
-                    return new Result(
-                        false,
-                        $"Failed to adjust the power from typo-ed command: ({command}). Asked for: ({arguments[0]}), result: ({jump.Power})"
-                    );
-                }
-            }
-
-            return Result.Success;
-        }
-
         [CSTestFunction]
         public static Result CanRejectUnprivilegedUsers()
         {
