@@ -123,7 +123,7 @@ public partial class Arena : Node2D
             #endregion
 
             // Adding a new command:
-            // - make a new case, decide if it needs the isPrivileged argument
+            // - make a new case, decide if it needs the isPrivileged argument (sub only, etc.)
             // - create a new dictionary of aliases inside the provider
             // - make a new command-specific matcher inside the provider
             // - create a new method for the logic (no defers needed!), for example:
@@ -134,6 +134,9 @@ public partial class Arena : Node2D
             // case string when CommandAliasProvider.MatchesPushCommand(command.Name):
             //     HandlePush(stringArguments[0]);
             //     break;
+            // --
+            // The `isPrivileged` argument can also be useful to execute logic only for privileged
+            // e.g. extra Char command choices for subs apart from 1-18, like new characters.
         }
     }
 
