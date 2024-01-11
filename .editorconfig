@@ -23,6 +23,12 @@ generated_code = true
 
 # C# files
 [*.cs]
+# StyleCop
+dotnet_diagnostic.SA1309.severity = none
+
+# Sonar Analyzer
+dotnet_diagnostic.S125.severity = none
+
 # New line preferences
 csharp_new_line_before_open_brace = all
 csharp_new_line_before_else = true
