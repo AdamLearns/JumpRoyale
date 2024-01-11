@@ -5,7 +5,7 @@ using Godot;
 
 namespace Tests
 {
-    public class ChatCommandDetector
+    public class ChatCommandDetectionTests
     {
         private static Tuple<string, bool> CommandNameMatcher(string chatMessage, bool isPrivileged = true)
         {
