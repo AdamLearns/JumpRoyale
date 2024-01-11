@@ -82,7 +82,7 @@ public partial class Arena : Node2D
 
         // Join is the only command, that can be executed by everyone, whether joined or not.
         // All the remaining commands are only available to those who joined the game
-        if (CommandAliasProvider.MatchesJoinCommand(command.Name))
+        if (CommandMatcher.MatchesJoin(command.Name))
         {
             AddPlayer(senderId, senderName, hexColor, isPrivileged);
             return;
@@ -100,15 +100,15 @@ public partial class Arena : Node2D
         {
             #region Commands for all Chatters (active)
 
-            case string when CommandAliasProvider.MatchesUnglowCommand(command.Name):
+            case string when CommandMatcher.MatchesUnglow(command.Name):
                 HandleUnglow(jumper);
                 break;
 
-            case string when CommandAliasProvider.MatchesJumpCommand(command.Name):
+            case string when CommandMatcher.MatchesJump(command.Name):
                 HandleJump(jumper, command.Name, numericArguments[0], numericArguments[1]);
                 break;
 
-            case string when CommandAliasProvider.MatchesCharacterChangeCommand(command.Name):
+            case string when CommandMatcher.MatchesCharacterChange(command.Name):
                 HandleChangeCharacter(jumper, numericArguments[0]);
                 break;
 
@@ -116,7 +116,7 @@ public partial class Arena : Node2D
 
             #region Commands For Mods, VIPs, Subs
 
-            case string when CommandAliasProvider.MatchesGlowCommand(command.Name, isPrivileged):
+            case string when CommandMatcher.MatchesGlow(command.Name, isPrivileged):
                 HandleGlow(jumper, stringArguments[0], hexColor);
                 break;
 

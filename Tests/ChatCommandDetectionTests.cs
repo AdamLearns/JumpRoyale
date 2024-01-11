@@ -17,16 +17,12 @@ namespace Tests
             {
                 return command.Name switch
                 {
-                    string when CommandAliasProvider.MatchesJoinCommand(command.Name, isPrivileged)
+                    string when CommandMatcher.MatchesJoin(command.Name, isPrivileged) => new(command.Name, true),
+                    string when CommandMatcher.MatchesUnglow(command.Name, isPrivileged) => new(command.Name, true),
+                    string when CommandMatcher.MatchesJump(command.Name, isPrivileged) => new(command.Name, true),
+                    string when CommandMatcher.MatchesCharacterChange(command.Name, isPrivileged)
                         => new(command.Name, true),
-                    string when CommandAliasProvider.MatchesUnglowCommand(command.Name, isPrivileged)
-                        => new(command.Name, true),
-                    string when CommandAliasProvider.MatchesJumpCommand(command.Name, isPrivileged)
-                        => new(command.Name, true),
-                    string when CommandAliasProvider.MatchesCharacterChangeCommand(command.Name, isPrivileged)
-                        => new(command.Name, true),
-                    string when CommandAliasProvider.MatchesGlowCommand(command.Name, isPrivileged)
-                        => new(command.Name, true),
+                    string when CommandMatcher.MatchesGlow(command.Name, isPrivileged) => new(command.Name, true),
                     // null is here just to check if there were cases when nothing was caught by
                     // pattern matching
                     _ => new(null, false),
