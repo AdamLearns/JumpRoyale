@@ -10,7 +10,6 @@ A platformer controlled through Twitch chat to be played on my stream during sho
     -   [Background](#background)
     -   [Building, running, testing](#building-running-testing)
         -   [Testing](#testing)
-            -   [Running Tests](#running-tests)
         -   [Adding a new command](#adding-a-new-command)
     -   [Credits](#credits)
 
@@ -153,51 +152,7 @@ Sending `char <choice>` in the chat allows you to change your character graphic.
 ### Testing
 
 > [!note]
-> This section will remain here until someone manages to get a proper testing framework running :wink:
-
-For now, very limited and simple unit tests are available thanks to the `GDMUT` Godot Plugin until a good `nunit/xunit` solution is implemented.
-
-To define a new test, create a new test under `Tests` directory (they don't _have_ to be there, it's just to keep them in one place; they are read from Assembly anyway), insert a simple class:
-
-```csharp
-namespace Test {
-
-    public class SomeTest
-    {
-        [CSTestFunction]
-        public static Result ThisTestsSomething()
-        {
-            // Do whatever here
-        }
-    }
-}
-```
-
-To pass a test, methods must return one of the following:
-
--   `new Result()` - overloads available, `bool`, `string`
--   `Result.Success`
-
-Tests fail with the following returns:
-
--   `new Result(false)`
--   `Result.Failure`
--   ...or when an `Exception` was thrown somewhere
-
-> [!caution]
-> Unfortunately, if any of the tests throw an exception, it won't get caught and you will be left with a vague message (screenshot below). Mono exceptions are not logged, the suggestion is to print errors instead (thanks, Godot)
-
-![exception](https://github.com/DarkStoorM/JumpRoyale/assets/7021295/28fc2adf-ca5f-46c5-80ff-197071591117)
-
-#### Running Tests
-
--   Build the project
--   Click `Load Tests`
--   Click `Run`
-
-![testing](https://github.com/DarkStoorM/JumpRoyale/assets/7021295/f1ec0fd9-c0c3-4faf-a2f4-7cee04c4e897)
-
-![results](https://github.com/DarkStoorM/JumpRoyale/assets/7021295/01765824-814c-4158-8e29-519ea1620d6a)
+> No testing frameworks available yet.
 
 ### Adding a new command
 
