@@ -4,7 +4,7 @@ using Godot;
 public partial class Jumper : CharacterBody2D
 {
     private const string SpriteNodeName = "Sprite";
-    private const string NameNodeName = "Node2D/Name";
+    private const string NameNodeName = "Name";
     private const string ParticleSystemNodeName = "Glow";
     private bool _wasOnFloor = false;
 
