@@ -20,7 +20,7 @@ public partial class Jumper : CharacterBody2D
         Position = new Vector2(x, y);
         Name = userName;
         this.playerData = playerData;
-        GetNode<Label>(NameNodeName).Text = userName;
+        GetNode<RichTextLabel>(NameNodeName).Text = "[center]" + userName + "[/center]";
 
         SetCharacter(playerData.CharacterChoice);
 
