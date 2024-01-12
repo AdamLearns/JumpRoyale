@@ -4,7 +4,7 @@ using Godot;
 public partial class Jumper : CharacterBody2D
 {
     private const string SpriteNodeName = "Sprite";
-    private const string NameNodeName = "Node2D/Name";
+    private const string NameNodeName = "Name";
     private const string ParticleSystemNodeName = "Glow";
     private bool _wasOnFloor = false;
 
@@ -15,7 +15,7 @@ public partial class Jumper : CharacterBody2D
 
     public PlayerData playerData;
 
-    private Timer _fontVisibilityTimer;
+    private bool _hasJumped = false;
     private ulong _fontVisibilityTimerStartTime;
 
     public void Init(int x, int y, string userName, PlayerData playerData)
@@ -100,59 +100,46 @@ public partial class Jumper : CharacterBody2D
             _jumpVelocity.Y = Mathf.Sin(Mathf.DegToRad(angle + 180));
             _jumpVelocity = _jumpVelocity.Normalized() * (float)normalizedPower;
             playerData.NumJumps++;
-            setNameTransparency(1f);
+            setNameAlpha(1f);
+
+            _hasJumped = true;
+            resetNameTimer();
         }
-        setupTimer();
     }
 
-    private void setupTimer()
+    private void resetNameTimer()
     {
-        // how long until the text disappears completely:
-        const ulong totalTimeMs = 10000;
-        const float maxSteps = 50f;
-        this._fontVisibilityTimerStartTime = Time.GetTicksMsec();
-
+        _fontVisibilityTimerStartTime = Time.GetTicksMsec();
         GetNode<RichTextLabel>(NameNodeName).Visible = true;
-        if (this._fontVisibilityTimer != null)
-        {
-            this.RemoveChild(this._fontVisibilityTimer);
-        }
-        this._fontVisibilityTimer = new()
-        {
-            WaitTime = totalTimeMs / 1000f / maxSteps,
-            OneShot = false,
-            Autostart = false
-        };
-        _fontVisibilityTimer.Timeout += () =>
-        {
-            ulong now = Time.GetTicksMsec();
-            ulong diffMs = now - this._fontVisibilityTimerStartTime;
-            float color = 0f;
-            float diff = (float)diffMs / (float)totalTimeMs;
-
-            if (diffMs >= totalTimeMs)
-            {
-                color = 0f;
-                _fontVisibilityTimer.Stop();
-            }
-            else
-            {
-                color = 1 - diff;
-            }
-            setNameTransparency(color);
-        };
-        this.AddChild(_fontVisibilityTimer);
-        _fontVisibilityTimer.Start();
     }
 
-    private void setNameTransparency(float alpha) =>
-        GetNode<RichTextLabel>(NameNodeName).Modulate = new Color(1, 1, 1, alpha);
-
-    public void disableTimer()
+    public void playerWon()
     {
-        _fontVisibilityTimer.Stop();
-        setNameTransparency(1f);
+        // Reset their _hasJumped property so that their name will be visible until they jump again.
+        _hasJumped = false;
     }
+
+    private void updateNameTransparency()
+    {
+        float alpha;
+        if (!_hasJumped)
+        {
+            alpha = 1f;
+        }
+        else
+        {
+            const ulong totalTimeMs = 5000;
+
+            ulong now = Time.GetTicksMsec();
+            ulong diffMs = now - _fontVisibilityTimerStartTime;
+            float diff = diffMs / (float)totalTimeMs;
+
+            alpha = Math.Max(0, 1 - diff);
+        }
+        setNameAlpha(alpha);
+    }
+
+    private void setNameAlpha(float alpha) => GetNode<RichTextLabel>(NameNodeName).Modulate = new Color(1, 1, 1, alpha);
 
     public void SetColor(string hexColor)
     {
@@ -206,6 +193,8 @@ public partial class Jumper : CharacterBody2D
         }
 
         _wasOnFloor = IsOnFloor();
+
+        updateNameTransparency();
 
         MoveAndSlide();
     }

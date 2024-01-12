@@ -402,7 +402,7 @@ public partial class Arena : Node2D
             }
             if (showName)
             {
-                jumper.disableTimer();
+                jumper.playerWon();
             }
         }
 
