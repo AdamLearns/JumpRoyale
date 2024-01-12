@@ -6,3 +6,6 @@ Unit Tests without automation are not real tests and it's easy to miss something
 
 **Note to contributors**: the old tests will remain in this directory just for reference purposes, since
 the test cases already covered some functionality and were able to find faulty behavior, so their logic _could_ be used in future tests to guard from unintentional changes. They will be stored until NUnit or xUnit testing frameworks are implemented.
+
+> [!note]
+> It was intentional to leave the entire test code commented, because GdMut doesn't exist anymore and they will just trigger build errors.
