@@ -136,14 +136,14 @@ public partial class Arena : Node2D
         }
     }
 
-    private static void HandleGlow(Jumper jumper, string userHexColor, string twitchChatHexColor)
+    private void HandleGlow(Jumper jumper, string userHexColor, string twitchChatHexColor)
     {
         string glowColor = userHexColor is not null ? userHexColor : twitchChatHexColor;
 
         jumper.SetGlow(glowColor);
     }
 
-    private static void HandleUnglow(Jumper jumper)
+    private void HandleUnglow(Jumper jumper)
     {
         jumper.DisableGlow();
     }
