@@ -37,10 +37,13 @@ public partial class Arena : Node2D
     private const string SaveLocation = "res://save_data/players.json";
 
     private const int WallHeight = 15; // in tiles
+    private const int ArenaHeight = 600; // in tiles
     private int _widthInTiles;
     private int _heightInTiles;
     private int _ceilingHeight;
     private TileMap _lobbyTilemap;
+
+    private int _generatedMaxHeight;
 
     private readonly Dictionary<string, Jumper> _jumpers = new Dictionary<string, Jumper>();
 
@@ -60,7 +63,7 @@ public partial class Arena : Node2D
 
         SetBackground();
 
-        GenerateWorld();
+        GenerateLobby();
 
         LoadPlayerData();
     }
@@ -205,7 +208,7 @@ public partial class Arena : Node2D
         File.WriteAllText(filesystemLocation, jsonString);
     }
 
-    private void GenerateWorld()
+    private void GenerateLobby()
     {
         _lobbyTilemap = new TileMap { Name = "TileMap", TileSet = TileSetToUse };
 
@@ -252,11 +255,7 @@ public partial class Arena : Node2D
             _lobbyTilemap.SetCell(0, new Vector2I(x, _ceilingHeight), 0, new Vector2I(12, 1));
         }
 
-        // Add some platforms
-        //
-        // The easiest way to do this is to generate one platform per row of the
-        // lobby area, then generate a platform of random width in that row, that
-        // way there are no collisions.
+        // Generate some lobby platforms
         int platformStartY = wallStartY - 2;
         int platformEndY = _ceilingHeight + 4;
         for (int y = platformStartY; y >= platformEndY; y--)
@@ -265,18 +264,37 @@ public partial class Arena : Node2D
             int startX = _rng.RandiRange(2, _widthInTiles - width - 2);
             AddPlatform(startX, y, width);
         }
+        _generatedMaxHeight = _ceilingHeight;
 
-        // Add platforms higher up
-        int lowestY = -600;
-        for (int y = _ceilingHeight - 2; y > lowestY; y--)
+        AddChild(_lobbyTilemap);
+    }
+
+    private void GenerateProceduralPlatforms()
+    {
+        var camera = GetNode<Camera2D>(CameraNodeName);
+        var viewport = GetViewportRect();
+        // NOTE(Hop): GetScreenCenterPosition was the only way to get accurate viewport position
+        //            without ignoring Position Smoothing
+        float cameraPos = camera.GetScreenCenterPosition().Y - (viewport.Size.Y / 2);
+        int cameraPosInTiles = (int)(cameraPos / TileSetToUse.TileSize.Y);
+
+        if (cameraPosInTiles >= _generatedMaxHeight)
+        {
+            return;
+        }
+
+        // Add platforms higher up;
+        for (int y = _generatedMaxHeight - 1; y >= cameraPosInTiles; y--)
         {
             // This goes from 0 to 1 linearly as Y decreases
-            float difficultyFactor = (float)Math.Min(0, y) / lowestY;
+            float difficultyFactor = (float)Math.Min(0, y) / -ArenaHeight;
 
             // Rarely, make a solid block to add some variety
             int r = _rng.RandiRange(0, 100);
             if (r < 6 + difficultyFactor * 40)
             {
+                // TODO: DrawRectangleOfTiles draws blocks _downward_, this means that part of them
+                //       will suddenly appear on screen
                 int blockWidth = 2 + (int)(difficultyFactor * 24);
                 int blockX = _rng.RandiRange(2, _widthInTiles - 1 - blockWidth);
                 DrawRectangleOfTiles(blockX, y + 1, blockWidth, blockWidth, new Vector2I(12, 1));
@@ -291,8 +309,7 @@ public partial class Arena : Node2D
             int startX = _rng.RandiRange(2, _widthInTiles - width - 2);
             AddPlatform(startX, y, width);
         }
-
-        AddChild(_lobbyTilemap);
+        _generatedMaxHeight = cameraPosInTiles;
     }
 
     private void AddPlatform(int x, int y, int width)
@@ -376,19 +393,19 @@ public partial class Arena : Node2D
         var podiumHeight = 6; // has to be divisible by numPodiums
         var podiumHeightDifference = podiumHeight / numPodiums;
         var podiumX = _widthInTiles / 2;
-        var podiumY = 13;
+        var podiumY = 13 + podiumHeight;
 
         DrawRectangleOfTiles(podiumX, podiumY, podiumWidth, podiumHeight, new Vector2I(12, 1));
         DrawRectangleOfTiles(
             podiumX - podiumWidth,
-            podiumY + podiumHeightDifference,
+            podiumY,
             podiumWidth,
             podiumHeight - podiumHeightDifference,
             new Vector2I(12, 1)
         );
         DrawRectangleOfTiles(
             podiumX + podiumWidth,
-            podiumY + podiumHeightDifference * 2,
+            podiumY,
             podiumWidth,
             podiumHeight - podiumHeightDifference * 2,
             new Vector2I(12, 1)
@@ -424,11 +441,11 @@ public partial class Arena : Node2D
         }
     }
 
-    private void DrawRectangleOfTiles(int leftX, int topY, int width, int height, Vector2I tileIndex)
+    private void DrawRectangleOfTiles(int leftX, int bottomY, int width, int height, Vector2I tileIndex)
     {
         for (int x = leftX; x < leftX + width; x++)
         {
-            for (int y = topY; y < topY + height; y++)
+            for (int y = bottomY; y > bottomY - height; y--)
             {
                 _lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, tileIndex);
             }
@@ -606,6 +623,8 @@ public partial class Arena : Node2D
     public override void _PhysicsProcess(double delta)
     {
         ModifyPlayerScales();
+
+        GenerateProceduralPlatforms();
 
         MoveCamera();
     }
