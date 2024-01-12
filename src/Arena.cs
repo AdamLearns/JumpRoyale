@@ -296,19 +296,19 @@ public partial class Arena : Node2D
         var podiumHeight = 6; // has to be divisible by numPodiums
         var podiumHeightDifference = podiumHeight / numPodiums;
         var podiumX = _widthInTiles / 2;
-        var podiumY = 13;
+        var podiumY = 13 + podiumHeight;
 
         DrawRectangleOfTiles(podiumX, podiumY, podiumWidth, podiumHeight, new Vector2I(12, 1));
         DrawRectangleOfTiles(
             podiumX - podiumWidth,
-            podiumY + podiumHeightDifference,
+            podiumY,
             podiumWidth,
             podiumHeight - podiumHeightDifference,
             new Vector2I(12, 1)
         );
         DrawRectangleOfTiles(
             podiumX + podiumWidth,
-            podiumY + podiumHeightDifference * 2,
+            podiumY,
             podiumWidth,
             podiumHeight - podiumHeightDifference * 2,
             new Vector2I(12, 1)
@@ -344,11 +344,11 @@ public partial class Arena : Node2D
         }
     }
 
-    private void DrawRectangleOfTiles(int leftX, int topY, int width, int height, Vector2I tileIndex)
+    private void DrawRectangleOfTiles(int leftX, int bottomY, int width, int height, Vector2I tileIndex)
     {
         for (int x = leftX; x < leftX + width; x++)
         {
-            for (int y = topY; y < topY + height; y++)
+            for (int y = bottomY; y > bottomY - height; y--)
             {
                 _lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, tileIndex);
             }
