@@ -67,9 +67,9 @@ public partial class Arena : Node2D
 
     private void OnMessage(object sender, MessageEventArgs e)
     {
-        // This is kind of a workaround for now to have a top level Defer and be able to pass
-        // objects around inside, which just can't be converted to Godot's Variant. We
-        // still have pull the required data separately, because `e` is an object :(
+        // This is kind of a workaround for now to have a top level Defer and be able to pass objects around inside,
+        // which can't be converted to Godot's Variant. We still have to pull the required data separately, because `e`
+        // is an object :(
         CallDeferred(nameof(HandleCommands), e.Message, e.SenderId, e.SenderName, e.HexColor, e.IsPrivileged);
     }
 
@@ -80,7 +80,7 @@ public partial class Arena : Node2D
         string[] stringArguments = command.ArgumentsAsStrings();
         int?[] numericArguments = command.ArgumentsAsNumbers();
 
-        // Join is the only command, that can be executed by everyone, whether joined or not.
+        // Join is the only command that can be executed by everyone, whether joined or not.
         // All the remaining commands are only available to those who joined the game
         if (CommandMatcher.MatchesJoin(command.Name))
         {
@@ -93,8 +93,8 @@ public partial class Arena : Node2D
             return;
         }
 
-        // Important: when working with Aliases that collide with each other, remember to use the
-        // proper order, e.g. Jump has `u` alias and if it was first on the list, it would
+        // Important: when working with aliases that collide with each other, remember to use the
+        // proper order. E.g. Jump has `u` alias and if it was first on the list, it would
         // execute if `unglow` was sent in the chat, because we don't use exact matching
         switch (command.Name)
         {
@@ -117,22 +117,6 @@ public partial class Arena : Node2D
                 HandleGlow(jumper, stringArguments[0], hexColor);
                 break;
             //-------------------------------------
-
-            // Adding a new command:
-            // - make a new case, decide if it needs the isPrivileged argument (sub only, etc.)
-            // - create a new dictionary of aliases inside the provider
-            // - make a new command-specific matcher inside the provider
-            // - create a new method for the logic (no defers needed!), for example:
-            //
-            // -- Assume there is a command, that pushes a random player "left" or "right"
-            //    where the command format is: push [direction] // <- random if null
-            //    (this is purely theoretical, assuming the player picked up a collectable for this)
-            // case string when CommandAliasProvider.MatchesPushCommand(command.Name):
-            //     HandlePush(stringArguments[0]);
-            //     break;
-            // --
-            // The `isPrivileged` argument can also be useful to execute logic only for privileged
-            // e.g. extra Char command choices for subs apart from 1-18, like new characters.
         }
     }
 

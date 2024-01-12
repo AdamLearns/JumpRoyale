@@ -5,8 +5,7 @@ using System.Text.RegularExpressions;
 internal class ChatCommandParser
 {
     /// <summary>
-    /// Maximum amount of arguments returned by the parser. This value is used for arguments
-    /// list padding with nulls
+    /// Maximum amount of arguments returned by the parser.
     /// </summary>
     private const int MaxArguments = 2;
 
@@ -26,7 +25,7 @@ internal class ChatCommandParser
 
     public string[] ArgumentsAsStrings()
     {
-        return PadListWithNullables(_arguments, null).ToArray();
+        return PadList(_arguments, null).ToArray();
     }
 
     /// <summary>
@@ -41,7 +40,7 @@ internal class ChatCommandParser
             select parsedArgument
         ).ToList();
 
-        return PadListWithNullables(arguments, null).ToArray();
+        return PadList(arguments, null).ToArray();
     }
 
     private static int? ParseToNumberOrNull(string test)
@@ -60,7 +59,7 @@ internal class ChatCommandParser
     /// </summary>
     /// <param name="list"></param>
     /// <param name="padValue">"Filler" to add if the arguments count is below set Maximum</param>
-    private static List<T> PadListWithNullables<T>(List<T> list, T padValue)
+    private static List<T> PadList<T>(List<T> list, T padValue)
     {
         if (list.Count < MaxArguments)
         {
