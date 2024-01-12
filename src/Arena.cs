@@ -46,6 +46,8 @@ public partial class Arena : Node2D
 
     private AllPlayerData _allPlayerData = new AllPlayerData();
 
+    private RandomNumberGenerator _rng = new();
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
@@ -63,11 +65,109 @@ public partial class Arena : Node2D
         LoadPlayerData();
     }
 
+    private void OnMessage(object sender, MessageEventArgs e)
+    {
+        // This is kind of a workaround for now to have a top level Defer and be able to pass objects around inside,
+        // which can't be converted to Godot's Variant. We still have to pull the required data separately, because `e`
+        // is an object :(
+        CallDeferred(nameof(HandleCommands), e.Message, e.SenderId, e.SenderName, e.HexColor, e.IsPrivileged);
+    }
+
+    private void HandleCommands(string message, string senderId, string senderName, string hexColor, bool isPrivileged)
+    {
+        ChatCommandParser command = new(message.ToLower());
+
+        string[] stringArguments = command.ArgumentsAsStrings();
+        int?[] numericArguments = command.ArgumentsAsNumbers();
+
+        // Join is the only command that can be executed by everyone, whether joined or not.
+        // All the remaining commands are only available to those who joined the game
+        if (CommandMatcher.MatchesJoin(command.Name))
+        {
+            AddPlayer(senderId, senderName, hexColor, isPrivileged);
+            return;
+        }
+
+        if (!_jumpers.TryGetValue(senderId, out Jumper jumper))
+        {
+            return;
+        }
+
+        // Important: when working with aliases that collide with each other, remember to use the
+        // proper order. E.g. Jump has `u` alias and if it was first on the list, it would
+        // execute if `unglow` was sent in the chat, because we don't use exact matching
+        switch (command.Name)
+        {
+            // -- Commands for all Chatters (active)
+            case string when CommandMatcher.MatchesUnglow(command.Name):
+                HandleUnglow(jumper);
+                break;
+
+            case string when CommandMatcher.MatchesJump(command.Name):
+                HandleJump(jumper, command.Name, numericArguments[0], numericArguments[1]);
+                break;
+
+            case string when CommandMatcher.MatchesCharacterChange(command.Name):
+                HandleChangeCharacter(jumper, numericArguments[0]);
+                break;
+            //-------------------------------------
+
+            // -- Commands for Mods, VIPs, Subs
+            case string when CommandMatcher.MatchesGlow(command.Name, isPrivileged):
+                HandleGlow(jumper, stringArguments[0], hexColor);
+                break;
+            //-------------------------------------
+        }
+    }
+
+    private void HandleGlow(Jumper jumper, string userHexColor, string twitchChatHexColor)
+    {
+        string glowColor = userHexColor is not null ? userHexColor : twitchChatHexColor;
+
+        jumper.SetGlow(glowColor);
+    }
+
+    private void HandleUnglow(Jumper jumper)
+    {
+        jumper.DisableGlow();
+    }
+
+    private void HandleChangeCharacter(Jumper jumper, int? userChoice)
+    {
+        int choice = userChoice ?? _rng.RandiRange(1, 18);
+
+        choice = Math.Clamp(choice, 1, 18);
+
+        jumper.SetCharacter(choice);
+    }
+
+    private void HandleJump(Jumper jumper, string direction, int? angle, int? jumpPower)
+    {
+        if (!IsAllowedToJump())
+        {
+            return;
+        }
+
+        JumpCommand command = new(direction, angle, jumpPower);
+
+        jumper.Jump(command.Angle, command.Power);
+    }
+
+    /// <summary>
+    /// Players are allowed to jump only if the game is still running or if 5
+    /// seconds have passed since the game ended (that way players don't jump
+    /// off the podiums due to a stream delay)
+    /// </summary>
+    private bool IsAllowedToJump()
+    {
+        return _timeSinceGameEnd <= 0 || (DateTime.Now.Ticks - _timeSinceGameEnd) / TimeSpan.TicksPerMillisecond > 5000;
+    }
+
     private void SetBackground()
     {
         var background = GetNode<Sprite2D>("Background");
         var colors = new string[] { "Blue", "Brown", "Gray", "Green", "Pink", "Purple", "Yellow" };
-        var color = colors[new RandomNumberGenerator().RandiRange(0, colors.Length - 1)];
+        var color = colors[_rng.RandiRange(0, colors.Length - 1)];
         background.Texture = ResourceLoader.Load<Texture2D>($"res://assets/sprites/backgrounds/{color}.png");
     }
 
@@ -161,9 +261,8 @@ public partial class Arena : Node2D
         int platformEndY = _ceilingHeight + 4;
         for (int y = platformStartY; y >= platformEndY; y--)
         {
-            RandomNumberGenerator rng = new RandomNumberGenerator();
-            int width = rng.RandiRange(3, 15);
-            int startX = rng.RandiRange(2, _widthInTiles - width - 2);
+            int width = _rng.RandiRange(3, 15);
+            int startX = _rng.RandiRange(2, _widthInTiles - width - 2);
             AddPlatform(startX, y, width);
         }
 
@@ -175,22 +274,21 @@ public partial class Arena : Node2D
             float difficultyFactor = (float)Math.Min(0, y) / lowestY;
 
             // Rarely, make a solid block to add some variety
-            RandomNumberGenerator rng = new RandomNumberGenerator();
-            int r = rng.RandiRange(0, 100);
+            int r = _rng.RandiRange(0, 100);
             if (r < 6 + difficultyFactor * 40)
             {
                 int blockWidth = 2 + (int)(difficultyFactor * 24);
-                int blockX = rng.RandiRange(2, _widthInTiles - 1 - blockWidth);
+                int blockX = _rng.RandiRange(2, _widthInTiles - 1 - blockWidth);
                 DrawRectangleOfTiles(blockX, y + 1, blockWidth, blockWidth, new Vector2I(12, 1));
             }
 
-            r = rng.RandiRange(0, 100);
+            r = _rng.RandiRange(0, 100);
             if (r > (70 - difficultyFactor * 60))
             {
                 continue;
             }
-            int width = rng.RandiRange(3, 15 - (int)Math.Round(6 * difficultyFactor));
-            int startX = rng.RandiRange(2, _widthInTiles - width - 2);
+            int width = _rng.RandiRange(3, 15 - (int)Math.Round(6 * difficultyFactor));
+            int startX = _rng.RandiRange(2, _widthInTiles - width - 2);
             AddPlatform(startX, y, width);
         }
 
@@ -251,7 +349,6 @@ public partial class Arena : Node2D
             }
         }
 
-        var rng = new RandomNumberGenerator();
         var viewport = GetViewportRect();
         var xPadding = 100;
 
@@ -261,8 +358,8 @@ public partial class Arena : Node2D
             var jumper = _jumpers.ElementAt(i).Value;
 
             jumper.Position = new Vector2(
-                rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding),
-                rng.RandiRange((int)(viewport.Size.Y / 2), (int)viewport.Size.Y - 100)
+                _rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding),
+                _rng.RandiRange((int)(viewport.Size.Y / 2), (int)viewport.Size.Y - 100)
             );
             jumper.Scale = new Vector2(1, 1);
             jumper.Velocity = new Vector2(0, 0);
@@ -456,144 +553,6 @@ public partial class Arena : Node2D
         }
     }
 
-    private void OnMessage(object sender, MessageEventArgs e)
-    {
-        var lowercaseMessage = e.Message.ToLower();
-        if (lowercaseMessage.StartsWith("join"))
-        {
-            CallDeferred(nameof(AddPlayer), e.SenderId, e.SenderName, e.HexColor, e.IsPrivileged);
-        }
-        else if (lowercaseMessage.StartsWith("glow"))
-        {
-            CallDeferred(nameof(HandleGlow), e.SenderId, lowercaseMessage, e.HexColor, e.IsPrivileged);
-        }
-        else if (lowercaseMessage.StartsWith("unglow"))
-        {
-            CallDeferred(nameof(HandleUnglow), e.SenderId);
-        }
-        else if (lowercaseMessage.StartsWith("char"))
-        {
-            CallDeferred(nameof(HandleChangeCharacter), e.SenderId, lowercaseMessage);
-        }
-        else if (
-            lowercaseMessage.StartsWith("jump")
-            || lowercaseMessage.StartsWith("j ")
-            || lowercaseMessage.Equals("j")
-            || lowercaseMessage.StartsWith("l ")
-            || lowercaseMessage.Equals("l")
-            || lowercaseMessage.StartsWith("r ")
-            || lowercaseMessage.Equals("r")
-            || lowercaseMessage.StartsWith("u ")
-            || lowercaseMessage.Equals("u")
-            || lowercaseMessage.StartsWith("ul ")
-            || lowercaseMessage.Equals("ul")
-            || lowercaseMessage.StartsWith("ur ")
-            || lowercaseMessage.Equals("ur")
-        )
-        {
-            /// Warning: the above list only exists until a List.Any is implemented for the check
-            HandleJump(e);
-        }
-    }
-
-    private void HandleGlow(string senderId, string message, string hexColor, bool isPrivileged)
-    {
-        if (!isPrivileged)
-        {
-            return;
-        }
-
-        var userId = senderId;
-        if (!_jumpers.ContainsKey(userId))
-        {
-            return;
-        }
-
-        Jumper jumper = _jumpers[userId];
-
-        string[] parts = message.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-
-        if (parts.Length == 1)
-        {
-            jumper.SetGlow(hexColor);
-        }
-        else
-        {
-            jumper.SetGlow(parts[1]);
-        }
-    }
-
-    private void HandleUnglow(string userId)
-    {
-        if (!_jumpers.ContainsKey(userId))
-        {
-            return;
-        }
-
-        Jumper jumper = _jumpers[userId];
-        jumper.DisableGlow();
-    }
-
-    private void HandleChangeCharacter(string userId, string message)
-    {
-        if (!_jumpers.ContainsKey(userId))
-        {
-            return;
-        }
-
-        RandomNumberGenerator rng = new RandomNumberGenerator();
-        int choice = rng.RandiRange(1, 18);
-
-        string[] parts = message.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-
-        if (parts.Length > 1 && int.TryParse(parts[1], out int specifiedChoice))
-        {
-            choice = specifiedChoice;
-        }
-
-        choice = Math.Clamp(choice, 1, 18);
-
-        Jumper jumper = _jumpers[userId];
-        jumper.SetCharacter(choice);
-    }
-
-    private void HandleJump(MessageEventArgs e)
-    {
-        string userId = e.SenderId;
-
-        /// We don't have to go through the logic if the sender does not exist on the jumpers list
-        if (!_jumpers.ContainsKey(userId))
-        {
-            return;
-        }
-
-        if (!IsAllowedToJump())
-        {
-            return;
-        }
-
-        JumpCommand command = new(e.Message);
-
-        if (!command.IsValid())
-        {
-            return;
-        }
-
-        Jumper jumper = _jumpers[userId];
-
-        jumper.CallDeferred(nameof(jumper.Jump), command.Angle, command.Power);
-    }
-
-    /// <summary>
-    /// Players are allowed to jump only if the game is still running or if 5
-    /// seconds have passed since the game ended (that way players don't jump
-    /// off the podiums due to a stream delay)
-    /// </summary>
-    private bool IsAllowedToJump()
-    {
-        return _timeSinceGameEnd <= 0 || (DateTime.Now.Ticks - _timeSinceGameEnd) / TimeSpan.TicksPerMillisecond > 5000;
-    }
-
     private void AddPlayer(string userId, string userName, string hexColor, bool isPrivileged)
     {
         if (_jumpers.ContainsKey(userId))
@@ -601,12 +560,12 @@ public partial class Arena : Node2D
             return;
         }
 
-        RandomNumberGenerator rng = new RandomNumberGenerator();
-        int randomCharacterChoice = rng.RandiRange(1, 18);
+        int randomCharacterChoice = _rng.RandiRange(1, 18);
 
-        var playerData = _allPlayerData.players.ContainsKey(userId)
+        PlayerData playerData = _allPlayerData.players.ContainsKey(userId)
             ? _allPlayerData.players[userId]
             : new PlayerData(hexColor, randomCharacterChoice);
+
         _allPlayerData.players[userId] = playerData;
 
         // Even if the player already existed, we may need to update their name.
@@ -619,11 +578,14 @@ public partial class Arena : Node2D
         }
 
         Jumper jumper = JumperScene.Instantiate() as Jumper;
+        Rect2 viewport = GetViewportRect();
         int tileHeight = TileSetToUse.TileSize.Y;
-        var viewport = GetViewportRect();
-        int y = ((int)(viewport.Size.Y / tileHeight) - 1 - WallHeight) * tileHeight;
         int xPadding = TileSetToUse.TileSize.X * 3;
-        jumper.Init(rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding), y, userName, playerData);
+        int x = _rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding);
+        int y = ((int)(viewport.Size.Y / tileHeight) - 1 - WallHeight) * tileHeight;
+
+        jumper.Init(x, y, userName, playerData);
+
         AddChild(jumper);
 
         _jumpers.Add(userId, jumper);
