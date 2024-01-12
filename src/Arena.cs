@@ -98,8 +98,7 @@ public partial class Arena : Node2D
         // execute if `unglow` was sent in the chat, because we don't use exact matching
         switch (command.Name)
         {
-            #region Commands for all Chatters (active)
-
+            // -- Commands for all Chatters (active)
             case string when CommandMatcher.MatchesUnglow(command.Name):
                 HandleUnglow(jumper);
                 break;
@@ -111,16 +110,13 @@ public partial class Arena : Node2D
             case string when CommandMatcher.MatchesCharacterChange(command.Name):
                 HandleChangeCharacter(jumper, numericArguments[0]);
                 break;
+            //-------------------------------------
 
-            #endregion
-
-            #region Commands for Mods, VIPs, Subs
-
+            // -- Commands for Mods, VIPs, Subs
             case string when CommandMatcher.MatchesGlow(command.Name, isPrivileged):
                 HandleGlow(jumper, stringArguments[0], hexColor);
                 break;
-
-            #endregion
+            //-------------------------------------
 
             // Adding a new command:
             // - make a new case, decide if it needs the isPrivileged argument (sub only, etc.)
@@ -139,8 +135,6 @@ public partial class Arena : Node2D
             // e.g. extra Char command choices for subs apart from 1-18, like new characters.
         }
     }
-
-    #region Command Handles
 
     private static void HandleGlow(Jumper jumper, string userHexColor, string twitchChatHexColor)
     {
@@ -174,10 +168,6 @@ public partial class Arena : Node2D
 
         jumper.Jump(command.Angle, command.Power);
     }
-
-    #endregion
-
-
 
     /// <summary>
     /// Players are allowed to jump only if the game is still running or if 5
