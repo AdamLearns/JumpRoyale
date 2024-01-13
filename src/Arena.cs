@@ -532,7 +532,7 @@ public partial class Arena : Node2D
         GetLobbyOverlay().Visible = false;
         var gameOverlay = GetGameOverlay();
         gameOverlay.Visible = true;
-        gameOverlay.init();
+        gameOverlay.Init();
     }
 
     private void OnRedemption(object sender, OnRewardRedeemedArgs e)
