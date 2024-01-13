@@ -9,11 +9,35 @@ using TwitchLib.PubSub.Events;
 
 public partial class Arena : Node2D
 {
+    private const int WallHeightInTiles = 15;
+    private const int ArenaHeightInTiles = 600;
+
+    private const string LobbyOverlayNodeName = "LobbyOverlay";
+    private const string GameOverlayNodeName = "GameOverlay";
+    private const string EndScreenOverlayNodeName = "EndScreenOverlay";
+    private const string CameraNodeName = "Camera";
+    private const string CanvasLayerNodeName = "CanvasLayer";
+    private const string SaveLocation = "res://save_data/players.json";
+
+    private readonly Dictionary<string, Jumper> _jumpers = new();
+
     [Export]
     private PackedScene? _jumperScene;
 
     [Export]
     private TileSet? _tileSetToUse;
+
+    private bool _hasGameEnded;
+
+    private int _ceilingHeight;
+    private int _choice = 1;
+    private int _generatedMaxHeight;
+    private int _heightInTiles;
+    private int _widthInTiles;
+
+    private long _timeSinceGameEnd;
+
+    private TileMap _lobbyTilemap = new();
 
     [Signal]
     public delegate void PlayerCountChangeEventHandler(int numPlayers);
@@ -24,36 +48,14 @@ public partial class Arena : Node2D
     [Signal]
     public delegate void CameraSpeedChangedEventHandler(int speed);
 
-    private int _choice = 1;
-
-    private bool _hasGameEnded = false;
-    private long _timeSinceGameEnd = 0;
-
-    private const string LobbyOverlayNodeName = "LobbyOverlay";
-    private const string GameOverlayNodeName = "GameOverlay";
-    private const string EndScreenOverlayNodeName = "EndScreenOverlay";
-    private const string CameraNodeName = "Camera";
-    private const string CanvasLayerNodeName = "CanvasLayer";
-    private const string SaveLocation = "res://save_data/players.json";
-
-    private const int WallHeight = 15; // in tiles
-    private const int ArenaHeight = 600; // in tiles
-    private int _widthInTiles;
-    private int _heightInTiles;
-    private int _ceilingHeight;
-    private TileMap _lobbyTilemap;
-
-    private int _generatedMaxHeight;
-
-    private readonly Dictionary<string, Jumper> _jumpers = new Dictionary<string, Jumper>();
-
     private AllPlayerData _allPlayerData = new AllPlayerData();
 
     private RandomNumberGenerator _rng = new();
 
-    // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
+        _lobbyTilemap = new TileMap { Name = "TileMap", TileSet = _tileSetToUse };
+
         TwitchChatClient twitchChatClient = new();
         twitchChatClient.OnRedemption += OnRedemption;
         twitchChatClient.OnMessage += OnMessage;
@@ -212,8 +214,6 @@ public partial class Arena : Node2D
     {
         Ensure.IsNotNull(_tileSetToUse);
 
-        _lobbyTilemap = new TileMap { Name = "TileMap", TileSet = _tileSetToUse };
-
         var viewport = GetViewportRect();
         _heightInTiles = (int)(viewport.Size.Y / _tileSetToUse.TileSize.Y);
         _widthInTiles = (int)(viewport.Size.X / _tileSetToUse.TileSize.X);
@@ -237,7 +237,7 @@ public partial class Arena : Node2D
         }
 
         int wallStartY = floorY - 1;
-        _ceilingHeight = wallStartY - WallHeight - 1;
+        _ceilingHeight = wallStartY - WallHeightInTiles - 1;
 
         // Draw the vertical walls
         for (int y = wallStartY; y >= _ceilingHeight; y--)
@@ -291,7 +291,7 @@ public partial class Arena : Node2D
         for (int y = _generatedMaxHeight - 1; y >= cameraPosInTiles; y--)
         {
             // This goes from 0 to 1 linearly as Y decreases
-            float difficultyFactor = (float)Math.Min(0, y) / -ArenaHeight;
+            float difficultyFactor = (float)Math.Min(0, y) / -ArenaHeightInTiles;
 
             // Rarely, make a solid block to add some variety
             int r = _rng.RandiRange(0, 100);
@@ -609,7 +609,7 @@ public partial class Arena : Node2D
         int tileHeight = _tileSetToUse.TileSize.Y;
         int xPadding = _tileSetToUse.TileSize.X * 3;
         int x = _rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding);
-        int y = ((int)(viewport.Size.Y / tileHeight) - 1 - WallHeight) * tileHeight;
+        int y = ((int)(viewport.Size.Y / tileHeight) - 1 - WallHeightInTiles) * tileHeight;
 
         jumper.Init(x, y, userName, playerData);
 
