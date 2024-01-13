@@ -47,7 +47,7 @@ public partial class Jumper : CharacterBody2D
         var clothingNumber = ((choice - 1) % 3) + 1;
         GD.Print("Choice: " + choice + " Gender: " + gender + " Char: " + charNumber + " Clothing: " + clothingNumber);
         var sprite = GetNode<AnimatedSprite2D>(SpriteNodeName);
-        sprite.SpriteFrames = SpriteFrameCreator.getInstance().GetSpriteFrames(gender, charNumber, clothingNumber);
+        sprite.SpriteFrames = SpriteFrameCreator.Instance.GetSpriteFrames(gender, charNumber, clothingNumber);
 
         if (IsOnFloor())
         {
