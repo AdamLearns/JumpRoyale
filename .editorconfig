@@ -23,6 +23,75 @@ generated_code = true
 
 # C# files
 [*.cs]
+# --- StyleCop ---
+# Require space after `new` keyword
+dotnet_diagnostic.SA1000.severity = none
+# Ignore cases for closing parenthesis being on new line
+# -- should not show this warning for multi-line constructors
+dotnet_diagnostic.SA1009.severity = none
+# Prefix local calls with `this`
+dotnet_diagnostic.SA1101.severity = none
+# Do not prefix local calls with `this`
+dotnet_diagnostic.SX1101.severity = warning
+# Allow closing parenthesis to be on new line after parameters
+dotnet_diagnostic.SA1111.severity = none
+# Do not use Regions
+dotnet_diagnostic.SA1124.severity = none
+# `using` only within namespace
+dotnet_diagnostic.SA1200.severity = none
+# Field should not begin with underscore
+dotnet_diagnostic.SA1309.severity = none
+# Field should begin with underscore (we want this)
+dotnet_diagnostic.SX1309.severity = warning
+# File should contain only a single type
+dotnet_diagnostic.SA1402.severity = none
+# Arithmetic expressions should declare precedence - require parenthesis
+dotnet_diagnostic.SA1407.severity = none
+# Allow single line elements (bodyless expression, abstract method, etc)
+dotnet_diagnostic.SA1502.severity = none
+# Blank lines between elements
+dotnet_diagnostic.SA1516.severity = warning
+# Require documentation of the element
+dotnet_diagnostic.SA1600.severity = none
+# Enum elements should be documented
+dotnet_diagnostic.SA1602.severity = none
+# Return value should always be documented
+dotnet_diagnostic.SA1615.severity = none
+# File name should match first type
+dotnet_diagnostic.SA1649.severity = none
+# Partial elements should be documented
+dotnet_diagnostic.SA1601.severity = none
+# File header (license, etc.)
+dotnet_diagnostic.SA1633.severity = none
+
+
+# --- Sonar Analyzer ---
+# No commented code blocks (questionable, sometimes)
+dotnet_diagnostic.S125.severity = none
+# Require protected constructor in non static class
+dotnet_diagnostic.S1118.severity = none
+# Require classes to be in a namespace
+dotnet_diagnostic.S3903.severity = none
+
+# --- IDE rules ---
+# Ignore s_ prefixes
+dotnet_diagnostic.IDE1006.severity = none
+# 'new' expression can be simplified
+dotnet_diagnostic.IDE0090.severity = warning
+
+# --- Code Analysis Rules ---
+# Declare types in namespaces
+dotnet_diagnostic.CA1050.severity = none
+# Ignore CultureInfo on string operations (applying locales)
+dotnet_diagnostic.CA1304.severity = none
+dotnet_diagnostic.CA1305.severity = none
+# Mark members as static when they don't access instance data
+# This is only for performance-sensitive operations, so we don't need this
+dotnet_diagnostic.CA1822.severity = none
+# Force disposing fields
+dotnet_diagnostic.CA2213.severity = none
+
+
 # New line preferences
 csharp_new_line_before_open_brace = all
 csharp_new_line_before_else = true
@@ -42,12 +111,6 @@ csharp_indent_labels = one_less_than_current
 
 # Modifier preferences
 csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:suggestion
-
-# avoid this. unless absolutely necessary
-dotnet_style_qualification_for_field = false:suggestion
-dotnet_style_qualification_for_property = false:suggestion
-dotnet_style_qualification_for_method = false:suggestion
-dotnet_style_qualification_for_event = false:suggestion
 
 # Types: use keywords instead of BCL types, and permit var only when the type is clear
 csharp_style_var_for_built_in_types = false:suggestion
