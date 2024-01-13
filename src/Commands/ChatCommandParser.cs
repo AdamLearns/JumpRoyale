@@ -9,28 +9,31 @@ internal class ChatCommandParser
     /// </summary>
     private const int MaxArguments = 2;
 
-    public string Name { get; private set; }
-
-    private readonly List<string> _arguments = new();
+    private readonly List<string?> _arguments;
 
     internal ChatCommandParser(string chatMessage)
     {
         _arguments = ParseChatMessage(chatMessage);
 
-        Name = _arguments[0];
+        if (_arguments.Count > 0)
+        {
+            Name = _arguments[0] ?? string.Empty;
 
-        // We don't need the name in the arguments anymore
-        _arguments.RemoveAt(0);
+            // We don't need the name in the arguments anymore
+            _arguments.RemoveAt(0);
+        }
     }
 
-    public string[] ArgumentsAsStrings()
+    public string Name { get; private set; } = string.Empty;
+
+    public string?[] ArgumentsAsStrings()
     {
         return PadList(_arguments, null).ToArray();
     }
 
     /// <summary>
     /// Tries to parse detected arguments to numbers (or nulls) and returns them in a padded
-    /// array. The padding values are nulls for easier defaulting
+    /// array. The padding values are nulls for easier defaulting.
     /// </summary>
     public int?[] ArgumentsAsNumbers()
     {
@@ -55,10 +58,10 @@ internal class ChatCommandParser
 
     /// <summary>
     /// Pad the arguments so the commands can imply their own default value in case a null was
-    /// present at requested position
+    /// present at requested position.
     /// </summary>
-    /// <param name="list"></param>
-    /// <param name="padValue">"Filler" to add if the arguments count is below set Maximum</param>
+    /// <param name="list">List to pad.</param>
+    /// <param name="padValue">"Filler" to add if the arguments count is below set Maximum.</param>
     private static List<T> PadList<T>(List<T> list, T padValue)
     {
         if (list.Count < MaxArguments)
@@ -69,9 +72,9 @@ internal class ChatCommandParser
         return list;
     }
 
-    private static List<string> ParseChatMessage(string chatMessage)
+    private static List<string?> ParseChatMessage(string chatMessage)
     {
-        List<string> result = new();
+        List<string?> result = new();
 
         // TODO: find a way to capture mixed values, like Hex (e.g. glow BDFF00)
         // Unfortunately, for now, since the only command that uses mixed values is glow, we have
@@ -82,7 +85,7 @@ internal class ChatCommandParser
             return HandleHexArguments(chatMessage);
         }
 
-        string tmpWord = "";
+        string tmpWord = string.Empty;
         bool wasDigit = false;
         bool wasLetter = false;
 
@@ -93,7 +96,7 @@ internal class ChatCommandParser
             {
                 result.Add(tmpWord);
 
-                tmpWord = "";
+                tmpWord = string.Empty;
             }
 
             tmpWord += letter;
@@ -125,15 +128,15 @@ internal class ChatCommandParser
         if (!result.Any())
         {
             // Just a failsafe in case nothing was caught and to have reference for Name
-            result.Add("");
+            result.Add(string.Empty);
         }
 
         return result;
     }
 
-    private static List<string> HandleHexArguments(string chatMessage)
+    private static List<string?> HandleHexArguments(string chatMessage)
     {
-        List<string> arguments = new() { "glow" };
+        List<string?> arguments = new() { "glow" };
 
         string[] split = chatMessage.Split(
             "glow",

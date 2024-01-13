@@ -80,7 +80,7 @@ public partial class Arena : Node2D
     {
         ChatCommandParser command = new(message.ToLower());
 
-        string[] stringArguments = command.ArgumentsAsStrings();
+        string?[] stringArguments = command.ArgumentsAsStrings();
         int?[] numericArguments = command.ArgumentsAsNumbers();
 
         // Join is the only command that can be executed by everyone, whether joined or not.
