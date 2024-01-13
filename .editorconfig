@@ -85,6 +85,11 @@ dotnet_diagnostic.CA1050.severity = none
 # Ignore CultureInfo on string operations (applying locales)
 dotnet_diagnostic.CA1304.severity = none
 dotnet_diagnostic.CA1305.severity = none
+dotnet_diagnostic.CA1307.severity = none
+dotnet_diagnostic.CA1308.severity = none
+dotnet_diagnostic.CA1309.severity = none
+dotnet_diagnostic.CA1310.severity = none
+dotnet_diagnostic.CA1311.severity = none
 # Mark members as static when they don't access instance data
 # This is only for performance-sensitive operations, so we don't need this
 dotnet_diagnostic.CA1822.severity = none
