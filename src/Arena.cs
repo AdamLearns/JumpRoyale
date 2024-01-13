@@ -462,7 +462,7 @@ public partial class Arena : Node2D
         for (int i = 0; i < winners.Length; i++)
         {
             var userId = winners[i];
-            var playerData = _allPlayerData.players[userId];
+            var playerData = _allPlayerData.Players[userId];
             var jumper = _jumpers[userId];
             var height = GetHeightFromYPosition(jumper.Position.Y);
             var totalHeight = Formatter.FormatBigNumber(playerData.TotalHeightAchieved);
@@ -579,11 +579,11 @@ public partial class Arena : Node2D
 
         int randomCharacterChoice = _rng.RandiRange(1, 18);
 
-        PlayerData playerData = _allPlayerData.players.ContainsKey(userId)
-            ? _allPlayerData.players[userId]
+        PlayerData playerData = _allPlayerData.Players.ContainsKey(userId)
+            ? _allPlayerData.Players[userId]
             : new PlayerData(hexColor, randomCharacterChoice);
 
-        _allPlayerData.players[userId] = playerData;
+        _allPlayerData.Players[userId] = playerData;
 
         // Even if the player already existed, we may need to update their name.
         playerData.Name = userName;

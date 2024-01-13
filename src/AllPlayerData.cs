@@ -2,5 +2,5 @@ using System.Collections.Generic;
 
 public class AllPlayerData
 {
-    public Dictionary<string, PlayerData> players { get; set; } = new Dictionary<string, PlayerData>();
+    public Dictionary<string, PlayerData> Players { get; } = new Dictionary<string, PlayerData>();
 }
