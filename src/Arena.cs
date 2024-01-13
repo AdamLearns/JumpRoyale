@@ -10,10 +10,10 @@ using TwitchLib.PubSub.Events;
 public partial class Arena : Node2D
 {
     [Export]
-    public PackedScene JumperScene;
+    private PackedScene? _jumperScene;
 
     [Export]
-    public TileSet TileSetToUse;
+    private TileSet? _tileSetToUse;
 
     [Signal]
     public delegate void PlayerCountChangeEventHandler(int numPlayers);
@@ -210,11 +210,13 @@ public partial class Arena : Node2D
 
     private void GenerateLobby()
     {
-        _lobbyTilemap = new TileMap { Name = "TileMap", TileSet = TileSetToUse };
+        Ensure.IsNotNull(_tileSetToUse);
+
+        _lobbyTilemap = new TileMap { Name = "TileMap", TileSet = _tileSetToUse };
 
         var viewport = GetViewportRect();
-        _heightInTiles = (int)(viewport.Size.Y / TileSetToUse.TileSize.Y);
-        _widthInTiles = (int)(viewport.Size.X / TileSetToUse.TileSize.X);
+        _heightInTiles = (int)(viewport.Size.Y / _tileSetToUse.TileSize.Y);
+        _widthInTiles = (int)(viewport.Size.X / _tileSetToUse.TileSize.X);
 
         int floorY = _heightInTiles - 3;
 
@@ -271,12 +273,14 @@ public partial class Arena : Node2D
 
     private void GenerateProceduralPlatforms()
     {
+        Ensure.IsNotNull(_tileSetToUse);
+
         var camera = GetNode<Camera2D>(CameraNodeName);
         var viewport = GetViewportRect();
         // NOTE(Hop): GetScreenCenterPosition was the only way to get accurate viewport position
         //            without ignoring Position Smoothing
         float cameraPos = camera.GetScreenCenterPosition().Y - (viewport.Size.Y / 2);
-        int cameraPosInTiles = (int)(cameraPos / TileSetToUse.TileSize.Y);
+        int cameraPosInTiles = (int)(cameraPos / _tileSetToUse.TileSize.Y);
 
         if (cameraPosInTiles >= _generatedMaxHeight)
         {
@@ -350,6 +354,8 @@ public partial class Arena : Node2D
 
     private void CreateEndArena(string[] winners)
     {
+        Ensure.IsNotNull(_tileSetToUse);
+
         // Draw border around the whole arena and clear any platforms
         for (int x = 0; x < _widthInTiles; x++)
         {
@@ -425,7 +431,7 @@ public partial class Arena : Node2D
             {
                 tileX += podiumWidth;
             }
-            jumper.Position = new Vector2(tileX * TileSetToUse.TileSize.X, 50);
+            jumper.Position = new Vector2(tileX * _tileSetToUse.TileSize.X, 50);
             int scale = winners.Length + 1 - i;
             jumper.Scale = new Vector2(scale, scale);
             jumper.SetCrazyParticles();
@@ -572,6 +578,9 @@ public partial class Arena : Node2D
 
     private void AddPlayer(string userId, string userName, string hexColor, bool isPrivileged)
     {
+        Ensure.IsNotNull(_jumperScene);
+        Ensure.IsNotNull(_tileSetToUse);
+
         if (_jumpers.ContainsKey(userId))
         {
             return;
@@ -594,10 +603,11 @@ public partial class Arena : Node2D
             playerData.GlowColor = null;
         }
 
-        Jumper jumper = JumperScene.Instantiate() as Jumper;
+        Jumper jumper = (Jumper)_jumperScene.Instantiate();
+
         Rect2 viewport = GetViewportRect();
-        int tileHeight = TileSetToUse.TileSize.Y;
-        int xPadding = TileSetToUse.TileSize.X * 3;
+        int tileHeight = _tileSetToUse.TileSize.Y;
+        int xPadding = _tileSetToUse.TileSize.X * 3;
         int x = _rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding);
         int y = ((int)(viewport.Size.Y / tileHeight) - 1 - WallHeight) * tileHeight;
 
@@ -665,6 +675,8 @@ public partial class Arena : Node2D
 
     private void MoveCamera()
     {
+        Ensure.IsNotNull(_tileSetToUse);
+
         // Iterate over jumpers and check for the highest player
         if (_jumpers.Count == 0 || _hasGameEnded)
         {
@@ -687,7 +699,7 @@ public partial class Arena : Node2D
         EmitSignal(SignalName.MaxHeightChanged, playerName, maxHeight);
 
         // Make sure the camera doesn't go higher than 0
-        int tileHeight = TileSetToUse.TileSize.Y;
+        int tileHeight = _tileSetToUse.TileSize.Y;
         lowestYValue = Math.Min(lowestYValue - tileHeight * 16, 0);
 
         var camera = GetNode<Camera2D>(CameraNodeName);
