@@ -74,6 +74,8 @@ dotnet_diagnostic.S1118.severity = none
 dotnet_diagnostic.S3903.severity = none
 
 # --- IDE rules ---
+# Unnecessary usings
+dotnet_diagnostic.IDE0005.severity = warning
 # Ignore s_ prefixes
 dotnet_diagnostic.IDE1006.severity = none
 # 'new' expression can be simplified
