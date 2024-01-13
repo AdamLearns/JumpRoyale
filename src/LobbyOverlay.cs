@@ -6,27 +6,25 @@ public partial class LobbyOverlay : FlowContainer
     private const string LobbyTimerNodeName = "LobbyTimer";
     private const string NumPlayersNodeName = "NumPlayers";
 
+    private int _lobbyTimer = 40;
+
     [Signal]
     public delegate void TimerDoneEventHandler();
 
-    private int _lobbyTimer = 40;
-
-    // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        var arena = GetTree().Root.GetNode<Arena>("Arena");
+        Arena arena = GetTree().Root.GetNode<Arena>("Arena");
 
         arena.PlayerCountChange += OnPlayerCountChange;
 
         _ = StartTimer();
     }
 
-    public async Task StartTimer()
+    private async Task StartTimer()
     {
         await ToSignal(GetTree().CreateTimer(1.0f), SceneTreeTimer.SignalName.Timeout);
 
-        _lobbyTimer--;
-        GetNode<Label>(LobbyTimerNodeName).Text = $"Game starts in: {_lobbyTimer}s";
+        UpdateCountdown();
 
         if (_lobbyTimer <= 0)
         {
@@ -38,8 +36,15 @@ public partial class LobbyOverlay : FlowContainer
         }
     }
 
-    public void OnPlayerCountChange(int numPlayers)
+    private void OnPlayerCountChange(int numPlayers)
     {
         GetNode<Label>(NumPlayersNodeName).Text = $"Players: {numPlayers}";
+    }
+
+    private void UpdateCountdown()
+    {
+        _lobbyTimer--;
+
+        GetNode<Label>(LobbyTimerNodeName).Text = $"Game starts in: {_lobbyTimer}s";
     }
 }
