@@ -82,9 +82,11 @@ public class SpriteFrameCreator
     public void Create(string gender, int charNumber, int clothingNumber)
     {
         var spriteFrames = new SpriteFrames();
+
         foreach (string animName in _numFramesPerAnimation.Keys)
         {
             spriteFrames.AddAnimation(animName);
+
             string fullGender = gender == "m" ? "Male" : "Female";
             string pathToFolder =
                 $"res://assets/sprites/characters/{fullGender}/Character {charNumber}/Clothes {clothingNumber}/";
