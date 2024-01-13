@@ -13,6 +13,7 @@ config_version=5
 config/name="Jump Royale"
 run/main_scene="res://scenes/Arena.tscn"
 config/features=PackedStringArray("4.2", "C#", "Forward Plus")
+run/max_fps=60
 config/icon="res://assets/sprites/icon.svg"
 
 [display]
