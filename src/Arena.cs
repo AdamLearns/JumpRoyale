@@ -158,11 +158,11 @@ public partial class Arena : Node2D
 
         int randomCharacterChoice = _rng.RandiRange(1, 18);
 
-        PlayerData playerData = _allPlayerData.Players.ContainsKey(userId)
-            ? _allPlayerData.Players[userId]
+        PlayerData playerData = _allPlayerData.players.ContainsKey(userId)
+            ? _allPlayerData.players[userId]
             : new PlayerData(hexColor, randomCharacterChoice);
 
-        _allPlayerData.Players[userId] = playerData;
+        _allPlayerData.players[userId] = playerData;
 
         // Even if the player already existed, we may need to update their name.
         playerData.Name = userName;
@@ -175,8 +175,19 @@ public partial class Arena : Node2D
         int x = _rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding);
         int y = ((int)(viewport.Size.Y / tileHeight) - 1 - WallHeightInTiles) * tileHeight;
 
-        jumper.Init(x, y, userName, playerData, isPrivileged);
+        jumper.Init(x, y, userName, playerData);
         AddChild(jumper);
+
+        // Note: the following block requires the jumper to be initialized before performing any changes,
+        // either cosmetic or on the jumper himself
+        jumper.SetCharacter(playerData.CharacterChoice);
+
+        if (!isPrivileged)
+        {
+            jumper.DisableGlow();
+        }
+
+        // ----------
         _jumpers.Add(userId, jumper);
 
         EmitSignal(SignalName.PlayerCountChange, _jumpers.Count);
@@ -259,14 +270,32 @@ public partial class Arena : Node2D
         }
 
         string jsonString = File.ReadAllText(filesystemLocation);
-        AllPlayerData? jsonResult = JsonSerializer.Deserialize<AllPlayerData>(jsonString);
 
-        // We are safe to "cheat" in this case, the json result can still be nullable, but this will only happen if
-        // the json input was literally "null" - this will return null. Otherwise, if an unparsable string was
-        // passed to the deserialization, it will throw an exception first, so we just handle a very edge case
-        Ensure.IsNotNull(jsonResult);
+        try
+        {
+            AllPlayerData? jsonResult = JsonSerializer.Deserialize<AllPlayerData>(jsonString);
 
-        _allPlayerData = jsonResult;
+            // We are safe to "cheat" in this case, the json result can still be nullable, but this will only happen if
+            // the json input was literally "null" - this will return null. Otherwise, if an unparsable string was
+            // passed to the deserialization, it will throw an exception first, so we just handle a very edge case
+            Ensure.IsNotNull(jsonResult);
+
+            // Note: the current system works with a json file. Change this when database is implemented. When
+            // something changes within the structure of the generic type we use during deserialization, it
+            // can return an empty instance, because, for example, the case on field changed
+            if (jsonResult.players.Count == 0)
+            {
+                GD.PushError(
+                    $"No records returned from the json string (length: {jsonString.Length}). If the json string appears to be valid and contains data, make sure"
+                );
+            }
+
+            _allPlayerData = jsonResult;
+        }
+        catch (JsonException e)
+        {
+            GD.PushError(e.Message);
+        }
     }
 
     private void SaveAllPlayers()
@@ -556,7 +585,7 @@ public partial class Arena : Node2D
         for (int i = 0; i < winners.Length; i++)
         {
             string userId = winners[i];
-            PlayerData playerData = _allPlayerData.Players[userId];
+            PlayerData playerData = _allPlayerData.players[userId];
             Jumper jumper = _jumpers[userId];
             int height = GetHeightFromYPosition(jumper.Position.Y);
             string totalHeight = Formatter.FormatBigNumber(playerData.TotalHeightAchieved);
@@ -595,7 +624,7 @@ public partial class Arena : Node2D
         for (int i = 0; i < _jumpers.Count; i++)
         {
             Jumper jumper = _jumpers.ElementAt(i).Value;
-            PlayerData playerData = jumper.playerData;
+            PlayerData playerData = jumper.PlayerData;
             bool showName = false;
 
             playerData.NumPlays++;
@@ -660,7 +689,7 @@ public partial class Arena : Node2D
         {
             Jumper jumper = jumpersEntry.Value;
 
-            if (jumper.playerData.Name.ToLower() != displayName.ToLower())
+            if (jumper.PlayerData.Name.ToLower() != displayName.ToLower())
             {
                 continue;
             }
@@ -676,7 +705,7 @@ public partial class Arena : Node2D
             Jumper thirdHighestJumper = _jumpers[thirdHighestPlayerId];
 
             GD.Print("Reviving " + displayName);
-            GD.Print("Snapping to " + thirdHighestJumper.playerData.Name);
+            GD.Print("Snapping to " + thirdHighestJumper.PlayerData.Name);
 
             jumper.Position = thirdHighestJumper.Position;
             jumper.Velocity = thirdHighestJumper.Velocity;

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Godot;
 
 public partial class Jumper : CharacterBody2D
@@ -6,34 +7,38 @@ public partial class Jumper : CharacterBody2D
     private const string SpriteNodeName = "Sprite";
     private const string NameNodeName = "Name";
     private const string ParticleSystemNodeName = "Glow";
+    private const float NameFadeoutTime = 5000f;
 
     private bool _wasOnFloor;
     private bool _lastJumpZeroAngle;
 
     // Get the gravity from the project settings to be synced with RigidBody nodes.
-    public float gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle();
+    private float _gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle();
 
     private Vector2 _jumpVelocity;
 
-    public PlayerData playerData;
-
-    private bool _hasJumped;
+    /// <summary>
+    /// Stores the game time as timestamp for the font fadeout timer.
+    /// </summary>
     private ulong _fontVisibilityTimerStartTime;
 
-    public void Init(int x, int y, string userName, PlayerData playerData)
+    private bool _hasJumped;
+
+    // This property is externally set by Init and there is no constructor on this class, so it can not be initialized
+    // inside here. It will never become null unless some external method does a really bad job parsing the player
+    // data from json
+    [AllowNull]
+    public PlayerData PlayerData { get; private set; }
+
+    public void Init(int x, int y, string userName, [NotNull] PlayerData playerData)
     {
         Position = new Vector2(x, y);
         Name = userName;
-        this.playerData = playerData;
+        PlayerData = playerData;
 
         GetNode<RichTextLabel>(NameNodeName).Text = "[center]" + userName + "[/center]";
 
         SetCharacter(playerData.CharacterChoice);
-
-        if (playerData.GlowColor is not null)
-        {
-            SetGlow(playerData.GlowColor);
-        }
     }
 
     public void SetCrazyParticles()
@@ -44,7 +49,7 @@ public partial class Jumper : CharacterBody2D
 
     public void SetCharacter(int choice)
     {
-        playerData.CharacterChoice = choice;
+        PlayerData.CharacterChoice = choice;
 
         AnimatedSprite2D sprite = GetNode<AnimatedSprite2D>(SpriteNodeName);
         string gender = choice > 9 ? "f" : "m";
@@ -71,11 +76,12 @@ public partial class Jumper : CharacterBody2D
             color = new Color(color.R, color.G, color.B, 1f);
             particles.SelfModulate = color;
             particles.Visible = true;
-            playerData.GlowColor = color.ToHtml(false);
+            PlayerData.GlowColor = color.ToHtml(false);
         }
         catch (Exception e)
         {
             GD.Print($"Failed to set glow color to {colorString}", e);
+            throw;
         }
     }
 
@@ -84,7 +90,6 @@ public partial class Jumper : CharacterBody2D
         CpuParticles2D particles = GetGlowNode();
 
         particles.Visible = false;
-        playerData.GlowColor = string.Empty;
     }
 
     public override void _Ready()
@@ -106,13 +111,13 @@ public partial class Jumper : CharacterBody2D
     {
         if (IsOnFloor())
         {
-            double normalizedPower = Math.Sqrt(power * 5 * gravity);
+            double normalizedPower = Math.Sqrt(power * 5 * _gravity);
 
             _jumpVelocity.X = Mathf.Cos(Mathf.DegToRad(angle + 180));
             _jumpVelocity.Y = Mathf.Sin(Mathf.DegToRad(angle + 180));
             _jumpVelocity = _jumpVelocity.Normalized() * (float)normalizedPower;
 
-            playerData.NumJumps++;
+            PlayerData.NumJumps++;
             SetNameAlpha(1f);
 
             _hasJumped = true;
@@ -149,7 +154,7 @@ public partial class Jumper : CharacterBody2D
         // Add the gravity.
         if (!IsOnFloor())
         {
-            velocity.Y += gravity * (float)delta;
+            velocity.Y += _gravity * (float)delta;
         }
 
         AnimatedSprite2D sprite = GetNode<AnimatedSprite2D>(SpriteNodeName);
@@ -213,24 +218,23 @@ public partial class Jumper : CharacterBody2D
 
     private void UpdateNameTransparency()
     {
-        float alpha;
-
-        if (!_hasJumped)
-        {
-            alpha = 1f;
-        }
-        else
-        {
-            const ulong totalTimeMs = 5000;
-
-            ulong now = Time.GetTicksMsec();
-            ulong diffMs = now - _fontVisibilityTimerStartTime;
-            float diff = diffMs / (float)totalTimeMs;
-
-            alpha = Math.Max(0, 1 - diff);
-        }
+        float alpha = _hasJumped ? CalculateFontAlpha() : 1f;
 
         SetNameAlpha(alpha);
+    }
+
+    /// <summary>
+    /// Calculates the <c>alpha</c> color component based on the time difference of timestamps (<c>now</c> and <c>the
+    /// last time it was requested</c>).
+    /// </summary>
+    /// <returns>Alpha color from 0 to 1.</returns>
+    private float CalculateFontAlpha()
+    {
+        ulong now = Time.GetTicksMsec();
+        ulong diffMs = now - _fontVisibilityTimerStartTime;
+        float diff = diffMs / NameFadeoutTime;
+
+        return Math.Max(0, 1 - diff);
     }
 
     private CpuParticles2D GetGlowNode()
