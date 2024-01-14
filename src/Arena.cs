@@ -179,7 +179,8 @@ public partial class Arena : Node2D
         AddChild(jumper);
 
         // Note: the following block requires the jumper to be initialized before performing any changes,
-        // either cosmetic or on the jumper himself
+        // either cosmetic or on the jumper himself, because we have to read the input from playerData,
+        // which has to be sent to the jumper through .Init() first.
         jumper.SetCharacter(playerData.CharacterChoice);
 
         if (!isPrivileged)
