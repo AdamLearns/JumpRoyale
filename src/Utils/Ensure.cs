@@ -10,6 +10,9 @@ public static class Ensure
     /// </summary>
     /// <remarks>
     /// This method will resolve "dereference of possible null reference".
+    /// <para>
+    /// In some cases, this can be used for other checks, like JSON deserialization.
+    /// </para>
     /// </remarks>
     /// <param name="argument">Any object to test for null reference, preferably a scene component.</param>
     /// <typeparam name="T">Type of the argument - its full type name will be printed on exception.</typeparam>
