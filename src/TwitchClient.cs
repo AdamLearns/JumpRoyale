@@ -38,7 +38,7 @@ namespace TwitchChat
 
         private readonly TwitchPubSub _tps;
         private readonly TwitchClient _client;
-#pragma warning disable // Reserved until Twitch API Requests are implemented
+#pragma warning disable // Reserved until Twitch API Requests are implemented. Only expose methods calling this client!
         private readonly TwitchHttpClient _httpClient;
 #pragma warning restore
 
@@ -166,7 +166,7 @@ namespace TwitchChat
                     Message = message,
                     SenderName = senderName,
                     SenderId = senderId,
-                    HexColor = colorHex ?? "#ffffff",
+                    HexColor = colorHex,
                     IsPrivileged = isPrivileged,
                 }
             );
