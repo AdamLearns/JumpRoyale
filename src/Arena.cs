@@ -597,9 +597,10 @@ public partial class Arena : Node2D
                 $"Wins: {playerData.Num1stPlaceWins}/{playerData.Num2ndPlaceWins}/{playerData.Num3rdPlaceWins}. "
             );
             text.Append($"Lifetime height: {totalHeight}");
+            text.AppendLine();
         }
 
-        text.AppendLine().AppendLine();
+        text.AppendLine();
         text.Append($"Number of players this game: {_jumpers.Count}");
         text.AppendLine().AppendLine();
         text.Append("YOU CAN NOW JUMP FREELY (until Adam gets back)!");
