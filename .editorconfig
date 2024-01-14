@@ -24,6 +24,8 @@ generated_code = true
 # C# files
 [*.cs]
 # --- StyleCop ---
+# Generated XML documentation analysis
+dotnet_diagnostic.SA0001.severity = none
 # Require space after `new` keyword
 dotnet_diagnostic.SA1000.severity = none
 # Ignore cases for closing parenthesis being on new line
