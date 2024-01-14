@@ -48,7 +48,7 @@ public partial class Arena : Node2D
     [Signal]
     public delegate void CameraSpeedChangedEventHandler(int speed);
 
-    private AllPlayerData _allPlayerData = new AllPlayerData();
+    private AllPlayerData _allPlayerData = new();
 
     private RandomNumberGenerator _rng = new();
 
@@ -93,7 +93,7 @@ public partial class Arena : Node2D
             return;
         }
 
-        if (!_jumpers.TryGetValue(senderId, out Jumper jumper))
+        if (!_jumpers.TryGetValue(senderId, out Jumper? jumper))
         {
             return;
         }
@@ -115,17 +115,15 @@ public partial class Arena : Node2D
             case string when CommandMatcher.MatchesCharacterChange(command.Name):
                 HandleChangeCharacter(jumper, numericArguments[0]);
                 break;
-            //-------------------------------------
 
             // -- Commands for Mods, VIPs, Subs
             case string when CommandMatcher.MatchesGlow(command.Name, isPrivileged):
                 HandleGlow(jumper, stringArguments[0], hexColor);
                 break;
-            //-------------------------------------
         }
     }
 
-    private void HandleGlow(Jumper jumper, string userHexColor, string twitchChatHexColor)
+    private void HandleGlow(Jumper jumper, string? userHexColor, string twitchChatHexColor)
     {
         string glowColor = userHexColor is not null ? userHexColor : twitchChatHexColor;
 
@@ -161,7 +159,7 @@ public partial class Arena : Node2D
     /// <summary>
     /// Players are allowed to jump only if the game is still running or if 5
     /// seconds have passed since the game ended (that way players don't jump
-    /// off the podiums due to a stream delay)
+    /// off the podiums due to a stream delay).
     /// </summary>
     private bool IsAllowedToJump()
     {
@@ -193,20 +191,29 @@ public partial class Arena : Node2D
 
     private void LoadPlayerData()
     {
-        var filesystemLocation = ProjectSettings.GlobalizePath(SaveLocation);
+        string filesystemLocation = ProjectSettings.GlobalizePath(SaveLocation);
+
         if (!File.Exists(filesystemLocation))
         {
             return;
         }
 
-        var jsonString = File.ReadAllText(filesystemLocation);
-        _allPlayerData = JsonSerializer.Deserialize<AllPlayerData>(jsonString);
+        string jsonString = File.ReadAllText(filesystemLocation);
+        AllPlayerData? jsonResult = JsonSerializer.Deserialize<AllPlayerData>(jsonString);
+
+        // We are safe to "cheat" in this case, because the json result can be nullable, but this will only happen if
+        // the json input was literally "null" - this will return null. Otherwise, if an unparsable string was
+        // passed to the deserialization, it will throw an exception first, so we just handle a very edge case
+        Ensure.IsNotNull(jsonResult);
+
+        _allPlayerData = jsonResult;
     }
 
     private void SaveAllPlayers()
     {
         var filesystemLocation = ProjectSettings.GlobalizePath(SaveLocation);
-        string jsonString = JsonSerializer.Serialize<AllPlayerData>(_allPlayerData);
+        string jsonString = JsonSerializer.Serialize(_allPlayerData);
+
         File.WriteAllText(filesystemLocation, jsonString);
     }
 
