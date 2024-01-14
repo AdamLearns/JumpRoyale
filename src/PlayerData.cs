@@ -1,3 +1,4 @@
+// Note to contributors: do not rename anything in this class if player data already exists in the file!!!
 public class PlayerData
 {
     public PlayerData(string glowColor, int characterChoice)
