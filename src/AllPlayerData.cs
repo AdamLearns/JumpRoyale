@@ -2,5 +2,7 @@ using System.Collections.Generic;
 
 public class AllPlayerData
 {
-    public Dictionary<string, PlayerData> Players { get; } = new Dictionary<string, PlayerData>();
+#pragma warning disable // Exception, ignore warnings, because this has to match the existing json structure
+    public Dictionary<string, PlayerData> players { get; set; } = new();
+#pragma warning restore
 }
