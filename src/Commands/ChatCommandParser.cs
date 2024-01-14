@@ -125,7 +125,7 @@ internal class ChatCommandParser
             result.Add(tmpWord);
         }
 
-        if (!result.Any())
+        if (result.Count == 0)
         {
             // Just a failsafe in case nothing was caught and to have reference for Name
             result.Add(string.Empty);
