@@ -72,6 +72,8 @@ dotnet_diagnostic.S112.severity = none
 dotnet_diagnostic.S125.severity = none
 # Require protected constructor in non static class
 dotnet_diagnostic.S1118.severity = none
+# Loop should be simplified with LINQ expressions
+dotnet_diagnostic.S3267.severity = none
 # Require classes to be in a namespace
 dotnet_diagnostic.S3903.severity = none
 
