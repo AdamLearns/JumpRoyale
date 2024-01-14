@@ -8,7 +8,7 @@
     <UserSecretsId>23d927a7-6e51-4762-84dd-5c35c017efb2</UserSecretsId>
     <AnalysisMode>All</AnalysisMode>
     <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
-    <EnableNETAnalyzers>False</EnableNETAnalyzers>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
