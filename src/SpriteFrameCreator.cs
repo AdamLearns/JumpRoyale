@@ -81,7 +81,7 @@ public class SpriteFrameCreator
 
     public void Create(string gender, int charNumber, int clothingNumber)
     {
-        var spriteFrames = new SpriteFrames();
+        SpriteFrames spriteFrames = new();
 
         foreach (string animName in _numFramesPerAnimation.Keys)
         {

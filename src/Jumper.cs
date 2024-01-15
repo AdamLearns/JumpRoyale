@@ -69,7 +69,7 @@ public partial class Jumper : CharacterBody2D
         try
         {
             CpuParticles2D particles = GetGlowNode();
-            var color = Color.FromHtml(colorString);
+            Color color = Color.FromHtml(colorString);
 
             color = new Color(color.R, color.G, color.B, 1f);
             particles.SelfModulate = color;
