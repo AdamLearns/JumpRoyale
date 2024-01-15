@@ -103,6 +103,7 @@ namespace TwitchChat
 
         private TwitchHttpClient CreateHttpClient()
         {
+            // Add http client logic, if needed
             TwitchHttpClient httpClient = new();
 
             return httpClient;
