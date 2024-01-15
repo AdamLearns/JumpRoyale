@@ -37,8 +37,6 @@ public partial class Jumper : CharacterBody2D
         PlayerData = playerData;
 
         GetNode<RichTextLabel>(NameNodeName).Text = "[center]" + userName + "[/center]";
-
-        SetCharacter(playerData.CharacterChoice);
     }
 
     public void SetCrazyParticles()
