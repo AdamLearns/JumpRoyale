@@ -6,3 +6,7 @@
 # Experimental. Find out what can be safely ignored from .vs  directory
 .vs/Jump Royale/
 .vs/ProjectEvaluation/
+
+Tests/bin
+Tests/obj
+Tests/Debug
