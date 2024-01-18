@@ -31,6 +31,11 @@ public class ChatCommandDetectionTests
         }
     }
 
+    /// <summary>
+    /// This test makes sure that when unprivileged user tries to execute a command, it won't get matched at all
+    /// despite providing a valid alias. This is because we want to separate some commands to be available for
+    /// channel Subscribers or possibly Mods in the future.
+    /// </summary>
     [Test]
     public void CanRejectUnprivilegedUsers()
     {
@@ -91,6 +96,12 @@ public class ChatCommandDetectionTests
         }
     }
 
+    /// <summary>
+    /// Temporary command matcher, this roughly matches the existing pattern matcher in the <c>Arena</c> until the
+    /// logic gets separated, so it can be tested properly.
+    /// </summary>
+    /// <param name="chatMessage">Supposed chat message sent by the user.</param>
+    /// <param name="isPrivileged">Privileged state of this user privileged, allows executing the matched command when <c>true</c>.</param>
     private Tuple<string, string, bool> CommandNameMatcher(string chatMessage, bool isPrivileged = true)
     {
         ChatCommandParser command = new(chatMessage.ToLower());
