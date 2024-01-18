@@ -4,7 +4,9 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
+    <AnalysisMode>All</AnalysisMode>
+    <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <NoWarn>CS8785</NoWarn>
@@ -16,6 +18,18 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.1" />
     <PackageReference Include="NUnit.Analyzers" Version="3.6.1" />
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="9.16.0.82469">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

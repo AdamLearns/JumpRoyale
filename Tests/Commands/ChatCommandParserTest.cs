@@ -21,12 +21,12 @@ public class ChatCommandParserTests
 
     /// <summary>
     /// This will most likely not happen on Twitch side, but in case the parser received a null or
-    /// an empty message, it should give an empty string back
+    /// an empty message, it should give an empty string back.
     /// </summary>
     [Test]
     public void CanReturnNothingWhenEmpty()
     {
-        List<string?> chatInput = new() { null, "", string.Empty };
+        List<string?> chatInput = new() { null, string.Empty };
 
         foreach (string? input in chatInput)
         {
@@ -42,12 +42,12 @@ public class ChatCommandParserTests
     /// <summary>
     /// Not all messages are "valid", game commands ideally should be [a-zA-Z0-9-], so
     /// as a fallback, there should be an empty string in return and sending just
-    /// a number is still a valid message interpreted as a command
+    /// a number is still a valid message interpreted as a command.
     /// </summary>
     [Test]
     public void CanHandleGarbageMessage()
     {
-        List<string> chatInput = new() { "", " ", ";", "!", "[]", "[#@}=]" };
+        List<string> chatInput = new() { string.Empty, " ", ";", "!", "[]", "[#@}=]" };
 
         foreach (string input in chatInput)
         {
@@ -59,7 +59,7 @@ public class ChatCommandParserTests
 
     /// <summary>
     /// This test ensures that both command formats work, where the initial space is omitted
-    /// and the argument is extracted properly (spaced and non-spaced commands)
+    /// and the argument is extracted properly (spaced and non-spaced commands).
     /// </summary>
     [Test]
     public void CanExtractStringArguments()
@@ -100,7 +100,7 @@ public class ChatCommandParserTests
     /// <summary>
     /// This test ensures that when we send just a matching command, we won't get any
     /// extra arguments on the arguments list. This is important, because we can
-    /// later use null checks to default to something
+    /// later use null checks to default to something.
     /// </summary>
     [Test]
     public void CanPadStringArgumentsWithNulls()
@@ -133,7 +133,7 @@ public class ChatCommandParserTests
     /// <summary>
     /// There are commands, which take mixed type of input, apart from numbers or simple
     /// strings (just letters). For example, `glow` command can change the particle
-    /// color and it takes Hex input from the user, which is a mixed type
+    /// color and it takes Hex input from the user, which is a mixed type.
     /// </summary>
     [Test]
     public void CanExtractArgumentOfMixedType()
