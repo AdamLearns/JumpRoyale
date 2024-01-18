@@ -1,8 +1,8 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jump Royale", "Jump Royale.csproj", "{E3ADED1C-A4D2-4ED4-9DBA-8A5A37DB30C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jump Royale", "JumpRoyale\Jump Royale.csproj", "{E3ADED1C-A4D2-4ED4-9DBA-8A5A37DB30C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "..\Tests\Tests.csproj", "{8C3E14B1-D3A8-43B9-99EE-50A93BD77659}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{8C3E14B1-D3A8-43B9-99EE-50A93BD77659}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
