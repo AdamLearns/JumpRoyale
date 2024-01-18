@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 public class JumpCommand
 {
@@ -7,11 +8,13 @@ public class JumpCommand
 
     private int _power;
 
-    public JumpCommand(string direction, int? angle, int? power)
+    public JumpCommand([NotNull] string direction, int? angle, int? power)
     {
         Angle = angle ?? 0;
         Power = power ?? 100;
 
+        // Note on [NotNull]: we already know the direction is not null, because it was caught by the CommandMatcher,
+        // so this should never happen (?) 🤔
         AdjustAngle(direction);
     }
 
