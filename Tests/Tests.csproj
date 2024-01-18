@@ -7,8 +7,6 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <NoWarn>CS8785</NoWarn>
   </PropertyGroup>
 
@@ -21,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Jump Royale.csproj" GeneratePathAttribute="true" />
+    <ProjectReference Include="..\JumpRoyale\Jump Royale.csproj" GeneratePathAttribute="true" />
   </ItemGroup>
 
 </Project>

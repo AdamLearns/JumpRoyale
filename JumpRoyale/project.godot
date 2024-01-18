@@ -29,7 +29,7 @@ project/assembly_name="Jump Royale"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/GDMUT/plugin.cfg")
+enabled=PackedStringArray()
 
 [input]
 
