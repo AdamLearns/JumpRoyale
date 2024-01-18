@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 /// <summary>
 /// Provides a set of methods for pattern matching of command names extracted from a chat message.
@@ -17,6 +19,31 @@ public static class CommandMatcher
     public static readonly ImmutableList<string> JoinCommandAliases = ImmutableList.Create("join");
     public static readonly ImmutableList<string> JumpCommandAliases = ImmutableList.Create("j", "l", "r", "u");
     public static readonly ImmutableList<string> UnglowCommandAliases = ImmutableList.Create("unglow");
+
+    static CommandMatcher()
+    {
+        // Warning: whenever a new list is added, add it to this list below! It will automatically
+        // expose a list of all commands combined for display and testing purposes
+        List<ImmutableList<string>> availableAliases =
+            new()
+            {
+                CharCommandAliases,
+                GlowCommandAliases,
+                JoinCommandAliases,
+                JumpCommandAliases,
+                UnglowCommandAliases,
+            };
+        List<string> allAliases = new();
+
+        foreach (ImmutableList<string> aliases in availableAliases)
+        {
+            allAliases.AddRange(aliases.ToArray());
+        }
+
+        AvailableCommands = ImmutableList.Create(allAliases.ToArray());
+    }
+
+    public static ImmutableList<string> AvailableCommands { get; private set; }
 
     public static bool MatchesCharacterChange(string commandName, bool isPrivileged = true)
     {
