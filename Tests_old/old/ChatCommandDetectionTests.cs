@@ -27,26 +27,6 @@ namespace Tests
             };
         }
 
-        [CSTestFunction]
-        public static Result CanMatchAvailableCommands()
-        {
-            List<string> availableCommands = new() { "char", "glow", "join", "j", "l", "r", "u", "unglow" };
-
-            foreach (string command in availableCommands)
-            {
-                (string caughtCommand, _) = CommandNameMatcher(command);
-
-                if (caughtCommand != command)
-                {
-                    return new Result(
-                        false,
-                        $"Incorrect command matched in the chat message. Caught: ({caughtCommand}) in message: ({command})"
-                    );
-                }
-            }
-
-            return Result.Success;
-        }
 
         /// <summary>
         /// Note about this test, we are only watching the string part, where the chat message
@@ -94,25 +74,7 @@ namespace Tests
             return Result.Success;
         }
 
-        [CSTestFunction]
-        public static Result CanRejectUnprivilegedUsers()
-        {
-            // Glow is currently a sub-only command, this will throw in the future if
-            // the design changes, so there should probably be a different way for
-            // checking this
 
-            // Also warning: this does not test the current command matching functionality,
-            // this is here only to check if the CommandMatcher can filter the commands
-            // if the passed argument (isPrivileged) happened to be `false`
-            (string caughtCommand, _) = CommandNameMatcher("glow", false);
-
-            if (caughtCommand is not null)
-            {
-                return new Result(false, $"Managed to match a privileged command with unprivileged user.");
-            }
-
-            return Result.Success;
-        }
     }
 }
  */
