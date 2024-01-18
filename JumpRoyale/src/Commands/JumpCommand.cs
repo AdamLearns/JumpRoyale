@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-internal class JumpCommand
+public class JumpCommand
 {
     private readonly List<string> _fixedAngleDirections = new() { "u", "ll", "lll", "jj", "rr", "jjj", "rrr" };
 

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-internal class ChatCommandParser
+public class ChatCommandParser
 {
     /// <summary>
     /// Maximum amount of arguments returned by the parser.
@@ -11,8 +11,10 @@ internal class ChatCommandParser
 
     private readonly List<string?> _arguments;
 
-    internal ChatCommandParser(string chatMessage)
+    public ChatCommandParser(string chatMessage)
     {
+        chatMessage ??= string.Empty;
+
         _arguments = ParseChatMessage(chatMessage);
 
         if (_arguments.Count > 0)
