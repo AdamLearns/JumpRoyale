@@ -22,7 +22,7 @@ public static class CommandMatcher
 
     static CommandMatcher()
     {
-        // Warning: whenever a new list is added, add it to this list below! It will automatically
+        // Warning: whenever a new alias list is added, add it to this list below! It will automatically
         // expose a list of all commands combined for display and testing purposes
         List<ImmutableList<string>> availableAliases =
             new()
