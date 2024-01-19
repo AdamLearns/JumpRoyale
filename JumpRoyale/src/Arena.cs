@@ -163,9 +163,10 @@ public partial class Arena : Node2D
 
         int randomCharacterChoice = _rng.RandiRange(1, 18);
 
-        PlayerData playerData = _allPlayerData.Players.TryGetValue(userId, out PlayerData? value)
-            ? value
-            : new PlayerData(hexColor, randomCharacterChoice);
+        if (!_allPlayerData.Players.TryGetValue(userId, out PlayerData? playerData))
+        {
+            playerData = new(hexColor, randomCharacterChoice);
+        }
 
         _allPlayerData.Players[userId] = playerData;
 
