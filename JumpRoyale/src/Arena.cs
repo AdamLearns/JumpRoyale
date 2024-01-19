@@ -86,10 +86,15 @@ public partial class Arena : Node2D
 
         if (Input.IsPhysicalKeyPressed(Key.W) && Input.IsPhysicalKeyPressed(Key.Ctrl))
         {
-            // Note: calling this a few times when at least one player is on the screen will cause the game to
-            // crash, investigate what is causing the crash here. Low priority anyway, because this is only
-            // a streamer tool for quick debugging purposes
             OnGameTimerDone();
+        }
+
+        if (Input.IsPhysicalKeyPressed(Key.B))
+        {
+            for (int i = 0; i < 200; i++)
+            {
+                HandleJoin(string.Empty + i, string.Empty + i, "#ffffff", false);
+            }
         }
     }
 
@@ -450,10 +455,10 @@ public partial class Arena : Node2D
 
         SaveAllPlayers();
         ShowEndScreen(winners);
-        CreateEndArena(winners);
+        GenerateEndArena(winners);
     }
 
-    private void CreateEndArena(string[] winners)
+    private void GenerateEndArena(string[] winners)
     {
         Ensure.IsNotNull(_tileSetToUse);
 
@@ -473,17 +478,37 @@ public partial class Arena : Node2D
             }
         }
 
-        Rect2 viewport = GetViewportRect();
-        int xPadding = 100;
+        int numPodiums = 3;
+        int podiumWidth = 6;
+        int podiumHeight = 6; // has to be divisible by numPodiums
+        int podiumHeightDifference = podiumHeight / numPodiums;
+        int podiumX = _widthInTiles / 2;
+        int podiumY = 13 + podiumHeight;
+
+        List<Tuple<int, int>> platformCoords = new();
+
+        // Add some platforms so that there are "fun" jumps to make
+        int startY = podiumY + podiumHeight + 10;
+        for (int y = startY; y < _heightInTiles; y += 6)
+        {
+            for (int x = _rng.RandiRange(3, 7); x < _widthInTiles - 5; )
+            {
+                AddPlatform(x, y, 1);
+                platformCoords.Add(new Tuple<int, int>(x, y));
+                x += _rng.RandiRange(2, 6);
+            }
+        }
 
         // Put all players back in the arena
         for (int i = 0; i < _jumpers.Count; i++)
         {
+            int platformNumber = _rng.RandiRange(0, platformCoords.Count - 1);
+            (int platformX, int platformY) = platformCoords[platformNumber];
             Jumper jumper = _jumpers.ElementAt(i).Value;
 
             jumper.Position = new Vector2(
-                _rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding),
-                _rng.RandiRange((int)(viewport.Size.Y / 2), (int)viewport.Size.Y - 100)
+                (platformX + 0.5f) * _tileSetToUse.TileSize.X,
+                platformY * _tileSetToUse.TileSize.Y - 5
             );
             jumper.Scale = new Vector2(1, 1);
             jumper.Velocity = new Vector2(0, 0);
@@ -496,13 +521,6 @@ public partial class Arena : Node2D
         camera.Position = new Vector2(0, 0);
 
         // Draw podiums
-        int numPodiums = 3;
-        int podiumWidth = 6;
-        int podiumHeight = 6; // has to be divisible by numPodiums
-        int podiumHeightDifference = podiumHeight / numPodiums;
-        int podiumX = _widthInTiles / 2;
-        int podiumY = 13 + podiumHeight;
-
         DrawRectangleOfTiles(podiumX, podiumY, podiumWidth, podiumHeight, new Vector2I(12, 1));
         DrawRectangleOfTiles(
             podiumX - podiumWidth,
@@ -544,15 +562,6 @@ public partial class Arena : Node2D
             jumper.Scale = new Vector2(scale, scale);
 
             jumper.SetCrazyParticles();
-        }
-
-        // Add some platforms so that there are "fun" jumps to make
-        for (int y = podiumY + podiumHeight + 15; y < _heightInTiles; y += 10)
-        {
-            int width = _widthInTiles / 3;
-            int startX = _widthInTiles / 3;
-
-            AddPlatform(startX, y, width);
         }
     }
 

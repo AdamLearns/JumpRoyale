@@ -47,7 +47,9 @@ public partial class Jumper : CharacterBody2D
     public void SetCrazyParticles()
     {
         CpuParticles2D particles = GetGlowNode();
-        particles.Amount *= 5;
+
+        // Make sure we can repeatedly call this function without unbounded growth.
+        particles.Amount = Math.Min(particles.Amount * 5, 500);
     }
 
     public void SetCharacter(int choice)
