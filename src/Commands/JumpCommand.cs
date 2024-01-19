@@ -54,12 +54,8 @@ internal class JumpCommand
 
         Angle = direction switch
         {
-            // Predefined set of angles for available jump commands. Experimental commands were
-            // defined just as repeated letters for easier typing. The pattern matching has
-            // been changed to allow typos and garbage and still allow changing the angle
-            // Warning: experimental commands - rrr/rr/lll/ll :)
-            // TODO: Change the format of double/triple char commands, because they can collide
-            // with intentionally typo-ed commands for message duplication evasion
+            // Predefined set of angles for available jump commands. The pattern matching allows
+            // for typos and garbage while still allowing the angle to be changed.
             string when direction.StartsWith("rrr") || direction.StartsWith("jjj") => 150,
             string when direction.StartsWith("rr") || direction.StartsWith("jj") => 120,
             string when direction.StartsWith("lll") => 30,

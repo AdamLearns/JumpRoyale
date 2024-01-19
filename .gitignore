@@ -3,6 +3,6 @@
 
 .DS_Store
 
-# Experimental. Find out what can be safely ignored from .vs  directory
+# Experimental. Find out what can be safely ignored from .vs directory
 .vs/Jump Royale/
 .vs/ProjectEvaluation/
