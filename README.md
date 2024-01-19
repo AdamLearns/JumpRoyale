@@ -151,8 +151,7 @@ Sending `char <choice>` in the chat allows you to change your character graphic.
 
 ### Testing
 
-> [!note]
-> No testing frameworks available yet.
+Refer to [Testing README](Testing.md)
 
 ### Adding a new command
 
