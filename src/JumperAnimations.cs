@@ -1,4 +1,4 @@
-public class JumperAnimations
+public static class JumperAnimations
 {
     public const string AnimationIdle = "idle";
     public const string AnimationJump = "jump";

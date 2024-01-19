@@ -8,27 +8,27 @@ public partial class GameOverlay : VFlowContainer
     private const string HeightOutputNodeName = "HeightOutput";
     private const string CameraScrollSpeedNodeName = "CameraScrollSpeed";
 
+    private const int GameLength = 150;
+
+    private int _timerSeconds = GameLength;
+
     [Signal]
     public delegate void TimerDoneEventHandler();
 
-    private const int GAME_LENGTH = 150;
-    private int _timerSeconds = GAME_LENGTH;
-
-    // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        var arena = GetTree().Root.GetNode<Arena>("Arena");
+        Arena arena = GetTree().Root.GetNode<Arena>("Arena");
 
         arena.PlayerCountChange += OnPlayerCountChange;
         arena.MaxHeightChanged += OnMaxHeightChange;
     }
 
-    public void init()
+    public void Init()
     {
         _ = StartTimer();
 
-        var arena = GetTree().Root.GetNode<Arena>("Arena");
-        var camera = arena.GetNode<Camera2D>("Camera");
+        Arena arena = GetTree().Root.GetNode<Arena>("Arena");
+        Camera2D camera = arena.GetNode<Camera2D>("Camera");
         GetNode<Label>(CameraScrollSpeedNodeName).Text = $"Camera speed: {camera.PositionSmoothingSpeed} px/s";
     }
 
@@ -36,15 +36,16 @@ public partial class GameOverlay : VFlowContainer
     {
         await ToSignal(GetTree().CreateTimer(1.0f), SceneTreeTimer.SignalName.Timeout);
 
-        _timerSeconds--;
-        GetNode<Label>(TimerNodeName).Text = $"Game ends in: {_timerSeconds}s";
+        UpdateTimer();
 
         if (_timerSeconds % 30 == 0)
         {
-            var arena = GetTree().Root.GetNode<Arena>("Arena");
-            var camera = arena.GetNode<Camera2D>("Camera");
-            var scaleFactor = _timerSeconds == GAME_LENGTH - 60 ? 3f : 2f;
+            Arena arena = GetTree().Root.GetNode<Arena>("Arena");
+            Camera2D camera = arena.GetNode<Camera2D>("Camera");
+            float scaleFactor = _timerSeconds == GameLength - 60 ? 3f : 2f;
+
             camera.PositionSmoothingSpeed *= scaleFactor;
+
             GetNode<Label>(CameraScrollSpeedNodeName).Text = $"Camera speed: {camera.PositionSmoothingSpeed} px/s";
         }
 
@@ -67,5 +68,12 @@ public partial class GameOverlay : VFlowContainer
     {
         GetNode<Label>(HeightOutputNodeName).Text =
             $"Leader: {playerName} at height={Formatter.FormatBigNumber(height)}";
+    }
+
+    private void UpdateTimer()
+    {
+        _timerSeconds--;
+
+        GetNode<Label>(TimerNodeName).Text = $"Game ends in: {_timerSeconds}s";
     }
 }

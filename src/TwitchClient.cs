@@ -12,69 +12,88 @@ namespace TwitchChat
 {
     public class MessageEventArgs : EventArgs
     {
-        public string Message { get; set; }
-        public string SenderName { get; set; }
-        public string SenderId { get; set; }
+        public string Message { get; set; } = string.Empty;
 
-        public string HexColor { get; set; }
+        public string SenderName { get; set; } = string.Empty;
+
+        public string SenderId { get; set; } = string.Empty;
+
+        public string HexColor { get; set; } = string.Empty;
+
         public bool IsPrivileged { get; set; }
     }
 
-    internal class TwitchChatClient
+    public class TwitchChatClient
     {
-        private readonly TwitchClient _client;
+        /// <summary>
+        /// Describes <c>MessagesAllowedInPeriod</c> argument for ClientOptions.
+        /// </summary>
+        private const int MaximumMessages = 750;
 
-        public event EventHandler<MessageEventArgs> OnMessage;
-        public event EventHandler<OnRewardRedeemedArgs> OnRedemption;
+        /// <summary>
+        /// Describes <c>ThrottlingPeriod</c> TimeSpan in seconds for ClientOptions.
+        /// </summary>
+        private const int Seconds = 30;
 
         private readonly TwitchPubSub _tps;
+        private readonly TwitchClient _client;
+
+        private string _channelId = string.Empty;
 
         public TwitchChatClient()
         {
-            _tps = new TwitchPubSub();
-            _tps.OnPubSubServiceConnected += (object sender, EventArgs e) =>
+            _tps = CreateTwitchPubSub();
+            _client = CreateTwitchClient();
+
+            ConnectToTwitch();
+        }
+
+        public event EventHandler<MessageEventArgs>? OnMessage;
+
+        public event EventHandler<OnRewardRedeemedArgs>? OnRedemption;
+
+        private void ConnectToTwitch()
+        {
+            _tps.Connect();
+            _client.Connect();
+        }
+
+        private TwitchPubSub CreateTwitchPubSub()
+        {
+            TwitchPubSub tps = new();
+
+            tps.OnPubSubServiceConnected += (object sender, EventArgs e) =>
             {
                 Console.WriteLine("PubSub connected");
 #pragma warning disable CS0618 // Type or member is obsolete
-                _tps.ListenToRewards("47098493");
+                tps.ListenToRewards("47098493"); // this is the ID of the "AdamLearnsLive" channel
 #pragma warning restore CS0618 // Type or member is obsolete
-                _tps.SendTopics();
-#pragma warning disable CS0618 // Type or member is obsolete
-                _tps.OnRewardRedeemed += (object sender, OnRewardRedeemedArgs e) =>
+                tps.SendTopics();
+#pragma warning disable CS0618,CS8602// Type or member is obsolete
+                tps.OnRewardRedeemed += (object sender, OnRewardRedeemedArgs e) =>
                 {
                     Console.WriteLine($"Reward redeemed: {e}");
                     OnRedemption.Invoke(this, e);
                 };
 #pragma warning restore CS0618 // Type or member is obsolete
             };
-            _tps.Connect();
 
-            var config = new ConfigurationBuilder().AddUserSecrets<TwitchChatClient>().Build();
-            string accessToken =
-                config["twitch_access_token"]
-                ?? throw new Exception(
-                    "No access token found. Please run `dotnet user-secrets set twitch_access_token <your access token>`"
-                );
-            string channel =
-                config["twitch_channel_name"]
-                ?? throw new Exception(
-                    "Channel not found. Please run `dotnet user-secrets set twitch_channel_name <your twitch channel>`"
-                );
-            ConnectionCredentials credentials = new ConnectionCredentials(channel, accessToken);
-            var clientOptions = new ClientOptions
-            {
-                MessagesAllowedInPeriod = 750,
-                ThrottlingPeriod = TimeSpan.FromSeconds(30)
-            };
-            WebSocketClient customClient = new WebSocketClient(clientOptions);
-            _client = new TwitchClient(customClient);
-            _client.Initialize(credentials, channel);
+            return tps;
+        }
 
-            _client.OnJoinedChannel += Client_OnJoinedChannel;
-            _client.OnMessageReceived += Client_OnMessageReceived;
-            _client.OnConnected += Client_OnConnected;
+        private TwitchClient CreateTwitchClient()
+        {
+            (ConnectionCredentials credentials, ClientOptions options) = ConfigureClient();
+            WebSocketClient customClient = new(options);
+            TwitchClient client = new(customClient);
 
-            _client.Connect();
+            client.Initialize(credentials, _channelId);
+
+            client.OnJoinedChannel += Client_OnJoinedChannel;
+            client.OnMessageReceived += Client_OnMessageReceived;
+            client.OnConnected += Client_OnConnected;
+
+            return client;
         }
 
         private void Client_OnConnected(object sender, OnConnectedArgs e)
@@ -89,7 +108,8 @@ namespace TwitchChat
 
         private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
-            var isPrivileged = e.ChatMessage.IsSubscriber || e.ChatMessage.IsModerator || e.ChatMessage.IsVip;
+            bool isPrivileged = e.ChatMessage.IsSubscriber || e.ChatMessage.IsModerator || e.ChatMessage.IsVip;
+
             HandleChatMessage(
                 e.ChatMessage.UserId,
                 e.ChatMessage.DisplayName,
@@ -97,6 +117,26 @@ namespace TwitchChat
                 e.ChatMessage.ColorHex,
                 isPrivileged
             );
+        }
+
+        private Tuple<ConnectionCredentials, ClientOptions> ConfigureClient()
+        {
+            IConfigurationRoot config = new ConfigurationBuilder().AddUserSecrets<TwitchChatClient>().Build();
+            string accessToken =
+                config["twitch_access_token"]
+                ?? throw new Exception(
+                    "No access token found. Please run `dotnet user-secrets set twitch_access_token <your access token>`"
+                );
+            _channelId =
+                config["twitch_channel_name"]
+                ?? throw new Exception(
+                    "Channel not found. Please run `dotnet user-secrets set twitch_channel_name <your twitch channel>`"
+                );
+            ConnectionCredentials credentials = new(_channelId, accessToken);
+            ClientOptions clientOptions =
+                new() { MessagesAllowedInPeriod = MaximumMessages, ThrottlingPeriod = TimeSpan.FromSeconds(Seconds), };
+
+            return new(credentials, clientOptions);
         }
 
         private void HandleChatMessage(
@@ -114,8 +154,8 @@ namespace TwitchChat
                     Message = message,
                     SenderName = senderName,
                     SenderId = senderId,
-                    HexColor = colorHex ?? "#ffffff",
-                    IsPrivileged = isPrivileged
+                    HexColor = colorHex,
+                    IsPrivileged = isPrivileged,
                 }
             );
         }
