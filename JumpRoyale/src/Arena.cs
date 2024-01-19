@@ -88,6 +88,14 @@ public partial class Arena : Node2D
         {
             OnGameTimerDone();
         }
+
+        if (Input.IsPhysicalKeyPressed(Key.B))
+        {
+            for (int i = 0; i < 200; i++)
+            {
+                HandleJoin(string.Empty + i, string.Empty + i, "#ffffff", false);
+            }
+        }
     }
 
     private void OnMessage(object sender, MessageEventArgs e)
