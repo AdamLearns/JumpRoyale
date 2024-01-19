@@ -1,8 +1,27 @@
 # Godot 4+ specific ignores
 .godot/
+JumpRoyale/.godot/
 
 .DS_Store
 
-# Experimental. Find out what can be safely ignored from .vs directory
-.vs/Jump Royale/
-.vs/ProjectEvaluation/
+# Experimental. Find out if .vs can be safely ignored, although,
+# there doesn't seem to be any applicationhost.config stored
+.vs/
+JumpRoyale/.vs/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
