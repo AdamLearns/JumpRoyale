@@ -32,7 +32,7 @@ dotnet_diagnostic.SA1000.severity = none
 # -- should not show this warning for multi-line constructors
 dotnet_diagnostic.SA1009.severity = none
 # Opening square brackets should not be preceded by a space
-# This is a C#12 specific
+# This is a C#12 specific issue related to formatters not being able to format collection expressions
 dotnet_diagnostic.SA1010.severity = none
 # Prefix local calls with `this`
 dotnet_diagnostic.SA1101.severity = none
