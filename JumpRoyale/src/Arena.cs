@@ -694,7 +694,7 @@ public partial class Arena : Node2D
         {
             Jumper jumper = jumpersEntry.Value;
 
-            if (!jumper.PlayerData.Name.Equals(displayName))
+            if (!jumper.PlayerData.Name.Equals(displayName, StringComparison.CurrentCultureIgnoreCase))
             {
                 continue;
             }
