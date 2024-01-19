@@ -9,7 +9,7 @@ public class ChatCommandParserTests
     [Test]
     public void CanExtractCommandName()
     {
-        List<string> chatInput = new() { "j", "l", "u", "r", "l3", "l30 30", "r 30", "u 30 30", "rrrr7890" };
+        List<string> chatInput = ["j", "l", "u", "r", "l3", "l30 30", "r 30", "u 30 30", "rrrr7890"];
 
         foreach (string input in chatInput)
         {
@@ -26,7 +26,7 @@ public class ChatCommandParserTests
     [Test]
     public void CanReturnNothingWhenEmpty()
     {
-        List<string?> chatInput = new() { null, string.Empty };
+        List<string?> chatInput = [null, string.Empty];
 
         foreach (string? input in chatInput)
         {
@@ -47,7 +47,7 @@ public class ChatCommandParserTests
     [Test]
     public void CanHandleGarbageMessage()
     {
-        List<string> chatInput = new() { string.Empty, " ", ";", "!", "[]", "[#@}=]" };
+        List<string> chatInput = [string.Empty, " ", ";", "!", "[]", "[#@}=]"];
 
         foreach (string input in chatInput)
         {
@@ -64,7 +64,7 @@ public class ChatCommandParserTests
     [Test]
     public void CanExtractStringArguments()
     {
-        List<string> commandInputs = new() { "l30 30", "l 30 30" };
+        List<string> commandInputs = ["l30 30", "l 30 30"];
 
         foreach (string input in commandInputs)
         {
@@ -82,7 +82,7 @@ public class ChatCommandParserTests
     [Test]
     public void CanExtractNumericArguments()
     {
-        List<string> commandInputs = new() { "l30 30", "l 30 30" };
+        List<string> commandInputs = ["l30 30", "l 30 30"];
 
         foreach (string input in commandInputs)
         {
@@ -138,12 +138,12 @@ public class ChatCommandParserTests
     [Test]
     public void CanExtractArgumentOfMixedType()
     {
-        List<string> expectedOutputs = new() { "09B0D9", "BDFF00", "123456", "f02", "f02bc6" };
+        List<string> expectedOutputs = ["09B0D9", "BDFF00", "123456", "f02", "f02bc6"];
 
         foreach (string output in expectedOutputs)
         {
             // Just test for both non-space and space
-            List<string> commandInputs = new() { $"glow {output}", $"glow{output}" };
+            List<string> commandInputs = [$"glow {output}", $"glow{output}"];
 
             foreach (string input in commandInputs)
             {
@@ -159,11 +159,11 @@ public class ChatCommandParserTests
     [Test]
     public void CanRejectInvalidGlowColors()
     {
-        List<string> invalidColors = new() { "1234", "90 8da", "ffdd1", "v90909", "8888888", "l", "2" };
+        List<string> invalidColors = ["1234", "90 8da", "ffdd1", "v90909", "8888888", "l", "2"];
 
         foreach (string color in invalidColors)
         {
-            List<string> commandInputs = new() { $"glow {color}", $"glow{color}" };
+            List<string> commandInputs = [$"glow {color}", $"glow{color}"];
 
             foreach (string input in commandInputs)
             {

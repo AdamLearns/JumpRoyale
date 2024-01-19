@@ -30,7 +30,7 @@ public class ChatCommandParser
 
     public string?[] ArgumentsAsStrings()
     {
-        return PadList(_arguments, null).ToArray();
+        return [.. PadList(_arguments, null)];
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public class ChatCommandParser
             select parsedArgument
         ).ToList();
 
-        return PadList(arguments, null).ToArray();
+        return [.. PadList(arguments, null)];
     }
 
     private static int? ParseToNumberOrNull(string test)
@@ -76,7 +76,7 @@ public class ChatCommandParser
 
     private static List<string?> ParseChatMessage(string chatMessage)
     {
-        List<string?> result = new();
+        List<string?> result = [];
 
         // TODO: find a way to capture mixed values, like Hex (e.g. glow BDFF00)
         // Unfortunately, for now, since the only command that uses mixed values is glow, we have
@@ -138,7 +138,7 @@ public class ChatCommandParser
 
     private static List<string?> HandleHexArguments(string chatMessage)
     {
-        List<string?> arguments = new() { "glow" };
+        List<string?> arguments = ["glow"];
 
         string[] split = chatMessage.Split(
             "glow",

@@ -9,7 +9,7 @@ public class SpriteFrameCreator
 
     // Map of string to SpriteFrames
     // Keys are animation names
-    private readonly Dictionary<string, SpriteFrames> _allSpriteFrames = new();
+    private readonly Dictionary<string, SpriteFrames> _allSpriteFrames = [];
 
     // Map of animation name to number of frames
     private readonly Dictionary<string, int> _numFramesPerAnimation =
@@ -43,7 +43,7 @@ public class SpriteFrameCreator
     {
         int numCharacters = 3;
         int numClothings = 3;
-        string[] genders = new[] { "m", "f" };
+        string[] genders = ["m", "f"];
 
         foreach (string gender in genders)
         {

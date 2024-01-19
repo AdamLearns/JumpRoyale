@@ -20,7 +20,7 @@ public partial class Arena : Node2D
     private const string CanvasLayerNodeName = "CanvasLayer";
     private const string SaveLocation = "res://save_data/players.json";
 
-    private readonly Dictionary<string, Jumper> _jumpers = new();
+    private readonly Dictionary<string, Jumper> _jumpers = [];
     private AllPlayerData _allPlayerData = new();
     private TileMap _lobbyTilemap = new();
     private RandomNumberGenerator _rng = new();

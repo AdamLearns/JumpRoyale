@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 public class JumpCommand
 {
-    private readonly List<string> _fixedAngleDirections = new() { "u", "ll", "lll", "jj", "rr", "jjj", "rrr" };
+    private readonly List<string> _fixedAngleDirections = ["u", "ll", "lll", "jj", "rr", "jjj", "rrr"];
 
     private int _power;
 
