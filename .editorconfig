@@ -111,6 +111,8 @@ dotnet_diagnostic.CA2213.severity = none
 dotnet_diagnostic.CA2201.severity = none
 # Match nullability of reference types in Delegates
 dotnet_diagnostic.CS8622.severity = none
+# Don't re-use primary constructor parameters
+dotnet_diagnostic.CS9124.severity = error
 
 # New line preferences
 csharp_new_line_before_open_brace = all
