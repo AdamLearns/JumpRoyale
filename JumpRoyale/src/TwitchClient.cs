@@ -1,6 +1,5 @@
 using System;
 using Microsoft.Extensions.Configuration;
-using TwitchLib.Api.Core.HttpCallHandlers;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
@@ -38,9 +37,6 @@ namespace TwitchChat
 
         private readonly TwitchPubSub _tps;
         private readonly TwitchClient _client;
-#pragma warning disable // Reserved until Twitch API Requests are implemented. Only expose methods calling this client!
-        private readonly TwitchHttpClient _httpClient;
-#pragma warning restore
 
         private string _channelId = string.Empty;
 
@@ -48,7 +44,6 @@ namespace TwitchChat
         {
             _tps = CreateTwitchPubSub();
             _client = CreateTwitchClient();
-            _httpClient = CreateHttpClient();
 
             ConnectToTwitch();
         }
@@ -71,7 +66,7 @@ namespace TwitchChat
             {
                 Console.WriteLine("PubSub connected");
 #pragma warning disable CS0618 // Type or member is obsolete
-                tps.ListenToRewards("47098493");
+                tps.ListenToRewards("47098493"); // this is the ID of the "AdamLearnsLive" channel
 #pragma warning restore CS0618 // Type or member is obsolete
                 tps.SendTopics();
 #pragma warning disable CS0618,CS8602// Type or member is obsolete
@@ -99,14 +94,6 @@ namespace TwitchChat
             client.OnConnected += Client_OnConnected;
 
             return client;
-        }
-
-        private TwitchHttpClient CreateHttpClient()
-        {
-            // Add http client logic, if needed
-            TwitchHttpClient httpClient = new();
-
-            return httpClient;
         }
 
         private void Client_OnConnected(object sender, OnConnectedArgs e)

@@ -158,11 +158,11 @@ public partial class Arena : Node2D
 
         int randomCharacterChoice = _rng.RandiRange(1, 18);
 
-        PlayerData playerData = _allPlayerData.players.ContainsKey(userId)
-            ? _allPlayerData.players[userId]
+        PlayerData playerData = _allPlayerData.Players.ContainsKey(userId)
+            ? _allPlayerData.Players[userId]
             : new PlayerData(hexColor, randomCharacterChoice);
 
-        _allPlayerData.players[userId] = playerData;
+        _allPlayerData.Players[userId] = playerData;
 
         // Even if the player already existed, we may need to update their name.
         playerData.Name = userName;
@@ -188,7 +188,6 @@ public partial class Arena : Node2D
             jumper.DisableGlow();
         }
 
-        // ----------
         _jumpers.Add(userId, jumper);
 
         EmitSignal(SignalName.PlayerCountChange, _jumpers.Count);
@@ -276,18 +275,13 @@ public partial class Arena : Node2D
         {
             AllPlayerData? jsonResult = JsonSerializer.Deserialize<AllPlayerData>(jsonString);
 
-            // We are safe to "cheat" in this case, the json result can still be nullable, but this will only happen if
-            // the json input was literally "null" - this will return null. Otherwise, if an unparsable string was
-            // passed to the deserialization, it will throw an exception first, so we just handle a very edge case
+            // This can only happen if the JSON input was literally `null`.
             Ensure.IsNotNull(jsonResult);
 
-            // Note: the current system works with a json file. Change this when database is implemented. When
-            // something changes within the structure of the generic type we use during deserialization, it
-            // can return an empty instance, because, for example, the case on field changed
-            if (jsonResult.players.Count == 0)
+            if (jsonResult.Players.Count == 0)
             {
                 GD.PushError(
-                    $"No records returned from the json string (length: {jsonString.Length}). If the json string appears to be valid and contains data, make sure"
+                    $"No records returned from the json string (length: {jsonString.Length}). Make sure the JSON string appears to be valid and contains data."
                 );
             }
 
@@ -532,8 +526,7 @@ public partial class Arena : Node2D
             Jumper jumper = _jumpers[userId];
             int tileX = podiumX + (podiumWidth / 2);
 
-            // Note about the warning: I we don't want to disable this for the entire project, since this is just an
-            // edge case conditional check
+            // This warning is only disabled due to a bug about false positives: https://github.com/SonarSource/sonar-dotnet/issues/8028
 #pragma warning disable S2583 // Conditionally executed code should be reachable
             if (i == 1)
             {
@@ -586,7 +579,7 @@ public partial class Arena : Node2D
         for (int i = 0; i < winners.Length; i++)
         {
             string userId = winners[i];
-            PlayerData playerData = _allPlayerData.players[userId];
+            PlayerData playerData = _allPlayerData.Players[userId];
             Jumper jumper = _jumpers[userId];
             int height = GetHeightFromYPosition(jumper.Position.Y);
             string totalHeight = Formatter.FormatBigNumber(playerData.TotalHeightAchieved);

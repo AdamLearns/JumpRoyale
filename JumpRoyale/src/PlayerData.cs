@@ -1,4 +1,4 @@
-// Note to contributors: do not rename anything in this class if player data already exists in the file!!!
+// Note to contributors: do not rename anything in this class without updating the corresponding JSON data on disk.
 public class PlayerData
 {
     public PlayerData(string glowColor, int characterChoice)

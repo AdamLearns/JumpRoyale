@@ -14,6 +14,6 @@ public static class Formatter
             return string.Format("{0,6:0.0}K", Math.Round((double)number / 1000, 1));
         }
 
-        return string.Format("{0,7:0}", number) + string.Empty;
+        return string.Format("{0,7:0}", number);
     }
 }
