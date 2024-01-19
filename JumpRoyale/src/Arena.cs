@@ -86,9 +86,6 @@ public partial class Arena : Node2D
 
         if (Input.IsPhysicalKeyPressed(Key.W) && Input.IsPhysicalKeyPressed(Key.Ctrl))
         {
-            // Note: calling this a few times when at least one player is on the screen will cause the game to
-            // crash, investigate what is causing the crash here. Low priority anyway, because this is only
-            // a streamer tool for quick debugging purposes
             OnGameTimerDone();
         }
     }
