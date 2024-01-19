@@ -3,5 +3,9 @@
         "editor.defaultFormatter": "csharpier.csharpier-vscode",
         "editor.formatOnSave": true,
         "editor.rulers": [120]
+    },
+    "markdownlint.config": {
+        "ul-indent": { "indent": 4 },
+        "list-marker-space": { "ul_single": 3, "ol_multi": 3, "ol_single": 3, "ul_multi": 3 }
     }
 }
