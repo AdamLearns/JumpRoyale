@@ -244,7 +244,7 @@ public partial class Arena : Node2D
     private void SetBackground()
     {
         Sprite2D background = GetNode<Sprite2D>("Background");
-        string[] colors = new string[] { "Blue", "Brown", "Gray", "Green", "Pink", "Purple", "Yellow" };
+        string[] colors = ["Blue", "Brown", "Gray", "Green", "Pink", "Purple", "Yellow"];
         string color = colors[Rng.IntRange(0, colors.Length - 1)];
 
         background.Texture = ResourceLoader.Load<Texture2D>($"res://assets/sprites/backgrounds/{color}.png");
