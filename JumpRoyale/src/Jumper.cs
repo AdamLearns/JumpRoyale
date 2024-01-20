@@ -104,12 +104,7 @@ public partial class Jumper : CharacterBody2D
 
     public void RandomJump()
     {
-        // TODO: Extract RNG to a global provider
-        RandomNumberGenerator rng = new();
-
-        Jump(rng.RandiRange(45, 135), rng.RandiRange(10, 100));
-
-        rng.Dispose();
+        Jump(Rng.IntRange(45, 135), Rng.IntRange(10, 100));
     }
 
     public void Jump(int angle, int power)
