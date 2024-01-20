@@ -169,6 +169,14 @@ public class ChatCommandParser
         {
             string input = parameters[i];
 
+            // Before we try matching a hex pattern, check if the argument exists in the build-in dictionary of colors
+            // and add it instead and proceed with the next argument
+            if (ColorProvider.TryGetColor(input, out string? color))
+            {
+                arguments.Add(color);
+                continue;
+            }
+
             // To match the hex color, inputs have to literally be 3 or 6 characters and a valid hex, so sending
             // something like "ffff" is not valid. Input has to be specific
             arguments.Add(pattern.IsMatch(input) ? input : null);
