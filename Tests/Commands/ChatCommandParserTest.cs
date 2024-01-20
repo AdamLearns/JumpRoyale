@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace Commands;
 
 [TestFixture]
@@ -220,6 +222,34 @@ public class ChatCommandParserTests
                 string?[] arguments = command.ArgumentsAsStrings();
 
                 Assert.That(arguments.ToList().TrueForAll(argument => argument is not null));
+            }
+        }
+    }
+
+    /// <summary>
+    /// This test makes sure that when we try to execute commands like "glow" or any other command specified by in the
+    /// CommandParser, we get a valid code name in return.
+    /// </summary>
+    [Test]
+    public void CanDetectColorNames()
+    {
+        Regex pattern = new("^(?:[0-9a-fA-F]{3}){1,2}$");
+        List<string> colorInputs = ["red red", "blue f0c", "f0c green"];
+
+        foreach (string colors in colorInputs)
+        {
+            List<string> commandInputs = [$"glow {colors}", $"glow{colors}"];
+
+            foreach (string input in commandInputs)
+            {
+                ChatCommandParser command = new(input);
+
+                string?[] arguments = command.ArgumentsAsStrings();
+
+                // If this evaluates to null, it means the command parser could not find the color name. The test color
+                // inside the ColorProvider was either removed or renamed, which caused the color to be returned as
+                // null, which fails this test
+                Assert.That(arguments.ToList().TrueForAll(pattern.IsMatch));
             }
         }
     }
