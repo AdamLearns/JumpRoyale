@@ -485,7 +485,7 @@ public partial class Arena : Node2D
         int podiumX = _widthInTiles / 2;
         int podiumY = 13 + podiumHeight;
 
-        List<Tuple<int, int>> platformCoords = new();
+        List<Tuple<int, int>> platformCoords = [];
 
         // Add some platforms so that there are "fun" jumps to make
         int startY = podiumY + podiumHeight + 10;
