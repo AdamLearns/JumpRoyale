@@ -175,4 +175,52 @@ public class ChatCommandParserTests
             }
         }
     }
+
+    /// <summary>
+    /// This test makes sure that when we try to execute a multi-color command and any of the arguments is invalid,
+    /// it will be passed as null. The reason for this is to be able to set default colors in case the provided
+    /// arguments are invalid.
+    /// </summary>
+    [Test]
+    public void CanConvertInvalidColorToNull()
+    {
+        List<string> colorInputs = ["zxcv f0c", "f0c vcx"];
+
+        foreach (string color in colorInputs)
+        {
+            List<string> commandInputs = [$"glow {color}", $"glow{color}"];
+
+            foreach (string input in commandInputs)
+            {
+                ChatCommandParser command = new(input);
+
+                string?[] arguments = command.ArgumentsAsStrings();
+
+                Assert.That(arguments.ToList().Exists(argument => argument is null));
+            }
+        }
+    }
+
+    /// <summary>
+    /// This test assumes all arguments are valid colors.
+    /// </summary>
+    [Test]
+    public void CanExtractMultipleColors()
+    {
+        List<string> colorInputs = ["f0c f0c", "f0c173 434343", "919292 f0c", "f0c Ac0eAc"];
+
+        foreach (string color in colorInputs)
+        {
+            List<string> commandInputs = [$"glow {color}", $"glow{color}"];
+
+            foreach (string input in commandInputs)
+            {
+                ChatCommandParser command = new(input);
+
+                string?[] arguments = command.ArgumentsAsStrings();
+
+                Assert.That(arguments.ToList().TrueForAll(argument => argument is not null));
+            }
+        }
+    }
 }
