@@ -15,6 +15,7 @@ public partial class Arena : Node2D
 
     private const string LobbyOverlayNodeName = "LobbyOverlay";
     private const string GameOverlayNodeName = "GameOverlay";
+    private const string TimerOverlayNodeName = "TimerOverlay";
     private const string EndScreenOverlayNodeName = "EndScreenOverlay";
     private const string CameraNodeName = "Camera";
     private const string CanvasLayerNodeName = "CanvasLayer";
@@ -258,6 +259,11 @@ public partial class Arena : Node2D
     private GameOverlay GetGameOverlay()
     {
         return GetNode<CanvasLayer>(CanvasLayerNodeName).GetNode<GameOverlay>(GameOverlayNodeName);
+    }
+
+    private TimerOverlay GetTimerOverlay()
+    {
+        return GetNode<CanvasLayer>(CanvasLayerNodeName).GetNode<TimerOverlay>(TimerOverlayNodeName);
     }
 
     private LobbyOverlay GetLobbyOverlay()
@@ -669,10 +675,11 @@ public partial class Arena : Node2D
         GetLobbyOverlay().Visible = false;
 
         GameOverlay gameOverlay = GetGameOverlay();
-
         gameOverlay.Visible = true;
-
         gameOverlay.Init();
+
+        TimerOverlay timerOverlay = GetTimerOverlay();
+        timerOverlay.Init();
     }
 
     private void OnRedemption(object sender, OnRewardRedeemedArgs e)
