@@ -28,11 +28,10 @@ public partial class TimerOverlay : VFlowContainer
         if (_timerSeconds <= 0)
         {
             EmitSignal(SignalName.TimerDone);
+            return;
         }
-        else
-        {
-            _ = StartTimer();
-        }
+
+        _ = StartTimer();
     }
 
     private void UpdateTimer()
