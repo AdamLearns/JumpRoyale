@@ -64,6 +64,10 @@ public static class ColorProvider
     /// Gets the color code associated with the specified color name. This helps with assigning a new value if the
     /// specified color does not exist. It can also be used for skipping the default assignment or to just do
     /// something else. Similar to what you would do with Dictionary.TryGetValue().
+    ///
+    /// To clarify the usage of this method: in <c>HexFromName</c>, when the color does not exist, we return a default
+    /// value which is non-nullable __to avoid unnecessary checks__. This method allows custom action when the lookup
+    /// fails, e.g.: "if [x] color exists, use it, otherwise do something completely different with [x]".
     /// </summary>
     /// <param name="colorName">Color name to check on the dictionary.</param>
     /// <param name="color">Nullable reference to eventual color.</param>

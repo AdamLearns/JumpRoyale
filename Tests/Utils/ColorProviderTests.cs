@@ -38,8 +38,8 @@ public class ColorProviderTests
     }
 
     /// <summary>
-    /// This test makes sure that we can properly use the guarded color request, covering both cases where we want to
-    /// assign a custom value if the check fails and to omit assignment on success.
+    /// This test makes sure that we can properly use the guarded color request, covering both cases where the expected
+    /// value is not overwritten or omitted by a failed check (falling into the <c>true</c> block).
     /// </summary>
     [Test]
     public void TestsGuardedCall()
