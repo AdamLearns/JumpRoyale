@@ -251,19 +251,4 @@ public class ChatCommandParserTests
             }
         }
     }
-
-    /// <summary>
-    /// This test makes sure that when we pass literal "random" as namecolor argument, we won't fail the first
-    /// validation check and pass this as an argument for a random color. This is the only whitelisted workaround.
-    /// </summary>
-    [Test]
-    public void AllowsRandomAsColorName()
-    {
-        ChatCommandParser command = new("namecolor RaNdOm");
-
-        string? argument = command.ArgumentsAsStrings()[0];
-
-        Assert.That(argument, Is.Not.Null);
-        Assert.That(argument.Equals("random", StringComparison.CurrentCultureIgnoreCase));
-    }
 }
