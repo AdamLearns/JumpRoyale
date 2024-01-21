@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 
 public class ChatCommandParser
 {
@@ -83,12 +84,13 @@ public class ChatCommandParser
         string forcedMatch = chatMessage switch
         {
             string when chatMessage.StartsWith("glow") => "glow",
+            string when chatMessage.StartsWith("namecolor") => "namecolor",
             _ => string.Empty
         };
 
         if (!string.IsNullOrEmpty(forcedMatch))
         {
-            return HandleHexArguments(chatMessage, forcedMatch);
+            return HandleColorArguments(chatMessage, forcedMatch);
         }
 
         string tmpWord = string.Empty;
@@ -140,7 +142,7 @@ public class ChatCommandParser
         return result;
     }
 
-    private static List<string?> HandleHexArguments(string chatMessage, string splitBy)
+    private static List<string?> HandleColorArguments(string chatMessage, string splitBy)
     {
         // Force the supposed command name to be on the arguments list so the constructor can extract it
         List<string?> arguments = [splitBy];
@@ -150,35 +152,39 @@ public class ChatCommandParser
             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
         );
 
-        // In case there was nothing, just return to be able to default to Twitch Color
+        // In case there was nothing, just return to be able to default to Twitch Color (or other default)
         if (split.Length == 0)
         {
             return arguments;
         }
 
-        // If there is a split result, it can be a potential hex argument, but just in case catch more than just the
-        // first argument. This will be useful if multiple hex arguments are required for some commands, e.g.
+        // If there is a split result, it can be a potential color argument, but just in case catch more than just the
+        // first argument. This will be useful if multiple color arguments are required for some commands, e.g.
         // simple gradients or multi-colored clothes
         string[] parameters = split[0].Split(" ");
 
-        // Match Both 3 and 6 length
         for (int i = 0; i < Math.Min(parameters.Length, MaxArguments); i++)
         {
             string input = parameters[i];
 
-            // Before we try matching a hex pattern, check if the argument exists in the built-in dictionary of colors
-            // and add it instead, then proceed with the next argument
-            string? color = ColorProvider.HexFromName(input, true);
-
-            if (color is not null)
+            // If a valid Hex was provided, just add it and proceed with other arguments
+            if (Color.HtmlIsValid(input))
             {
-                arguments.Add(color);
+                arguments.Add(input);
                 continue;
             }
 
-            // To match the hex color, inputs have to literally be 3 or 6 characters and a valid hex, so sending
-            // something like "ffff" is not valid. Input has to be specific
-            arguments.Add(RegexPatterns.HexColor.IsMatch(input) ? input : null);
+            // Finally, check if the input is usable as standardized color name
+            try
+            {
+                Color color = new(input);
+
+                arguments.Add(color.ToHtml());
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                arguments.Add(null);
+            }
         }
 
         return arguments;
