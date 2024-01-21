@@ -673,7 +673,7 @@ public partial class Arena : Node2D
 
             if (showName)
             {
-                jumper.PlayerWon();
+                jumper.DisableNameFadeout();
             }
         }
 

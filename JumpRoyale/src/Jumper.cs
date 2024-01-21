@@ -13,8 +13,13 @@ public partial class Jumper : CharacterBody2D
     private const string ParticleSystemNodeName = "Glow";
     private const float NameFadeoutTime = 5000f;
 
-    private bool _wasOnFloor;
+    /// <summary>
+    /// Used to block the fadeout in some situations, e.g. at the start of the game. This is automatically set to true
+    /// on every jump.
+    /// </summary>
+    private bool _canFadePlayerName;
     private bool _lastJumpZeroAngle;
+    private bool _wasOnFloor;
 
     // Get the gravity from the project settings to be synced with RigidBody nodes.
     private float _gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle();
@@ -25,8 +30,6 @@ public partial class Jumper : CharacterBody2D
     /// Stores the game time as timestamp for the font fadeout timer.
     /// </summary>
     private ulong _fontVisibilityTimerStartTime;
-
-    private bool _hasJumped;
 
     // This property is externally set by Init and there is no constructor on this class, so it can not be initialized
     // inside here. It will never become null unless some external method does a really bad job parsing the player
@@ -142,15 +145,17 @@ public partial class Jumper : CharacterBody2D
 
             PlayerData.NumJumps++;
 
-            _hasJumped = true;
+            _canFadePlayerName = true;
             _lastJumpZeroAngle = angle == 90; // 0 in the command is expressed here as 90.
         }
     }
 
-    public void PlayerWon()
+    /// <summary>
+    /// Stops the name fadeout until the player jumps again.
+    /// </summary>
+    public void DisableNameFadeout()
     {
-        // Reset their _hasJumped property so that their name will be visible until they jump again.
-        _hasJumped = false;
+        _canFadePlayerName = false;
     }
 
     public void SetColor(string hexColor)
@@ -247,7 +252,7 @@ public partial class Jumper : CharacterBody2D
 
     private void UpdateNameTransparency()
     {
-        float alpha = _hasJumped ? CalculateFontAlpha() : 1f;
+        float alpha = _canFadePlayerName ? CalculateFontAlpha() : 1f;
 
         SetNameAlpha(alpha);
     }
