@@ -42,7 +42,7 @@ public partial class TimerOverlay : VFlowContainer
         int seconds = _timerSeconds % 60;
         int minutes = _timerSeconds / 60;
 
-        GetNode<Label>(TimerNodeName).Text = $"{minutes}:{seconds.ToString("00")}";
+        GetNode<Label>(TimerNodeName).Text = $"{minutes}:{seconds:00}";
         Sprite2D sprite = GetNode<Sprite2D>(SpriteName);
         if (_timerSeconds > 15)
         {
