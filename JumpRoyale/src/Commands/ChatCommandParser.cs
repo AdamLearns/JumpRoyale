@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 public class ChatCommandParser
 {
@@ -163,15 +162,15 @@ public class ChatCommandParser
         string[] parameters = split[0].Split(" ");
 
         // Match Both 3 and 6 length
-        Regex pattern = new("^(?:[0-9a-fA-F]{3}){1,2}$");
-
         for (int i = 0; i < Math.Min(parameters.Length, MaxArguments); i++)
         {
             string input = parameters[i];
 
-            // Before we try matching a hex pattern, check if the argument exists in the build-in dictionary of colors
-            // and add it instead and proceed with the next argument
-            if (ColorProvider.TryGetColor(input, out string? color))
+            // Before we try matching a hex pattern, check if the argument exists in the built-in dictionary of colors
+            // and add it instead, then proceed with the next argument
+            string? color = ColorProvider.HexFromName(input, true);
+
+            if (color is not null)
             {
                 arguments.Add(color);
                 continue;
@@ -179,7 +178,7 @@ public class ChatCommandParser
 
             // To match the hex color, inputs have to literally be 3 or 6 characters and a valid hex, so sending
             // something like "ffff" is not valid. Input has to be specific
-            arguments.Add(pattern.IsMatch(input) ? input : null);
+            arguments.Add(RegexPatterns.HexColor.IsMatch(input) ? input : null);
         }
 
         return arguments;
