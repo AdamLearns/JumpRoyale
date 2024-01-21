@@ -154,7 +154,7 @@ Sending `char <choice>` in the chat allows you to change your character graphic.
     -   Same as "building", but click "Run" in Godot
 
 > [!note]
-> When developing with VSCode, if any changes were made in the `.editorconfig` file, you **need to** reload your window, because it will not pick when changed up immediately. Open `Command Palette` and rul `Developer: Reload Window` task.
+> When developing with VSCode, if any changes were made in the `.editorconfig` file, you **need to** reload your window, because it will not pick up the changes immediately. Open `Command Palette` and run `Developer: Reload Window` task. This will most likely happen when switching to another branch that has different rules in `.editorconfig`, so you might see warnings from old cached config.
 >
 > On another note, you sometimes have to rebuild the solution for static analysis to detect the fixes (VSCode only).
 
