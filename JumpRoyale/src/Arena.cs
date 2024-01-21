@@ -236,6 +236,7 @@ public partial class Arena : Node2D
 
         jumper.PlayerData.NameColor = nameColor;
         jumper.SetPlayerName();
+        jumper.FlashPlayerName();
     }
 
     private void HandleJump(Jumper jumper, string direction, int? angle, int? jumpPower)
@@ -248,6 +249,7 @@ public partial class Arena : Node2D
         JumpCommand command = new(direction, angle, jumpPower);
 
         jumper.Jump(command.Angle, command.Power);
+        jumper.FlashPlayerName();
     }
 
     /// <summary>
@@ -732,6 +734,8 @@ public partial class Arena : Node2D
 
             jumper.Position = thirdHighestJumper.Position;
             jumper.Velocity = thirdHighestJumper.Velocity;
+
+            jumper.FlashPlayerName();
 
             break;
         }

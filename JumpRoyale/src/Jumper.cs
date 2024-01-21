@@ -141,12 +141,9 @@ public partial class Jumper : CharacterBody2D
             _jumpVelocity = _jumpVelocity.Normalized() * (float)normalizedPower;
 
             PlayerData.NumJumps++;
-            SetNameAlpha(1f);
 
             _hasJumped = true;
             _lastJumpZeroAngle = angle == 90; // 0 in the command is expressed here as 90.
-
-            ResetNameTimer();
         }
     }
 
@@ -230,6 +227,15 @@ public partial class Jumper : CharacterBody2D
         {
             sprite.Play(JumperAnimations.AnimationIdle);
         }
+    }
+
+    /// <summary>
+    /// Resets the alpha component to 1 on player's name label and resets the name fadeout timer.
+    /// </summary>
+    public void FlashPlayerName()
+    {
+        SetNameAlpha(1f);
+        ResetNameTimer();
     }
 
     private void ResetNameTimer()
