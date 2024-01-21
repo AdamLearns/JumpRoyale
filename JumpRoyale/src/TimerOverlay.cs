@@ -46,18 +46,10 @@ public partial class TimerOverlay : VFlowContainer
         Sprite2D sprite = GetNode<Sprite2D>(SpriteName);
         if (_timerSeconds > 15)
         {
-            sprite.Modulate = new Color(1, 1, 1, 1);
+            sprite.Modulate = _white;
+            return;
         }
-        else
-        {
-            if (seconds % 2 == 0)
-            {
-                sprite.Modulate = new Color(1, 1, 1, 1);
-            }
-            else
-            {
-                sprite.Modulate = new Color(1, 0, 0, 1);
-            }
-        }
+
+        sprite.Modulate = seconds % 2 == 0 ? _white : _red;
     }
 }
