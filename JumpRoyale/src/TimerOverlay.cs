@@ -11,6 +11,7 @@ public partial class TimerOverlay : VFlowContainer
     private int _timerSeconds = GameLength;
     private Color _white = new(1, 1, 1, 1);
     private Color _red = new(1, 0, 0, 1);
+    
     [Signal]
     public delegate void TimerDoneEventHandler();
 
