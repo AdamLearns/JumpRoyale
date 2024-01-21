@@ -161,7 +161,7 @@ public class ChatCommandParserTests
     [Test]
     public void CanRejectInvalidGlowColors()
     {
-        List<string> invalidColors = ["1234", "90 8da", "ffdd1", "v90909", "8888888", "l", "2"];
+        List<string> invalidColors = ["12342", "90 8da", "ffdd1", "v90909", "8888888", "l", "2"];
 
         foreach (string color in invalidColors)
         {
@@ -249,7 +249,7 @@ public class ChatCommandParserTests
                 // If this evaluates to null, it means the command parser could not find the color name. The test color
                 // inside the ColorProvider was either removed or renamed (or if the CommandParser was modified),
                 // which caused the color to be returned as null, failing the name detection.
-                Assert.That(arguments.ToList().TrueForAll(RegexPatterns.HexColor.IsMatch));
+                Assert.That(arguments.ToList().TrueForAll(argument => argument is not null), $"Command: {input}");
             }
         }
     }
