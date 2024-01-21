@@ -1,58 +1,50 @@
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
+using System.Collections.Immutable;
 
 public static class ColorProvider
 {
-    private static readonly Dictionary<string, string> _colors = [];
-
     static ColorProvider()
     {
-        _colors.Add("red", "ff0000");
-        _colors.Add("orange", "ffa500");
-        _colors.Add("yellow", "ffff00");
-        _colors.Add("green", "008000");
-        _colors.Add("cyan", "00ffff");
-        _colors.Add("blue", "0000ff");
-        _colors.Add("magenta", "ff00ff");
-        _colors.Add("purple", "800080");
-        _colors.Add("white", "ffffff");
-        _colors.Add("black", "000000");
-        _colors.Add("grey", "808080");
-        _colors.Add("gray", "808080");
-        _colors.Add("silver", "c0c0c0");
-        _colors.Add("pink", "ffc0cb");
-        _colors.Add("maroon", "800000");
-        _colors.Add("brown", "a52a2a");
-        _colors.Add("beige", "f5f5dc");
-        _colors.Add("tan", "d4b48c");
-        _colors.Add("lime", "00ff00");
-        _colors.Add("olive", "808000");
-        _colors.Add("turquoise", "40e0d0");
-        _colors.Add("teal", "008080");
-        _colors.Add("indigo", "4b0082");
-        _colors.Add("violet", "ee82ee");
+        AvailableColors = ImmutableDictionary<string, string>
+            .Empty.Add("red", "ff0000")
+            .Add("orange", "ffa500")
+            .Add("yellow", "ffff00")
+            .Add("green", "008000")
+            .Add("cyan", "00ffff")
+            .Add("blue", "0000ff")
+            .Add("magenta", "ff00ff")
+            .Add("purple", "800080")
+            .Add("white", "ffffff")
+            .Add("black", "000000")
+            .Add("grey", "808080")
+            .Add("gray", "808080")
+            .Add("silver", "c0c0c0")
+            .Add("pink", "ffc0cb")
+            .Add("maroon", "800000")
+            .Add("brown", "a52a2a")
+            .Add("beige", "f5f5dc")
+            .Add("tan", "d4b48c")
+            .Add("lime", "00ff00")
+            .Add("olive", "808000")
+            .Add("turquoise", "40e0d0")
+            .Add("teal", "008080")
+            .Add("indigo", "4b0082")
+            .Add("violet", "ee82ee");
     }
 
-    /// <summary>
-    /// Returns a collection of all available names in the built-in dictionary.
-    /// </summary>
-    public static Collection<string> AvailableColorNames()
-    {
-        return [.. _colors.Keys];
-    }
+    public static ImmutableDictionary<string, string> AvailableColors { get; private set; }
 
     /// <summary>
     /// Returns a hex color associated with the provided name in the built-in collection, if exists. Use this method
     /// if you don't care about overriding the default value if the specified color does not exist.
     /// </summary>
     /// <remarks>
-    /// This method is guaranteed to return a color code even if it doesn't exist in the collection. For a condition
-    /// guarded method use <c>TryGetColor</c>.
+    /// This method is guaranteed to return a color code even if it doesn't exist in the collection to omit
+    /// unnecessary null checks every time. For a nullable return type, use the boolean overload.
     /// </remarks>
+    /// <param name="colorName">Color name for dictionary lookup.</param>
     public static string HexFromName(string colorName)
     {
-        if (!_colors.TryGetValue(colorName, out string? hexColor))
+        if (!AvailableColors.TryGetValue(colorName, out string? hexColor))
         {
             hexColor ??= "fff";
         }
@@ -61,25 +53,22 @@ public static class ColorProvider
     }
 
     /// <summary>
-    /// Gets the color code associated with the specified color name. This helps with assigning a new value if the
-    /// specified color does not exist. It can also be used for skipping the default assignment or to just do
-    /// something else. Similar to what you would do with Dictionary.TryGetValue().
-    ///
-    /// To clarify the usage of this method: in <c>HexFromName</c>, when the color does not exist, we return a default
-    /// value which is non-nullable __to avoid unnecessary checks__. This method allows custom action when the lookup
-    /// fails, e.g.: "if [x] color exists, use it, otherwise do something completely different with [x]".
+    /// Returns a hex color associated with the provided name in the built-in collection, will return default value
+    /// if the specified color does not exist or <c>null</c> if <c>nullIfNotExists</c> was set to <c>true</c>.
     /// </summary>
-    /// <param name="colorName">Color name to check on the dictionary.</param>
-    /// <param name="color">Nullable reference to eventual color.</param>
-    /// <returns>
-    /// True if the colors dictionary contains the requested specified color.
-    /// </returns>
-    public static bool TryGetColor(string colorName, [MaybeNullWhen(false)] out string color)
+    /// <remarks>
+    /// This is a helper overload that allows performing a custom action if the color does not exist in the
+    /// collection, e.g. "if no color was returned, call some arbitrary method".
+    /// </remarks>
+    /// <param name="colorName">Color name for dictionary lookup.</param>
+    /// <param name="nullIfNotExists">If true, the default return value is returned as <c>null</c>.</param>
+    public static string? HexFromName(string colorName, bool nullIfNotExists)
     {
-        bool condition = _colors.ContainsKey(colorName);
+        if (!AvailableColors.TryGetValue(colorName, out string? hexColor))
+        {
+            hexColor ??= nullIfNotExists ? null : "fff";
+        }
 
-        color = condition ? HexFromName(colorName) : null;
-
-        return condition;
+        return hexColor;
     }
 }
