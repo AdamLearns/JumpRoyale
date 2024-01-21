@@ -4,6 +4,10 @@ using Godot;
 
 public partial class Jumper : CharacterBody2D
 {
+    public const string DefaultColorName = "white";
+
+    public static readonly Color DefaultPlayerNameColor = Colors.White;
+
     private const string SpriteNodeName = "Sprite";
     private const string NameNodeName = "Name";
     private const string ParticleSystemNodeName = "Glow";
@@ -36,12 +40,31 @@ public partial class Jumper : CharacterBody2D
         Name = userName;
         PlayerData = playerData;
 
-        GetNode<RichTextLabel>(NameNodeName).Text = "[center]" + userName + "[/center]";
+        // Initialize player name with default color. This will use the color from PlayerData, if set
+        SetPlayerName();
 
         if (playerData.GlowColor != null)
         {
             SetGlow(playerData.GlowColor);
         }
+    }
+
+    public void SetPlayerName(string? newColor = null)
+    {
+        // If no color was specified use Default instead
+        string colorOverride = newColor ?? DefaultColorName;
+
+        // If JSON data was incomplete, e.g. first run or property was just null (new player), use the above override
+        string colorName = PlayerData.NameColor ?? colorOverride;
+
+        // Note: ToHTML() excludes alpha component to avoid transparent names
+        string colorCode = Color.FromString(colorName, DefaultPlayerNameColor).ToHtml(false);
+
+        GetNode<RichTextLabel>(NameNodeName).Text = "[center]";
+        GetNode<RichTextLabel>(NameNodeName).Text += $"[color={colorCode}]";
+        GetNode<RichTextLabel>(NameNodeName).Text += PlayerData.Name;
+        GetNode<RichTextLabel>(NameNodeName).Text += "[/color]";
+        GetNode<RichTextLabel>(NameNodeName).Text += "[/center]";
     }
 
     public void SetCrazyParticles()

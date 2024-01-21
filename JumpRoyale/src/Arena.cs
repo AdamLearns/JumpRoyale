@@ -147,6 +147,10 @@ public partial class Arena : Node2D
             case string when CommandMatcher.MatchesGlow(command.Name, isPrivileged):
                 HandleGlow(jumper, stringArguments[0], hexColor);
                 break;
+
+            case string when CommandMatcher.MatchesNamecolor(command.Name, isPrivileged):
+                HandleNamecolor(jumper, stringArguments[0]);
+                break;
         }
     }
 
@@ -164,7 +168,7 @@ public partial class Arena : Node2D
 
         if (!_allPlayerData.Players.TryGetValue(userId, out PlayerData? playerData))
         {
-            playerData = new(hexColor, randomCharacterChoice);
+            playerData = new(hexColor, randomCharacterChoice, Jumper.DefaultPlayerNameColor.ToHtml());
         }
 
         _allPlayerData.Players[userId] = playerData;
@@ -190,6 +194,8 @@ public partial class Arena : Node2D
 
         if (!isPrivileged)
         {
+            // Reset the name with default color
+            jumper.SetPlayerName();
             jumper.DisableGlow();
         }
 
@@ -217,6 +223,19 @@ public partial class Arena : Node2D
         choice = Math.Clamp(choice, 1, 18);
 
         jumper.SetCharacter(choice);
+    }
+
+    private void HandleNamecolor(Jumper jumper, string? nameColor)
+    {
+        // If the specified color was invalid (garbage message) or omitted, don't do anything
+        // to not change the currently selected color
+        if (!Color.HtmlIsValid(nameColor) || nameColor is null)
+        {
+            return;
+        }
+
+        jumper.PlayerData.NameColor = nameColor;
+        jumper.SetPlayerName();
     }
 
     private void HandleJump(Jumper jumper, string direction, int? angle, int? jumpPower)
