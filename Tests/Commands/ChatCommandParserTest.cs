@@ -228,16 +228,16 @@ public class ChatCommandParserTests
 
     /// <summary>
     /// This test makes sure that when we try to execute commands like "glow" or any other command specified by in the
-    /// CommandParser, we get a valid code name in return.
+    /// CommandParser, we get a valid code name in return if there was a literal name provided by the user.
     /// </summary>
     [Test]
     public void CanDetectColorNames()
     {
-        Regex pattern = new("^(?:[0-9a-fA-F]{3}){1,2}$");
         List<string> colorInputs = ["red red", "blue f0c", "f0c green"];
 
         foreach (string colors in colorInputs)
         {
+            // Test for space and non-space arguments
             List<string> commandInputs = [$"glow {colors}", $"glow{colors}"];
 
             foreach (string input in commandInputs)
@@ -247,9 +247,9 @@ public class ChatCommandParserTests
                 string?[] arguments = command.ArgumentsAsStrings();
 
                 // If this evaluates to null, it means the command parser could not find the color name. The test color
-                // inside the ColorProvider was either removed or renamed, which caused the color to be returned as
-                // null, which fails this test
-                Assert.That(arguments.ToList().TrueForAll(pattern.IsMatch));
+                // inside the ColorProvider was either removed or renamed (or if the CommandParser was modified),
+                // which caused the color to be returned as null, failing the name detection.
+                Assert.That(arguments.ToList().TrueForAll(RegexPatterns.HexColor.IsMatch));
             }
         }
     }
