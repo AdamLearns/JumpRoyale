@@ -9,7 +9,8 @@ public partial class TimerOverlay : VFlowContainer
     private static readonly int GameLength = GameOverlay.GameLength;
 
     private int _timerSeconds = GameLength;
-
+    private Color _white = new(1, 1, 1, 1);
+    private Color _red = new(1, 0, 0, 1);
     [Signal]
     public delegate void TimerDoneEventHandler();
 
