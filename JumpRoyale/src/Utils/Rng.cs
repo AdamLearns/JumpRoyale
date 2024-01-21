@@ -14,4 +14,12 @@ public static class Rng
     {
         return _rng.RandiRange(min, max);
     }
+
+    /// <summary>
+    /// Returns a random Hex color, excluding Alpha component.
+    /// </summary>
+    public static string RandomHex()
+    {
+        return new Color(_rng.Randf(), _rng.Randf(), _rng.Randf(), 1).ToHtml(false);
+    }
 }

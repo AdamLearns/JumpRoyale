@@ -227,14 +227,24 @@ public partial class Arena : Node2D
 
     private void HandleNamecolor(Jumper jumper, string? nameColor)
     {
+        string? color = nameColor;
+
+        // We only want to pick a random color when requested by the user to not regenerate it if there was garbage
+        // sent with the command or nothing at all to not give a false impression of the input having an
+        // effect on the color, e.g. sending "znmxbc" and picking a random color for this
+        if (color is not null && color.Equals("random", StringComparison.CurrentCultureIgnoreCase))
+        {
+            color = Rng.RandomHex();
+        }
+
         // If the specified color was invalid (garbage message) or omitted, don't do anything
         // to not change the currently selected color
-        if (!Color.HtmlIsValid(nameColor) || nameColor is null)
+        if (!Color.HtmlIsValid(color) || color is null)
         {
             return;
         }
 
-        jumper.PlayerData.NameColor = nameColor;
+        jumper.PlayerData.NameColor = color;
         jumper.SetPlayerName();
         jumper.FlashPlayerName();
     }

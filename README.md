@@ -114,8 +114,9 @@ Sending `char <choice>` in the chat allows you to change your character graphic.
     -   If `color` isn't specified, it'll take the color of your Twitch name.
     -   `color` is in the form `RGB` or `RRGGBB`, e.g. `color f00` to set it to red, `color f0f` to set it to pink.
 -   `namecolor <color>`: change your name color. This is for subscribers, VIPs, and moderators only.
-    -   Color names are allowed, e.g. `red`, `yellow`, `tomato`. Refer to the [X11 Color Name Chart](https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart) for color names.
-    -   Hexadecimal values are also supported, e.g. `f0c`, `bd00cd`. Godot also supports `4`-`8` hex formats, but the `alpha` component is discarded, player name transparency is not allowed.
+    -   `Color names` are allowed, e.g. `red`, `yellow`, `tomato`. Refer to the [X11 Color Name Chart](https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart) for color names.
+    -   `Hexadecimal` values are also supported, e.g. `f0c`, `bd00cd`. Godot also supports `4`-`8` hex formats, but the `alpha` component is discarded, player name transparency is not allowed.
+    -   `random` randomizes your name color.
 
 ---
 
