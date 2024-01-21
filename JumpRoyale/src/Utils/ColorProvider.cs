@@ -62,7 +62,8 @@ public static class ColorProvider
 
     /// <summary>
     /// Gets the color code associated with the specified color name. This helps with assigning a new value if the
-    /// specified color does not exist or to skip the default assignment.
+    /// specified color does not exist. It can also be used for skipping the default assignment or to just do
+    /// something else. Similar to what you would do with Dictionary.TryGetValue().
     /// </summary>
     /// <param name="colorName">Color name to check on the dictionary.</param>
     /// <param name="color">Nullable reference to eventual color.</param>
