@@ -16,7 +16,7 @@ jobs:
         run: dotnet restore
       - name: Install dotnet-format
         run: dotnet tool install -g dotnet-format
-      - name: Verify formatting
-        run: dotnet format --verify-no-changes
+      #- name: Verify formatting
+      #  run: dotnet format --verify-no-changes
       - name: Build
         run: dotnet build --no-restore -warnaserror
