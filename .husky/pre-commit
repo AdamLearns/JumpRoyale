@@ -2,5 +2,7 @@
 . "$(dirname "$0")/_/husky.sh"
 
 # Uncomment, when ready
+#dotnet format -v q --no-restore
+#
 #echo 'Formatting code. Check Command Output on errors.'
-#dotnet format --verify-no-changes
+#dotnet format --no-restore --verify-no-changes
