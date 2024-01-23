@@ -1,0 +1,6 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Uncomment, when ready
+#echo 'Formatting code. Check Command Output on errors.'
+#dotnet format --verify-no-changes
