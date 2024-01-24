@@ -112,8 +112,8 @@ namespace TwitchChat
             ConnectionCredentials credentials = new(_channelId, accessToken);
             ClientOptions clientOptions = new()
             {
-                MessagesAllowedInPeriod = TwitchConstants.MaximumMessages,
-                ThrottlingPeriod = TimeSpan.FromSeconds(TwitchConstants.ThrottlingInSeconds),
+                MessagesAllowedInPeriod = TwitchClientConstants.MaximumMessages,
+                ThrottlingPeriod = TimeSpan.FromSeconds(TwitchClientConstants.ThrottlingInSeconds),
             };
 
             return new(credentials, clientOptions);

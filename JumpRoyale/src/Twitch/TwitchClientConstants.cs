@@ -1,6 +1,6 @@
 namespace TwitchChat
 {
-    public static class TwitchConstants
+    public static class TwitchClientConstants
     {
         /// <summary>
         /// Describes <c>MessagesAllowedInPeriod</c> argument for ClientOptions.
