@@ -41,7 +41,8 @@ namespace TwitchChat
 
             tps.OnPubSubServiceConnected += (object sender, EventArgs e) =>
             {
-                Console.WriteLine("PubSub connected");
+                Console.WriteLine(TwitchConstants.OnPubSubConnected);
+
 #pragma warning disable CS0618 // Type or member is obsolete
                 tps.ListenToRewards("47098493"); // this is the ID of the "AdamLearnsLive" channel
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -75,12 +76,12 @@ namespace TwitchChat
 
         private void Client_OnConnected(object sender, OnConnectedArgs e)
         {
-            Console.WriteLine("Successfully connected to Twitch");
+            Console.WriteLine(TwitchConstants.OnClientConnectedMessage);
         }
 
         private void Client_OnJoinedChannel(object sender, OnJoinedChannelArgs e)
         {
-            Console.WriteLine("Successfully connected to the channel");
+            Console.WriteLine(TwitchConstants.OnChannelJoinMessage);
         }
 
         private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
@@ -99,22 +100,15 @@ namespace TwitchChat
         private Tuple<ConnectionCredentials, ClientOptions> ConfigureClient()
         {
             IConfigurationRoot config = new ConfigurationBuilder().AddUserSecrets<TwitchChatClient>().Build();
-            string accessToken =
-                config["twitch_access_token"]
-                ?? throw new Exception(
-                    "No access token found. Please run `dotnet user-secrets set twitch_access_token <your access token>`"
-                );
-            _channelId =
-                config["twitch_channel_name"]
-                ?? throw new Exception(
-                    "Channel not found. Please run `dotnet user-secrets set twitch_channel_name <your twitch channel>`"
-                );
+            string accessToken = config["twitch_access_token"] ?? throw new Exception(TwitchConstants.MissingAccessTokenError);
+            _channelId = config["twitch_channel_name"] ?? throw new Exception(TwitchConstants.MissingChannelNameError);
             ConnectionCredentials credentials = new(_channelId, accessToken);
-            ClientOptions clientOptions = new()
-            {
-                MessagesAllowedInPeriod = TwitchClientConstants.MaximumMessages,
-                ThrottlingPeriod = TimeSpan.FromSeconds(TwitchClientConstants.ThrottlingInSeconds),
-            };
+            ClientOptions clientOptions =
+                new()
+                {
+                    MessagesAllowedInPeriod = TwitchConstants.MaximumMessages,
+                    ThrottlingPeriod = TimeSpan.FromSeconds(TwitchConstants.ThrottlingInSeconds),
+                };
 
             return new(credentials, clientOptions);
         }
