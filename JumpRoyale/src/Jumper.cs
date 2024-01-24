@@ -63,11 +63,9 @@ public partial class Jumper : CharacterBody2D
         // Note: ToHTML() excludes alpha component to avoid transparent names
         string colorCode = Color.FromString(colorName, DefaultPlayerNameColor).ToHtml(false);
 
-        GetNode<RichTextLabel>(NameNodeName).Text = "[center]";
-        GetNode<RichTextLabel>(NameNodeName).Text += $"[color={colorCode}]";
-        GetNode<RichTextLabel>(NameNodeName).Text += PlayerData.Name;
-        GetNode<RichTextLabel>(NameNodeName).Text += "[/color]";
-        GetNode<RichTextLabel>(NameNodeName).Text += "[/center]";
+        RichTextLabel nameLabel = GetNode<RichTextLabel>(NameNodeName);
+
+        nameLabel.Text = $"[center][color={colorCode}]{PlayerData.Name}[/color][/center]";
     }
 
     public void SetCrazyParticles()
