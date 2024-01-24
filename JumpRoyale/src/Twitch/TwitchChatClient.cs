@@ -12,16 +12,6 @@ namespace TwitchChat
 {
     public class TwitchChatClient
     {
-        /// <summary>
-        /// Describes <c>MessagesAllowedInPeriod</c> argument for ClientOptions.
-        /// </summary>
-        private const int MaximumMessages = 750;
-
-        /// <summary>
-        /// Describes <c>ThrottlingPeriod</c> TimeSpan in seconds for ClientOptions.
-        /// </summary>
-        private const int Seconds = 30;
-
         private readonly TwitchPubSub _tps;
         private readonly TwitchClient _client;
 
@@ -120,8 +110,11 @@ namespace TwitchChat
                     "Channel not found. Please run `dotnet user-secrets set twitch_channel_name <your twitch channel>`"
                 );
             ConnectionCredentials credentials = new(_channelId, accessToken);
-            ClientOptions clientOptions =
-                new() { MessagesAllowedInPeriod = MaximumMessages, ThrottlingPeriod = TimeSpan.FromSeconds(Seconds), };
+            ClientOptions clientOptions = new()
+            {
+                MessagesAllowedInPeriod = TwitchConstants.MaximumMessages,
+                ThrottlingPeriod = TimeSpan.FromSeconds(TwitchConstants.ThrottlingInSeconds),
+            };
 
             return new(credentials, clientOptions);
         }
