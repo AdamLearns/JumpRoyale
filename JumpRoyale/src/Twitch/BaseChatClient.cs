@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.Configuration;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
@@ -11,12 +12,19 @@ public class BaseChatClient
 {
     protected BaseChatClient()
     {
+        ConfigurationBuilder config = new();
+
+        // Here, we can replace user secrets later with Json or other providers, then inject it to the channel config,
+        // where it calls the final .Build()
+        config.AddUserSecrets<TwitchChatClient>();
+
+        Configuration = new(config);
         TwitchClient = InitializeClient();
 
         ConnectToTwitch();
     }
 
-    protected ChannelConfiguration Configuration { get; private set; } = new();
+    protected ChannelConfiguration Configuration { get; private set; }
 
     protected TwitchPubSub TwitchPubSub { get; private set; } = new();
 
