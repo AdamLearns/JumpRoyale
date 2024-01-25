@@ -1,5 +1,4 @@
 using System;
-using Microsoft.Extensions.Configuration;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
@@ -10,44 +9,33 @@ namespace TwitchChat;
 
 public class BaseChatClient
 {
-    private readonly string _accessToken;
-
-    protected BaseChatClient(string channelId)
+    protected BaseChatClient()
     {
-        IConfigurationRoot config = new ConfigurationBuilder().AddUserSecrets<TwitchChatClient>().Build();
-
-        _accessToken = config[TwitchConstants.TwitchAccessTokenKey] ?? throw new MissingTwitchAccessTokenException();
-        ChannelName = config[TwitchConstants.TwitchChannelNameKey] ?? throw new MissingTwitchChannelNameException();
-
-        ChannelId = channelId;
-        TwitchPubSub = new();
-        TwitchClient = CreateTwitchClient();
+        TwitchClient = InitializeClient();
 
         ConnectToTwitch();
     }
 
-    protected string ChannelId { get; private set; }
+    protected ChannelConfiguration Configuration { get; private set; } = new();
 
-    protected string ChannelName { get; private set; }
-
-    protected TwitchPubSub TwitchPubSub { get; private set; }
+    protected TwitchPubSub TwitchPubSub { get; private set; } = new();
 
     protected TwitchClient TwitchClient { get; private set; }
 
-    private TwitchClient CreateTwitchClient()
+    private TwitchClient InitializeClient()
     {
         (ConnectionCredentials credentials, ClientOptions options) = ConfigureClient();
         WebSocketClient customClient = new(options);
         TwitchClient client = new(customClient);
 
-        client.Initialize(credentials, ChannelName);
+        client.Initialize(credentials, Configuration.ChannelName);
 
         return client;
     }
 
     private Tuple<ConnectionCredentials, ClientOptions> ConfigureClient()
     {
-        ConnectionCredentials credentials = new(ChannelName, _accessToken);
+        ConnectionCredentials credentials = new(Configuration.ChannelName, Configuration.AccessToken);
         ClientOptions clientOptions =
             new()
             {
