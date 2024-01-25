@@ -55,9 +55,7 @@ public partial class Arena : Node2D
     {
         _lobbyTilemap = new TileMap { Name = "TileMap", TileSet = _tileSetToUse };
 
-        // Channel ID for "AdamLearnsLive" - we really need to make some settings file for this, preferably a json, so
-        // we don't even have to use user-secrets for non-secrets related stuff
-        TwitchChatClient twitchChatClient = new("47098493");
+        TwitchChatClient twitchChatClient = new();
 
         twitchChatClient.OnRedemptionEvent += OnRedemption;
         twitchChatClient.OnMessageEvent += OnMessage;
