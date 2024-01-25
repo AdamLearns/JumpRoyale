@@ -28,7 +28,9 @@ namespace TwitchChat
 
         private void OnChannelPointsRewardRedeemed(object sender, OnChannelPointsRewardRedeemedArgs e)
         {
-            Console.WriteLine($"Reward redeemed: {e}");
+            Console.WriteLine(TwitchClientMessages.OnRewardRedeemMessage);
+            Console.WriteLine(e.RewardRedeemed.Redemption.Id);
+
             OnRedemptionEvent?.Invoke(this, e);
         }
 
