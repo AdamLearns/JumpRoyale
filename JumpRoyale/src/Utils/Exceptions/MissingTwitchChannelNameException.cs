@@ -5,7 +5,7 @@ namespace TwitchChat
     public class MissingTwitchChannelNameException : Exception
     {
         public MissingTwitchChannelNameException()
-            : base(TwitchClientMessages.MissingChannelNameError) { }
+            : base(TwitchConstants.MissingChannelNameError) { }
 
         public MissingTwitchChannelNameException(string message)
             : base(message) { }

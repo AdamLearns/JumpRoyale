@@ -28,7 +28,7 @@ public class TwitchChatClient : BaseChatClient
 
     private void OnChannelPointsRewardRedeemed(object sender, OnChannelPointsRewardRedeemedArgs e)
     {
-        Console.WriteLine(TwitchClientMessages.OnRewardRedeemMessage);
+        Console.WriteLine(TwitchConstants.OnRewardRedeemMessage);
         Console.WriteLine(e.RewardRedeemed.Redemption.Id);
 
         OnRedemptionEvent?.Invoke(this, e);
@@ -36,17 +36,17 @@ public class TwitchChatClient : BaseChatClient
 
     private void OnConnected(object sender, OnConnectedArgs e)
     {
-        Console.WriteLine(TwitchClientMessages.OnClientConnectedMessage);
+        Console.WriteLine(TwitchConstants.OnClientConnectedMessage);
     }
 
     private void OnJoinedChannel(object sender, OnJoinedChannelArgs e)
     {
-        Console.WriteLine(TwitchClientMessages.OnChannelJoinMessage);
+        Console.WriteLine(TwitchConstants.OnChannelJoinMessage);
     }
 
     private void OnPubSubServiceConnected(object sender, EventArgs e)
     {
-        Console.WriteLine(TwitchClientMessages.OnPubSubConnected);
+        Console.WriteLine(TwitchConstants.OnPubSubConnected);
 
         TwitchPubSub.ListenToChannelPoints(ChannelId); // this is the ID of the "AdamLearnsLive" channel
         TwitchPubSub.SendTopics();

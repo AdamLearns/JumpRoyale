@@ -5,7 +5,7 @@ namespace TwitchChat
     public class MissingTwitchAccessTokenException : Exception
     {
         public MissingTwitchAccessTokenException()
-            : base(TwitchClientMessages.MissingAccessTokenError) { }
+            : base(TwitchConstants.MissingAccessTokenError) { }
 
         public MissingTwitchAccessTokenException(string message)
             : base(message) { }

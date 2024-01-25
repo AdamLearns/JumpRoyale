@@ -10,24 +10,14 @@ namespace TwitchChat;
 
 public class BaseChatClient
 {
-    /// <summary>
-    /// Describes <c>MessagesAllowedInPeriod</c> argument for ClientOptions.
-    /// </summary>
-    private const int _maximumMessages = 750;
-
-    /// <summary>
-    /// Describes <c>ThrottlingPeriod</c> TimeSpan in seconds for ClientOptions.
-    /// </summary>
-    private const int _throttlingInSeconds = 30;
-
     private readonly string _accessToken;
 
     protected BaseChatClient(string channelId)
     {
         IConfigurationRoot config = new ConfigurationBuilder().AddUserSecrets<TwitchChatClient>().Build();
 
-        _accessToken = config["twitch_access_token"] ?? throw new MissingTwitchAccessTokenException();
-        ChannelName = config["twitch_channel_name"] ?? throw new MissingTwitchChannelNameException();
+        _accessToken = config[TwitchConstants.TwitchAccessTokenKey] ?? throw new MissingTwitchAccessTokenException();
+        ChannelName = config[TwitchConstants.TwitchChannelNameKey] ?? throw new MissingTwitchChannelNameException();
 
         ChannelId = channelId;
         TwitchPubSub = new();
@@ -61,8 +51,8 @@ public class BaseChatClient
         ClientOptions clientOptions =
             new()
             {
-                MessagesAllowedInPeriod = _maximumMessages,
-                ThrottlingPeriod = TimeSpan.FromSeconds(_throttlingInSeconds),
+                MessagesAllowedInPeriod = TwitchConstants.MaximumMessages,
+                ThrottlingPeriod = TimeSpan.FromSeconds(TwitchConstants.ThrottlingInSeconds),
             };
 
         return new(credentials, clientOptions);
