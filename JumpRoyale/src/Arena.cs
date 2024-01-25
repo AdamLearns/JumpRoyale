@@ -7,6 +7,7 @@ using System.Text.Json;
 using Godot;
 using TwitchChat;
 using TwitchLib.PubSub.Events;
+using TwitchLib.PubSub.Models.Responses.Messages.Redemption;
 
 public partial class Arena : Node2D
 {
@@ -54,10 +55,12 @@ public partial class Arena : Node2D
     {
         _lobbyTilemap = new TileMap { Name = "TileMap", TileSet = _tileSetToUse };
 
-        TwitchChatClient twitchChatClient = new();
+        // Channel ID for "AdamLearnsLive" - we really need to make some settings file for this, preferably a json, so
+        // we don't even have to use user-secrets for non-secrets related stuff
+        TwitchChatClient twitchChatClient = new("47098493");
 
-        twitchChatClient.OnRedemption += OnRedemption;
-        twitchChatClient.OnMessage += OnMessage;
+        twitchChatClient.OnRedemptionEvent += OnRedemption;
+        twitchChatClient.OnMessageEvent += OnMessage;
         GetLobbyOverlay().TimerDone += OnLobbyTimerDone;
         GetGameOverlay().TimerDone += OnGameTimerDone;
 
@@ -93,7 +96,7 @@ public partial class Arena : Node2D
         }
     }
 
-    private void OnMessage(object sender, MessageEventArgs e)
+    private void OnMessage(object sender, ChatMessageEventArgs e)
     {
         // This is kind of a workaround for now to have a top level Defer and be able to pass objects around inside,
         // which can't be converted to Godot's Variant. We still have to pull the required data separately, because `e`
@@ -666,16 +669,18 @@ public partial class Arena : Node2D
         gameOverlay.Init();
     }
 
-    private void OnRedemption(object sender, OnRewardRedeemedArgs e)
+    private void OnRedemption(object sender, OnChannelPointsRewardRedeemedArgs e)
     {
-        if (!e.RewardId.Equals(Guid.Parse("f04bb300-d135-4670-a7ba-1d6761590042")))
+        Redemption reward = e.RewardRedeemed.Redemption;
+
+        if (!reward.Id.Equals(Guid.Parse("f04bb300-d135-4670-a7ba-1d6761590042")))
         {
             return;
         }
 
-        GD.Print($"{e.DisplayName} is redeeming a revive!");
+        GD.Print($"{reward.User.DisplayName} is redeeming a revive!");
 
-        CallDeferred(nameof(RedeemRevive), e.DisplayName);
+        CallDeferred(nameof(RedeemRevive), reward.User.DisplayName);
     }
 
     private void RedeemRevive(string displayName)

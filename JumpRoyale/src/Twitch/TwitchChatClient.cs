@@ -1,90 +1,56 @@
 using System;
-using Microsoft.Extensions.Configuration;
-using TwitchLib.Client;
 using TwitchLib.Client.Events;
-using TwitchLib.Client.Models;
-using TwitchLib.Communication.Clients;
-using TwitchLib.Communication.Models;
-using TwitchLib.PubSub;
 using TwitchLib.PubSub.Events;
 
 namespace TwitchChat
 {
-    public class TwitchChatClient
+    public class TwitchChatClient : BaseChatClient
     {
-        private readonly TwitchPubSub _tps;
-        private readonly TwitchClient _client;
-
-        private string _channelId = string.Empty;
-
-        public TwitchChatClient()
+        public TwitchChatClient(string channelId)
+            : base(channelId)
         {
-            _tps = CreateTwitchPubSub();
-            _client = CreateTwitchClient();
-
-            ConnectToTwitch();
+            SubscribeToEvents();
         }
 
-        public event EventHandler<MessageEventArgs>? OnMessage;
+        public event EventHandler<ChatMessageEventArgs>? OnMessageEvent;
 
-        public event EventHandler<OnRewardRedeemedArgs>? OnRedemption;
+        public event EventHandler<OnChannelPointsRewardRedeemedArgs>? OnRedemptionEvent;
 
-        private void ConnectToTwitch()
+        private void SubscribeToEvents()
         {
-            _tps.Connect();
-            _client.Connect();
+            TwitchPubSub.OnPubSubServiceConnected += OnPubSubServiceConnected;
+            TwitchPubSub.OnChannelPointsRewardRedeemed += OnChannelPointsRewardRedeemed;
+
+            TwitchClient.OnJoinedChannel += OnJoinedChannel;
+            TwitchClient.OnMessageReceived += OnMessageReceived;
+            TwitchClient.OnConnected += OnConnected;
         }
 
-        private TwitchPubSub CreateTwitchPubSub()
+        private void OnChannelPointsRewardRedeemed(object sender, OnChannelPointsRewardRedeemedArgs e)
         {
-            TwitchPubSub tps = new();
-
-            tps.OnPubSubServiceConnected += (object sender, EventArgs e) =>
-            {
-                Console.WriteLine(TwitchConstants.OnPubSubConnected);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-                tps.ListenToRewards("47098493"); // this is the ID of the "AdamLearnsLive" channel
-#pragma warning restore CS0618 // Type or member is obsolete
-                tps.SendTopics();
-#pragma warning disable CS0618,CS8602// Type or member is obsolete
-                tps.OnRewardRedeemed += (object sender, OnRewardRedeemedArgs e) =>
-                {
-                    Console.WriteLine($"Reward redeemed: {e}");
-                    OnRedemption.Invoke(this, e);
-                };
-#pragma warning restore CS0618 // Type or member is obsolete
-            };
-
-            return tps;
+            Console.WriteLine($"Reward redeemed: {e}");
+            OnRedemptionEvent?.Invoke(this, e);
         }
 
-        private TwitchClient CreateTwitchClient()
+        private void OnConnected(object sender, OnConnectedArgs e)
         {
-            (ConnectionCredentials credentials, ClientOptions options) = ConfigureClient();
-            WebSocketClient customClient = new(options);
-            TwitchClient client = new(customClient);
-
-            client.Initialize(credentials, _channelId);
-
-            client.OnJoinedChannel += Client_OnJoinedChannel;
-            client.OnMessageReceived += Client_OnMessageReceived;
-            client.OnConnected += Client_OnConnected;
-
-            return client;
+            Console.WriteLine(TwitchClientMessages.OnClientConnectedMessage);
         }
 
-        private void Client_OnConnected(object sender, OnConnectedArgs e)
+        private void OnJoinedChannel(object sender, OnJoinedChannelArgs e)
         {
-            Console.WriteLine(TwitchConstants.OnClientConnectedMessage);
+            Console.WriteLine(TwitchClientMessages.OnChannelJoinMessage);
         }
 
-        private void Client_OnJoinedChannel(object sender, OnJoinedChannelArgs e)
+        private void OnPubSubServiceConnected(object sender, EventArgs e)
         {
-            Console.WriteLine(TwitchConstants.OnChannelJoinMessage);
+            Console.WriteLine(TwitchClientMessages.OnPubSubConnected);
+
+            TwitchPubSub.ListenToChannelPoints(ChannelId); // this is the ID of the "AdamLearnsLive" channel
+            TwitchPubSub.SendTopics();
         }
 
-        private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
+        private void OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
             bool isPrivileged = e.ChatMessage.IsSubscriber || e.ChatMessage.IsModerator || e.ChatMessage.IsVip;
 
@@ -97,22 +63,6 @@ namespace TwitchChat
             );
         }
 
-        private Tuple<ConnectionCredentials, ClientOptions> ConfigureClient()
-        {
-            IConfigurationRoot config = new ConfigurationBuilder().AddUserSecrets<TwitchChatClient>().Build();
-            string accessToken = config["twitch_access_token"] ?? throw new Exception(TwitchConstants.MissingAccessTokenError);
-            _channelId = config["twitch_channel_name"] ?? throw new Exception(TwitchConstants.MissingChannelNameError);
-            ConnectionCredentials credentials = new(_channelId, accessToken);
-            ClientOptions clientOptions =
-                new()
-                {
-                    MessagesAllowedInPeriod = TwitchConstants.MaximumMessages,
-                    ThrottlingPeriod = TimeSpan.FromSeconds(TwitchConstants.ThrottlingInSeconds),
-                };
-
-            return new(credentials, clientOptions);
-        }
-
         private void HandleChatMessage(
             string senderId,
             string senderName,
@@ -121,9 +71,9 @@ namespace TwitchChat
             bool isPrivileged
         )
         {
-            OnMessage.Invoke(
+            OnMessageEvent?.Invoke(
                 this,
-                new MessageEventArgs
+                new ChatMessageEventArgs
                 {
                     Message = message,
                     SenderName = senderName,

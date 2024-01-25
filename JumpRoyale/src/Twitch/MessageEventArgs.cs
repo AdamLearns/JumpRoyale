@@ -2,7 +2,7 @@ using System;
 
 namespace TwitchChat
 {
-    public class MessageEventArgs : EventArgs
+    public class ChatMessageEventArgs : EventArgs
     {
         public string Message { get; set; } = string.Empty;
 
