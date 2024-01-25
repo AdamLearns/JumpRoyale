@@ -6,8 +6,7 @@ namespace TwitchChat;
 
 public class TwitchChatClient : BaseChatClient
 {
-    public TwitchChatClient(string channelId)
-        : base(channelId)
+    public TwitchChatClient()
     {
         SubscribeToEvents();
     }
@@ -48,7 +47,7 @@ public class TwitchChatClient : BaseChatClient
     {
         Console.WriteLine(TwitchConstants.OnPubSubConnected);
 
-        TwitchPubSub.ListenToChannelPoints(ChannelId); // this is the ID of the "AdamLearnsLive" channel
+        TwitchPubSub.ListenToChannelPoints(Configuration.ChannelId);
         TwitchPubSub.SendTopics();
     }
 
