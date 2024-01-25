@@ -1,17 +1,16 @@
 using System;
 
-namespace TwitchChat
+namespace TwitchChat;
+
+public class ChatMessageEventArgs : EventArgs
 {
-    public class ChatMessageEventArgs : EventArgs
-    {
-        public string Message { get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
 
-        public string SenderName { get; set; } = string.Empty;
+    public string SenderName { get; set; } = string.Empty;
 
-        public string SenderId { get; set; } = string.Empty;
+    public string SenderId { get; set; } = string.Empty;
 
-        public string HexColor { get; set; } = string.Empty;
+    public string HexColor { get; set; } = string.Empty;
 
-        public bool IsPrivileged { get; set; }
-    }
+    public bool IsPrivileged { get; set; }
 }

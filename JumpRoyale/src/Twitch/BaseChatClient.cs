@@ -6,72 +6,71 @@ using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 using TwitchLib.PubSub;
 
-namespace TwitchChat
+namespace TwitchChat;
+
+public class BaseChatClient
 {
-    public class BaseChatClient
+    /// <summary>
+    /// Describes <c>MessagesAllowedInPeriod</c> argument for ClientOptions.
+    /// </summary>
+    private const int _maximumMessages = 750;
+
+    /// <summary>
+    /// Describes <c>ThrottlingPeriod</c> TimeSpan in seconds for ClientOptions.
+    /// </summary>
+    private const int _throttlingInSeconds = 30;
+
+    private readonly string _accessToken;
+
+    protected BaseChatClient(string channelId)
     {
-        /// <summary>
-        /// Describes <c>MessagesAllowedInPeriod</c> argument for ClientOptions.
-        /// </summary>
-        private const int _maximumMessages = 750;
+        IConfigurationRoot config = new ConfigurationBuilder().AddUserSecrets<TwitchChatClient>().Build();
 
-        /// <summary>
-        /// Describes <c>ThrottlingPeriod</c> TimeSpan in seconds for ClientOptions.
-        /// </summary>
-        private const int _throttlingInSeconds = 30;
+        _accessToken = config["twitch_access_token"] ?? throw new MissingTwitchAccessTokenException();
+        ChannelName = config["twitch_channel_name"] ?? throw new MissingTwitchChannelNameException();
 
-        private readonly string _accessToken;
+        ChannelId = channelId;
+        TwitchPubSub = new();
+        TwitchClient = CreateTwitchClient();
 
-        protected BaseChatClient(string channelId)
-        {
-            IConfigurationRoot config = new ConfigurationBuilder().AddUserSecrets<TwitchChatClient>().Build();
+        ConnectToTwitch();
+    }
 
-            _accessToken = config["twitch_access_token"] ?? throw new MissingTwitchAccessTokenException();
-            ChannelName = config["twitch_channel_name"] ?? throw new MissingTwitchChannelNameException();
+    protected string ChannelId { get; private set; }
 
-            ChannelId = channelId;
-            TwitchPubSub = new();
-            TwitchClient = CreateTwitchClient();
+    protected string ChannelName { get; private set; }
 
-            ConnectToTwitch();
-        }
+    protected TwitchPubSub TwitchPubSub { get; private set; }
 
-        protected string ChannelId { get; private set; }
+    protected TwitchClient TwitchClient { get; private set; }
 
-        protected string ChannelName { get; private set; }
+    private TwitchClient CreateTwitchClient()
+    {
+        (ConnectionCredentials credentials, ClientOptions options) = ConfigureClient();
+        WebSocketClient customClient = new(options);
+        TwitchClient client = new(customClient);
 
-        protected TwitchPubSub TwitchPubSub { get; private set; }
+        client.Initialize(credentials, ChannelName);
 
-        protected TwitchClient TwitchClient { get; private set; }
+        return client;
+    }
 
-        private TwitchClient CreateTwitchClient()
-        {
-            (ConnectionCredentials credentials, ClientOptions options) = ConfigureClient();
-            WebSocketClient customClient = new(options);
-            TwitchClient client = new(customClient);
+    private Tuple<ConnectionCredentials, ClientOptions> ConfigureClient()
+    {
+        ConnectionCredentials credentials = new(ChannelName, _accessToken);
+        ClientOptions clientOptions =
+            new()
+            {
+                MessagesAllowedInPeriod = _maximumMessages,
+                ThrottlingPeriod = TimeSpan.FromSeconds(_throttlingInSeconds),
+            };
 
-            client.Initialize(credentials, ChannelName);
+        return new(credentials, clientOptions);
+    }
 
-            return client;
-        }
-
-        private Tuple<ConnectionCredentials, ClientOptions> ConfigureClient()
-        {
-            ConnectionCredentials credentials = new(ChannelName, _accessToken);
-            ClientOptions clientOptions =
-                new()
-                {
-                    MessagesAllowedInPeriod = _maximumMessages,
-                    ThrottlingPeriod = TimeSpan.FromSeconds(_throttlingInSeconds),
-                };
-
-            return new(credentials, clientOptions);
-        }
-
-        private void ConnectToTwitch()
-        {
-            TwitchPubSub.Connect();
-            TwitchClient.Connect();
-        }
+    private void ConnectToTwitch()
+    {
+        TwitchPubSub.Connect();
+        TwitchClient.Connect();
     }
 }
