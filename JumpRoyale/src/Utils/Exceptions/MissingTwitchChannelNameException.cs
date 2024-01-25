@@ -1,16 +1,15 @@
 using System;
 
-namespace TwitchChat
+namespace TwitchChat;
+
+public class MissingTwitchChannelNameException : Exception
 {
-    public class MissingTwitchChannelNameException : Exception
-    {
-        public MissingTwitchChannelNameException()
-            : base(TwitchConstants.MissingChannelNameError) { }
+    public MissingTwitchChannelNameException()
+        : base(TwitchConstants.MissingChannelNameError) { }
 
-        public MissingTwitchChannelNameException(string message)
-            : base(message) { }
+    public MissingTwitchChannelNameException(string message)
+        : base(message) { }
 
-        public MissingTwitchChannelNameException(string message, Exception innerException)
-            : base(message, innerException) { }
-    }
+    public MissingTwitchChannelNameException(string message, Exception innerException)
+        : base(message, innerException) { }
 }
