@@ -105,7 +105,6 @@ public class ChatCommandDetectionTests
     {
         ChatCommandParser command = new(chatMessage.ToLower());
 
-        // TODO: replace this with some external pattern matcher without hardcoding the cases...
         return command.Name switch
         {
             string when CommandMatcher.MatchesJoin(command.Name, isPrivileged) => new(chatMessage, command.Name, true),

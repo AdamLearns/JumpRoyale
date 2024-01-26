@@ -438,8 +438,6 @@ public partial class Arena : Node2D
 
             if (r < 6 + difficultyFactor * 40)
             {
-                // TODO: DrawRectangleOfTiles draws blocks _downward_, this means that part of them
-                //       will suddenly appear on screen
                 int blockWidth = 2 + (int)(difficultyFactor * 24);
                 int blockX = Rng.IntRange(2, _widthInTiles - 1 - blockWidth);
 
