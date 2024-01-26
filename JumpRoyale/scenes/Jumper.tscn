@@ -116,9 +116,9 @@ shape = SubResource("RectangleShape2D_6u5om")
 [node name="Name" type="RichTextLabel" parent="."]
 texture_filter = 2
 offset_left = -1328.0
-offset_top = -69.0
+offset_top = -61.0
 offset_right = 1328.0
-offset_bottom = 85.0
+offset_bottom = 93.0
 theme = ExtResource("16_fsbtc")
 theme_override_font_sizes/normal_font_size = 24
 bbcode_enabled = true

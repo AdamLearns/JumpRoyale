@@ -21,10 +21,9 @@ public partial class Arena : Node2D
     private const string CanvasLayerNodeName = "CanvasLayer";
     private const string SaveLocation = "res://save_data/players.json";
 
-    private readonly Dictionary<string, Jumper> _jumpers = new();
+    private readonly Dictionary<string, Jumper> _jumpers = [];
     private AllPlayerData _allPlayerData = new();
     private TileMap _lobbyTilemap = new();
-    private RandomNumberGenerator _rng = new();
 
     [Export]
     private PackedScene? _jumperScene;
@@ -162,11 +161,12 @@ public partial class Arena : Node2D
             return;
         }
 
-        int randomCharacterChoice = _rng.RandiRange(1, 18);
+        int randomCharacterChoice = Rng.IntRange(1, 18);
 
-        PlayerData playerData = _allPlayerData.Players.ContainsKey(userId)
-            ? _allPlayerData.Players[userId]
-            : new PlayerData(hexColor, randomCharacterChoice);
+        if (!_allPlayerData.Players.TryGetValue(userId, out PlayerData? playerData))
+        {
+            playerData = new(hexColor, randomCharacterChoice);
+        }
 
         _allPlayerData.Players[userId] = playerData;
 
@@ -178,7 +178,7 @@ public partial class Arena : Node2D
         Rect2 viewport = GetViewportRect();
         int tileHeight = _tileSetToUse.TileSize.Y;
         int xPadding = _tileSetToUse.TileSize.X * 3;
-        int x = _rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding);
+        int x = Rng.IntRange(xPadding, (int)viewport.Size.X - xPadding);
         int y = ((int)(viewport.Size.Y / tileHeight) - 1 - WallHeightInTiles) * tileHeight;
 
         jumper.Init(x, y, userName, playerData);
@@ -213,7 +213,7 @@ public partial class Arena : Node2D
 
     private void HandleCharacterChange(Jumper jumper, int? userChoice)
     {
-        int choice = userChoice ?? _rng.RandiRange(1, 18);
+        int choice = userChoice ?? Rng.IntRange(1, 18);
 
         choice = Math.Clamp(choice, 1, 18);
 
@@ -245,8 +245,8 @@ public partial class Arena : Node2D
     private void SetBackground()
     {
         Sprite2D background = GetNode<Sprite2D>("Background");
-        string[] colors = new string[] { "Blue", "Brown", "Gray", "Green", "Pink", "Purple", "Yellow" };
-        string color = colors[_rng.RandiRange(0, colors.Length - 1)];
+        string[] colors = ["Blue", "Brown", "Gray", "Green", "Pink", "Purple", "Yellow"];
+        string color = colors[Rng.IntRange(0, colors.Length - 1)];
 
         background.Texture = ResourceLoader.Load<Texture2D>($"res://assets/sprites/backgrounds/{color}.png");
     }
@@ -368,8 +368,8 @@ public partial class Arena : Node2D
 
         for (int y = platformStartY; y >= platformEndY; y--)
         {
-            int width = _rng.RandiRange(3, 15);
-            int startX = _rng.RandiRange(2, _widthInTiles - width - 2);
+            int width = Rng.IntRange(3, 15);
+            int startX = Rng.IntRange(2, _widthInTiles - width - 2);
 
             AddPlatform(startX, y, width);
         }
@@ -403,27 +403,27 @@ public partial class Arena : Node2D
             float difficultyFactor = (float)Math.Min(0, y) / -ArenaHeightInTiles;
 
             // Rarely, make a solid block to add some variety
-            int r = _rng.RandiRange(0, 100);
+            int r = Rng.IntRange(0, 100);
 
             if (r < 6 + difficultyFactor * 40)
             {
                 // TODO: DrawRectangleOfTiles draws blocks _downward_, this means that part of them
                 //       will suddenly appear on screen
                 int blockWidth = 2 + (int)(difficultyFactor * 24);
-                int blockX = _rng.RandiRange(2, _widthInTiles - 1 - blockWidth);
+                int blockX = Rng.IntRange(2, _widthInTiles - 1 - blockWidth);
 
                 DrawRectangleOfTiles(blockX, y + 1, blockWidth, blockWidth, new Vector2I(12, 1));
             }
 
-            r = _rng.RandiRange(0, 100);
+            r = Rng.IntRange(0, 100);
 
             if (r > (70 - difficultyFactor * 60))
             {
                 continue;
             }
 
-            int width = _rng.RandiRange(3, 15 - (int)Math.Round(6 * difficultyFactor));
-            int startX = _rng.RandiRange(2, _widthInTiles - width - 2);
+            int width = Rng.IntRange(3, 15 - (int)Math.Round(6 * difficultyFactor));
+            int startX = Rng.IntRange(2, _widthInTiles - width - 2);
 
             AddPlatform(startX, y, width);
         }
@@ -491,24 +491,24 @@ public partial class Arena : Node2D
         int podiumX = _widthInTiles / 2;
         int podiumY = 13 + podiumHeight;
 
-        List<Tuple<int, int>> platformCoords = new();
+        List<Tuple<int, int>> platformCoords = [];
 
         // Add some platforms so that there are "fun" jumps to make
         int startY = podiumY + podiumHeight + 10;
         for (int y = startY; y < _heightInTiles; y += 6)
         {
-            for (int x = _rng.RandiRange(3, 7); x < _widthInTiles - 5; )
+            for (int x = Rng.IntRange(3, 7); x < _widthInTiles - 5; )
             {
                 AddPlatform(x, y, 1);
                 platformCoords.Add(new Tuple<int, int>(x, y));
-                x += _rng.RandiRange(2, 6);
+                x += Rng.IntRange(2, 6);
             }
         }
 
         // Put all players back in the arena
         for (int i = 0; i < _jumpers.Count; i++)
         {
-            int platformNumber = _rng.RandiRange(0, platformCoords.Count - 1);
+            int platformNumber = Rng.IntRange(0, platformCoords.Count - 1);
             (int platformX, int platformY) = platformCoords[platformNumber];
             Jumper jumper = _jumpers.ElementAt(i).Value;
 
@@ -562,7 +562,8 @@ public partial class Arena : Node2D
             }
 #pragma warning restore S2583 // Conditionally executed code should be reachable
 
-            int scale = winners.Length + 1 - i;
+            // Make the winners much bigger
+            int scale = Math.Max(2, 4 - i);
 
             jumper.Position = new Vector2(tileX * _tileSetToUse.TileSize.X, 50);
             jumper.Scale = new Vector2(scale, scale);
@@ -700,7 +701,7 @@ public partial class Arena : Node2D
         {
             Jumper jumper = jumpersEntry.Value;
 
-            if (jumper.PlayerData.Name.ToLower() != displayName.ToLower())
+            if (!jumper.PlayerData.Name.Equals(displayName, StringComparison.CurrentCultureIgnoreCase))
             {
                 continue;
             }
