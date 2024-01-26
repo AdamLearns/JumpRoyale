@@ -20,7 +20,7 @@ public partial class Arena : Node2D
     private const string CanvasLayerNodeName = "CanvasLayer";
     private const string SaveLocation = "res://save_data/players.json";
 
-    private readonly Dictionary<string, Jumper> _jumpers = new();
+    private readonly Dictionary<string, Jumper> _jumpers = [];
     private AllPlayerData _allPlayerData = new();
     private TileMap _lobbyTilemap = new();
     private RandomNumberGenerator _rng = new();
@@ -163,9 +163,10 @@ public partial class Arena : Node2D
 
         int randomCharacterChoice = _rng.RandiRange(1, 18);
 
-        PlayerData playerData = _allPlayerData.Players.ContainsKey(userId)
-            ? _allPlayerData.Players[userId]
-            : new PlayerData(hexColor, randomCharacterChoice);
+        if (!_allPlayerData.Players.TryGetValue(userId, out PlayerData? playerData))
+        {
+            playerData = new(hexColor, randomCharacterChoice);
+        }
 
         _allPlayerData.Players[userId] = playerData;
 
@@ -694,7 +695,7 @@ public partial class Arena : Node2D
         {
             Jumper jumper = jumpersEntry.Value;
 
-            if (jumper.PlayerData.Name.ToLower() != displayName.ToLower())
+            if (!jumper.PlayerData.Name.Equals(displayName, StringComparison.CurrentCultureIgnoreCase))
             {
                 continue;
             }

@@ -31,6 +31,9 @@ dotnet_diagnostic.SA1000.severity = none
 # Ignore cases for closing parenthesis being on new line
 # -- should not show this warning for multi-line constructors
 dotnet_diagnostic.SA1009.severity = none
+# Opening square brackets should not be preceded by a space
+# This is a C#12 specific issue related to formatters not being able to format collection expressions
+dotnet_diagnostic.SA1010.severity = none
 # Prefix local calls with `this`
 dotnet_diagnostic.SA1101.severity = none
 # Do not prefix local calls with `this`
@@ -108,6 +111,8 @@ dotnet_diagnostic.CA2213.severity = none
 dotnet_diagnostic.CA2201.severity = none
 # Match nullability of reference types in Delegates
 dotnet_diagnostic.CS8622.severity = none
+# Don't re-use primary constructor parameters
+dotnet_diagnostic.CS9124.severity = error
 
 # New line preferences
 csharp_new_line_before_open_brace = all
