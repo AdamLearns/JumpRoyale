@@ -538,11 +538,10 @@ public partial class Arena : Node2D
         int startY = podiumY + podiumHeight + 10;
         for (int y = startY; y < _heightInTiles; y += 6)
         {
-            for (int x = Rng.IntRange(3, 7); x < _widthInTiles - 5; )
+            for (int x = Rng.IntRange(3, 7); x < _widthInTiles - 5; x += Rng.IntRange(2, 6))
             {
                 AddPlatform(x, y, 1);
                 platformCoords.Add(new Tuple<int, int>(x, y));
-                x += Rng.IntRange(2, 6);
             }
         }
 
