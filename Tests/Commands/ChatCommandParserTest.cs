@@ -9,7 +9,7 @@ public class ChatCommandParserTests
     [Test]
     public void CanExtractCommandName()
     {
-        List<string> chatInput = new() { "j", "l", "u", "r", "l3", "l30 30", "r 30", "u 30 30", "rrrr7890" };
+        List<string> chatInput = ["j", "l", "u", "r", "l3", "l30 30", "r 30", "u 30 30", "rrrr7890"];
 
         foreach (string input in chatInput)
         {
@@ -26,7 +26,7 @@ public class ChatCommandParserTests
     [Test]
     public void CanReturnNothingWhenEmpty()
     {
-        List<string?> chatInput = new() { null, string.Empty };
+        List<string?> chatInput = [null, string.Empty];
 
         foreach (string? input in chatInput)
         {
@@ -47,7 +47,7 @@ public class ChatCommandParserTests
     [Test]
     public void CanHandleGarbageMessage()
     {
-        List<string> chatInput = new() { string.Empty, " ", ";", "!", "[]", "[#@}=]" };
+        List<string> chatInput = [string.Empty, " ", ";", "!", "[]", "[#@}=]"];
 
         foreach (string input in chatInput)
         {
@@ -64,7 +64,7 @@ public class ChatCommandParserTests
     [Test]
     public void CanExtractStringArguments()
     {
-        List<string> commandInputs = new() { "l30 30", "l 30 30" };
+        List<string> commandInputs = ["l30 30", "l 30 30"];
 
         foreach (string input in commandInputs)
         {
@@ -82,7 +82,7 @@ public class ChatCommandParserTests
     [Test]
     public void CanExtractNumericArguments()
     {
-        List<string> commandInputs = new() { "l30 30", "l 30 30" };
+        List<string> commandInputs = ["l30 30", "l 30 30"];
 
         foreach (string input in commandInputs)
         {
@@ -138,12 +138,12 @@ public class ChatCommandParserTests
     [Test]
     public void CanExtractArgumentOfMixedType()
     {
-        List<string> expectedOutputs = new() { "09B0D9", "BDFF00", "123456", "f02", "f02bc6" };
+        List<string> expectedOutputs = ["09B0D9", "BDFF00", "123456", "f02", "f02bc6"];
 
         foreach (string output in expectedOutputs)
         {
             // Just test for both non-space and space
-            List<string> commandInputs = new() { $"glow {output}", $"glow{output}" };
+            List<string> commandInputs = [$"glow {output}", $"glow{output}"];
 
             foreach (string input in commandInputs)
             {
@@ -159,11 +159,11 @@ public class ChatCommandParserTests
     [Test]
     public void CanRejectInvalidGlowColors()
     {
-        List<string> invalidColors = new() { "1234", "90 8da", "ffdd1", "v90909", "8888888", "l", "2" };
+        List<string> invalidColors = ["12342", "90 8da", "ffdd1", "v90909", "8888888", "l", "2"];
 
         foreach (string color in invalidColors)
         {
-            List<string> commandInputs = new() { $"glow {color}", $"glow{color}" };
+            List<string> commandInputs = [$"glow {color}", $"glow{color}"];
 
             foreach (string input in commandInputs)
             {
@@ -174,5 +174,96 @@ public class ChatCommandParserTests
                 Assert.That(arguments[0], Is.Null);
             }
         }
+    }
+
+    /// <summary>
+    /// This test makes sure that when we try to execute a multi-color command and any of the arguments is invalid,
+    /// it will be passed as null. The reason for this is to be able to set default colors in case the provided
+    /// arguments are invalid.
+    /// </summary>
+    [Test]
+    public void CanConvertInvalidColorToNull()
+    {
+        List<string> colorInputs = ["zxcv f0c", "f0c vcx"];
+
+        foreach (string color in colorInputs)
+        {
+            List<string> commandInputs = [$"glow {color}", $"glow{color}"];
+
+            foreach (string input in commandInputs)
+            {
+                ChatCommandParser command = new(input);
+
+                string?[] arguments = command.ArgumentsAsStrings();
+
+                Assert.That(arguments.ToList().Exists(argument => argument is null));
+            }
+        }
+    }
+
+    /// <summary>
+    /// This test assumes all arguments are valid colors.
+    /// </summary>
+    [Test]
+    public void CanExtractMultipleColors()
+    {
+        List<string> colorInputs = ["f0c f0c", "f0c173 434343", "919292 f0c", "f0c Ac0eAc"];
+
+        foreach (string color in colorInputs)
+        {
+            List<string> commandInputs = [$"glow {color}", $"glow{color}"];
+
+            foreach (string input in commandInputs)
+            {
+                ChatCommandParser command = new(input);
+
+                string?[] arguments = command.ArgumentsAsStrings();
+
+                Assert.That(arguments.ToList().TrueForAll(argument => argument is not null));
+            }
+        }
+    }
+
+    /// <summary>
+    /// This test makes sure that when we try to execute commands like "glow" or any other command specified by in the
+    /// CommandParser, we get a valid code name in return if there was a literal name provided by the user.
+    /// </summary>
+    [Test]
+    public void CanDetectColorNames()
+    {
+        List<string> colorInputs = ["red red", "blue f0c", "f0c green"];
+
+        foreach (string colors in colorInputs)
+        {
+            // Test for space and non-space arguments
+            List<string> commandInputs = [$"glow {colors}", $"glow{colors}"];
+
+            foreach (string input in commandInputs)
+            {
+                ChatCommandParser command = new(input);
+
+                string?[] arguments = command.ArgumentsAsStrings();
+
+                // If this evaluates to null, it means the command parser could not find the color name. The test color
+                // inside the ColorProvider was either removed or renamed (or if the CommandParser was modified),
+                // which caused the color to be returned as null, failing the name detection.
+                Assert.That(arguments.ToList().TrueForAll(argument => argument is not null), $"Command: {input}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// This test makes sure that when we pass literal "random" as namecolor argument, we won't fail the first
+    /// validation check and pass this as an argument for a random color. This is the only whitelisted workaround.
+    /// </summary>
+    [Test]
+    public void AllowsRandomAsColorName()
+    {
+        ChatCommandParser command = new("namecolor RaNdOm");
+
+        string? argument = command.ArgumentsAsStrings()[0];
+
+        Assert.That(argument, Is.Not.Null);
+        Assert.That(argument.Equals("random", StringComparison.CurrentCultureIgnoreCase));
     }
 }

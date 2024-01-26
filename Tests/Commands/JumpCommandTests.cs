@@ -11,7 +11,7 @@ public class JumpCommandTests
     public void CanOmitSpaceInJumpCommands()
     {
         // Reminder, Angle input of 60 to the Left evaluates to 30
-        List<string> commandInputs = new() { "l60 30", "l 60 30" };
+        List<string> commandInputs = ["l60 30", "l 60 30"];
 
         foreach (string input in commandInputs)
         {
@@ -32,7 +32,7 @@ public class JumpCommandTests
     [Test]
     public void CanFallbackToDefaults()
     {
-        List<string> commandInputs = new() { "j", "l", "r", "r r", "u" };
+        List<string> commandInputs = ["j", "l", "r", "r r", "u"];
 
         foreach (string input in commandInputs)
         {
@@ -52,7 +52,7 @@ public class JumpCommandTests
     [Test]
     public void CanAlwaysJumpUpWithAmbiguousParameters()
     {
-        List<string> commandInputs = new() { "u u", "u", "u45", "u 45", "u 70 70", "u 100 90" };
+        List<string> commandInputs = ["u u", "u", "u45", "u 45", "u 70 70", "u 100 90"];
 
         foreach (string input in commandInputs)
         {
@@ -70,7 +70,7 @@ public class JumpCommandTests
     public void CanAdjustPowerOfJumpUp()
     {
         // Mind the angle conversion for the given command! "u" returns 90, because we don't convert it
-        List<string> commandInputs = new() { "u50", "u 50", "u50 50" };
+        List<string> commandInputs = ["u50", "u 50", "u50 50"];
 
         foreach (string input in commandInputs)
         {
@@ -92,7 +92,7 @@ public class JumpCommandTests
     public void CanAdjustPowerOfTypoedJumpUp()
     {
         // Mind the angle conversion for the given command! "u" returns 90, because we don't convert it
-        List<string> commandInputs = new() { "ughk50", "uj 50", "ufjh50 50" };
+        List<string> commandInputs = ["ughk50", "uj 50", "ufjh50 50"];
 
         foreach (string input in commandInputs)
         {
@@ -117,7 +117,7 @@ public class JumpCommandTests
         // "l l 5" will cause the test to fail, because the argument extractor will interpret
         // the first string as command name and the rest will be interpreted as arguments,
         // so the second string will default to "JUMP UP" (90 angle)
-        List<string> commands = new() { "lk5", "rkl-5", "la 5", "jk -5", "l 5 l", "l5 ldfs" };
+        List<string> commands = ["lk5", "rkl-5", "la 5", "jk -5", "l 5 l", "l5 ldfs"];
 
         foreach (string command in commands)
         {
@@ -141,6 +141,6 @@ public class JumpCommandTests
         JumpCommand jump = new(command.Name, arguments[0], arguments[1]);
 
         // Note: arguments are interpreted as Angle/Power values
-        return new(jump, new[] { arguments[0] ?? 0, arguments[1] ?? 100 }, command.Name);
+        return new(jump, [arguments[0] ?? 0, arguments[1] ?? 100], command.Name);
     }
 }

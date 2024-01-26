@@ -64,25 +64,24 @@ public class ChatCommandDetectionTests
         // want to force the player to type again when something like "lk 30" was sent.
         // Typo-ed Glow will ditch the argument, if no space was provided
         List<string> commandsWithTypos =
-            new()
-            {
-                "chars",
-                "char 3 3",
-                "gloww",
-                "glow uuuuu",
-                "glowf0f",
-                "glow aaa",
-                "llll 234432",
-                "joinerino",
-                "jumperoni 30 50",
-                "uwu 45",
-                "jjjj",
-                "rrrr",
-                "llll",
-                "rrl42",
-                "u u",
-                "u uu7",
-            };
+        [
+            "chars",
+            "char 3 3",
+            "gloww",
+            "glow uuuuu",
+            "glowf0f",
+            "glow aaa",
+            "llll 234432",
+            "joinerino",
+            "jumperoni 30 50",
+            "uwu 45",
+            "jjjj",
+            "rrrr",
+            "llll",
+            "rrl42",
+            "u u",
+            "u uu7",
+        ];
 
         foreach (string command in commandsWithTypos)
         {
@@ -116,6 +115,8 @@ public class ChatCommandDetectionTests
             string when CommandMatcher.MatchesCharacterChange(command.Name, isPrivileged)
                 => new(chatMessage, command.Name, true),
             string when CommandMatcher.MatchesGlow(command.Name, isPrivileged) => new(chatMessage, command.Name, true),
+            string when CommandMatcher.MatchesNamecolor(command.Name, isPrivileged)
+                => new(chatMessage, command.Name, true),
 
             // The below return is here just to check if there were cases when nothing was caught by
             // pattern matching
