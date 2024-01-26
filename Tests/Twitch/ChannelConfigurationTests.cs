@@ -11,7 +11,7 @@ public class ChannelConfigurationTests
     {
         ConfigurationBuilder builder = new();
 
-        // Not an ideal example, but good it's a enough workaround to force empty keys before we inject the builder
+        // Not an ideal example, but it's a good enough workaround to force empty keys before we inject the builder
         builder.Properties[TwitchConstants.TwitchAccessTokenKey] = new object();
         builder.Properties[TwitchConstants.TwitchChannelNameKey] = new object();
         builder.Properties[TwitchConstants.TwitchChannelIdKey] = new object();
