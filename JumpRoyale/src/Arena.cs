@@ -538,7 +538,8 @@ public partial class Arena : Node2D
             }
 #pragma warning restore S2583 // Conditionally executed code should be reachable
 
-            int scale = 3 + 1 - i;
+            // Make the winners much bigger
+            int scale = Math.Max(2, 4 - i);
 
             jumper.Position = new Vector2(tileX * _tileSetToUse.TileSize.X, 50);
             jumper.Scale = new Vector2(scale, scale);
