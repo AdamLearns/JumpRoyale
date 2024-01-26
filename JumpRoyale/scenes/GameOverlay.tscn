@@ -11,10 +11,6 @@ offset_bottom = 440.0
 grow_horizontal = 0
 script = ExtResource("1_612sj")
 
-[node name="Timer" type="Label" parent="."]
-layout_mode = 2
-text = "Timer goes here"
-
 [node name="NumPlayers" type="Label" parent="."]
 layout_mode = 2
 text = "Number of players goes here

@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://cmi121gyo365a"]
+[gd_scene load_steps=9 format=3 uid="uid://cmi121gyo365a"]
 
 [ext_resource type="Script" path="res://src/Arena.cs" id="1_5vcv2"]
 [ext_resource type="PackedScene" uid="uid://bhke5myraos1m" path="res://scenes/Jumper.tscn" id="2_6nvro"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://bvl6vnp0t3iy6" path="res://scenes/LobbyOverlay.tscn" id="4_2j1ab"]
 [ext_resource type="PackedScene" uid="uid://c5b384kxo0vyl" path="res://scenes/GameOverlay.tscn" id="5_5yfyu"]
 [ext_resource type="PackedScene" uid="uid://cibfccggfqmwh" path="res://scenes/EndScreenOverlay.tscn" id="6_eibxd"]
+[ext_resource type="PackedScene" uid="uid://bilf6xw44urbm" path="res://scenes/TimerOverlay.tscn" id="7_f58o7"]
 [ext_resource type="Texture2D" uid="uid://dppmxvp2mcbw3" path="res://assets/sprites/backgrounds/Blue.png" id="7_xjx8h"]
 
 [node name="Arena" type="Node2D"]
@@ -30,7 +31,6 @@ grow_horizontal = 1
 size_flags_horizontal = 8
 
 [node name="GameOverlay" parent="CanvasLayer" instance=ExtResource("5_5yfyu")]
-visible = false
 z_index = 1
 offset_left = -447.0
 offset_top = 15.0
@@ -43,6 +43,15 @@ offset_left = -1877.0
 offset_top = 29.0
 offset_right = -70.0
 offset_bottom = 432.0
+
+[node name="TimerOverlay" parent="CanvasLayer" instance=ExtResource("7_f58o7")]
+anchors_preset = 0
+anchor_left = 0.0
+anchor_right = 0.0
+offset_left = 0.0
+offset_right = 153.0
+offset_bottom = 40.0
+grow_horizontal = 1
 
 [node name="Background" type="Sprite2D" parent="."]
 modulate = Color(1, 1, 1, 0.25098)

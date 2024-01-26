@@ -3,12 +3,11 @@ using Godot;
 
 public partial class GameOverlay : VFlowContainer
 {
-    private const string TimerNodeName = "Timer";
+    public static readonly int GameLength = 150; // in seconds
+
     private const string NumPlayersNodeName = "NumPlayers";
     private const string HeightOutputNodeName = "HeightOutput";
     private const string CameraScrollSpeedNodeName = "CameraScrollSpeed";
-
-    private const int GameLength = 150;
 
     private int _timerSeconds = GameLength;
 
@@ -73,7 +72,5 @@ public partial class GameOverlay : VFlowContainer
     private void UpdateTimer()
     {
         _timerSeconds--;
-
-        GetNode<Label>(TimerNodeName).Text = $"Game ends in: {_timerSeconds}s";
     }
 }

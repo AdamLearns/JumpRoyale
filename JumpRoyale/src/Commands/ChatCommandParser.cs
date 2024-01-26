@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -5,7 +6,7 @@ using System.Text.RegularExpressions;
 public class ChatCommandParser
 {
     /// <summary>
-    /// Maximum amount of arguments returned by the parser.
+    /// Maximum amount of arguments returned by the parser. Increase, if necessary.
     /// </summary>
     private const int MaxArguments = 2;
 
@@ -30,7 +31,7 @@ public class ChatCommandParser
 
     public string?[] ArgumentsAsStrings()
     {
-        return PadList(_arguments, null).ToArray();
+        return [.. PadList(_arguments, null)];
     }
 
     /// <summary>
@@ -45,7 +46,7 @@ public class ChatCommandParser
             select parsedArgument
         ).ToList();
 
-        return PadList(arguments, null).ToArray();
+        return [.. PadList(arguments, null)];
     }
 
     private static int? ParseToNumberOrNull(string test)
@@ -76,15 +77,19 @@ public class ChatCommandParser
 
     private static List<string?> ParseChatMessage(string chatMessage)
     {
-        List<string?> result = new();
+        List<string?> result = [];
 
-        // TODO: find a way to capture mixed values, like Hex (e.g. glow BDFF00)
-        // Unfortunately, for now, since the only command that uses mixed values is glow, we have
-        // to hardcode the glow command handler to retrieve Hex value, until coded properly :)
-        // This could later be replaced to match other commands that use Hex arguments
-        if (chatMessage.StartsWith("glow"))
+        // Just hardcode the list of commands that could be using hex colors as arguments until someone finds a
+        // smarter way of doing this :)
+        string forcedMatch = chatMessage switch
         {
-            return HandleHexArguments(chatMessage);
+            string when chatMessage.StartsWith("glow") => "glow",
+            _ => string.Empty
+        };
+
+        if (!string.IsNullOrEmpty(forcedMatch))
+        {
+            return HandleHexArguments(chatMessage, forcedMatch);
         }
 
         string tmpWord = string.Empty;
@@ -136,13 +141,14 @@ public class ChatCommandParser
         return result;
     }
 
-    private static List<string?> HandleHexArguments(string chatMessage)
+    private static List<string?> HandleHexArguments(string chatMessage, string splitBy)
     {
-        List<string?> arguments = new() { "glow" };
+        // Force the supposed command name to be on the arguments list so the constructor can extract it
+        List<string?> arguments = [splitBy];
 
         string[] split = chatMessage.Split(
-            "glow",
-            System.StringSplitOptions.TrimEntries | System.StringSplitOptions.RemoveEmptyEntries
+            splitBy,
+            StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
         );
 
         // In case there was nothing, just return to be able to default to Twitch Color
@@ -151,13 +157,21 @@ public class ChatCommandParser
             return arguments;
         }
 
+        // If there is a split result, it can be a potential hex argument, but just in case catch more than just the
+        // first argument. This will be useful if multiple hex arguments are required for some commands, e.g.
+        // simple gradients or multi-colored clothes
+        string[] parameters = split[0].Split(" ");
+
         // Match Both 3 and 6 length
         Regex pattern = new("^(?:[0-9a-fA-F]{3}){1,2}$");
 
-        // Note: no Else for defaults, this defaults to Twitch color later anyway
-        if (pattern.IsMatch(split[0]))
+        for (int i = 0; i < Math.Min(parameters.Length, MaxArguments); i++)
         {
-            arguments.Add(split[0]);
+            string input = parameters[i];
+
+            // To match the hex color, inputs have to literally be 3 or 6 characters and a valid hex, so sending
+            // something like "ffff" is not valid. Input has to be specific
+            arguments.Add(pattern.IsMatch(input) ? input : null);
         }
 
         return arguments;

@@ -47,7 +47,9 @@ public partial class Jumper : CharacterBody2D
     public void SetCrazyParticles()
     {
         CpuParticles2D particles = GetGlowNode();
-        particles.Amount *= 5;
+
+        // Make sure we can repeatedly call this function without unbounded growth.
+        particles.Amount = Math.Min(particles.Amount * 5, 500);
     }
 
     public void SetCharacter(int choice)
@@ -102,12 +104,7 @@ public partial class Jumper : CharacterBody2D
 
     public void RandomJump()
     {
-        // TODO: Extract RNG to a global provider
-        RandomNumberGenerator rng = new();
-
-        Jump(rng.RandiRange(45, 135), rng.RandiRange(10, 100));
-
-        rng.Dispose();
+        Jump(Rng.IntRange(45, 135), Rng.IntRange(10, 100));
     }
 
     public void Jump(int angle, int power)

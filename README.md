@@ -136,7 +136,7 @@ Sending `char <choice>` in the chat allows you to change your character graphic.
     -   Install [Godot ≥4.2](https://godotengine.org/download/windows/)
     -   Clone this repo
     -   Generate a twitch token for your twitch account: <https://twitchtokengenerator.com/>. You only need the scopes "chat:read" and "chat:edit" for now. Copy the **access token** and set it:
-        -   `cd JumpRoyale` (directory with `Jump Royale.csproj`)
+        -   `cd JumpRoyale` (i.e. your working directory should contain `JumpRoyale/JumpRoyale` and there should be `Jump Royale.csproj` in it)
         -   `dotnet user-secrets set twitch_access_token <your access token>`
         -   `dotnet user-secrets set twitch_channel_name <your channel name>`
     -   Ensure that you have a `GODOT4` environment variable:

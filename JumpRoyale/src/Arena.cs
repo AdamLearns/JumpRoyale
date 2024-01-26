@@ -15,15 +15,15 @@ public partial class Arena : Node2D
 
     private const string LobbyOverlayNodeName = "LobbyOverlay";
     private const string GameOverlayNodeName = "GameOverlay";
+    private const string TimerOverlayNodeName = "TimerOverlay";
     private const string EndScreenOverlayNodeName = "EndScreenOverlay";
     private const string CameraNodeName = "Camera";
     private const string CanvasLayerNodeName = "CanvasLayer";
     private const string SaveLocation = "res://save_data/players.json";
 
-    private readonly Dictionary<string, Jumper> _jumpers = new();
+    private readonly Dictionary<string, Jumper> _jumpers = [];
     private AllPlayerData _allPlayerData = new();
     private TileMap _lobbyTilemap = new();
-    private RandomNumberGenerator _rng = new();
 
     [Export]
     private PackedScene? _jumperScene;
@@ -86,10 +86,15 @@ public partial class Arena : Node2D
 
         if (Input.IsPhysicalKeyPressed(Key.W) && Input.IsPhysicalKeyPressed(Key.Ctrl))
         {
-            // Note: calling this a few times when at least one player is on the screen will cause the game to
-            // crash, investigate what is causing the crash here. Low priority anyway, because this is only
-            // a streamer tool for quick debugging purposes
             OnGameTimerDone();
+        }
+
+        if (Input.IsPhysicalKeyPressed(Key.B))
+        {
+            for (int i = 0; i < 200; i++)
+            {
+                HandleJoin(string.Empty + i, string.Empty + i, "#ffffff", false);
+            }
         }
     }
 
@@ -156,11 +161,12 @@ public partial class Arena : Node2D
             return;
         }
 
-        int randomCharacterChoice = _rng.RandiRange(1, 18);
+        int randomCharacterChoice = Rng.IntRange(1, 18);
 
-        PlayerData playerData = _allPlayerData.Players.ContainsKey(userId)
-            ? _allPlayerData.Players[userId]
-            : new PlayerData(hexColor, randomCharacterChoice);
+        if (!_allPlayerData.Players.TryGetValue(userId, out PlayerData? playerData))
+        {
+            playerData = new(hexColor, randomCharacterChoice);
+        }
 
         _allPlayerData.Players[userId] = playerData;
 
@@ -172,7 +178,7 @@ public partial class Arena : Node2D
         Rect2 viewport = GetViewportRect();
         int tileHeight = _tileSetToUse.TileSize.Y;
         int xPadding = _tileSetToUse.TileSize.X * 3;
-        int x = _rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding);
+        int x = Rng.IntRange(xPadding, (int)viewport.Size.X - xPadding);
         int y = ((int)(viewport.Size.Y / tileHeight) - 1 - WallHeightInTiles) * tileHeight;
 
         jumper.Init(x, y, userName, playerData);
@@ -207,7 +213,7 @@ public partial class Arena : Node2D
 
     private void HandleCharacterChange(Jumper jumper, int? userChoice)
     {
-        int choice = userChoice ?? _rng.RandiRange(1, 18);
+        int choice = userChoice ?? Rng.IntRange(1, 18);
 
         choice = Math.Clamp(choice, 1, 18);
 
@@ -239,8 +245,8 @@ public partial class Arena : Node2D
     private void SetBackground()
     {
         Sprite2D background = GetNode<Sprite2D>("Background");
-        string[] colors = new string[] { "Blue", "Brown", "Gray", "Green", "Pink", "Purple", "Yellow" };
-        string color = colors[_rng.RandiRange(0, colors.Length - 1)];
+        string[] colors = ["Blue", "Brown", "Gray", "Green", "Pink", "Purple", "Yellow"];
+        string color = colors[Rng.IntRange(0, colors.Length - 1)];
 
         background.Texture = ResourceLoader.Load<Texture2D>($"res://assets/sprites/backgrounds/{color}.png");
     }
@@ -253,6 +259,11 @@ public partial class Arena : Node2D
     private GameOverlay GetGameOverlay()
     {
         return GetNode<CanvasLayer>(CanvasLayerNodeName).GetNode<GameOverlay>(GameOverlayNodeName);
+    }
+
+    private TimerOverlay GetTimerOverlay()
+    {
+        return GetNode<CanvasLayer>(CanvasLayerNodeName).GetNode<TimerOverlay>(TimerOverlayNodeName);
     }
 
     private LobbyOverlay GetLobbyOverlay()
@@ -357,8 +368,8 @@ public partial class Arena : Node2D
 
         for (int y = platformStartY; y >= platformEndY; y--)
         {
-            int width = _rng.RandiRange(3, 15);
-            int startX = _rng.RandiRange(2, _widthInTiles - width - 2);
+            int width = Rng.IntRange(3, 15);
+            int startX = Rng.IntRange(2, _widthInTiles - width - 2);
 
             AddPlatform(startX, y, width);
         }
@@ -392,27 +403,27 @@ public partial class Arena : Node2D
             float difficultyFactor = (float)Math.Min(0, y) / -ArenaHeightInTiles;
 
             // Rarely, make a solid block to add some variety
-            int r = _rng.RandiRange(0, 100);
+            int r = Rng.IntRange(0, 100);
 
             if (r < 6 + difficultyFactor * 40)
             {
                 // TODO: DrawRectangleOfTiles draws blocks _downward_, this means that part of them
                 //       will suddenly appear on screen
                 int blockWidth = 2 + (int)(difficultyFactor * 24);
-                int blockX = _rng.RandiRange(2, _widthInTiles - 1 - blockWidth);
+                int blockX = Rng.IntRange(2, _widthInTiles - 1 - blockWidth);
 
                 DrawRectangleOfTiles(blockX, y + 1, blockWidth, blockWidth, new Vector2I(12, 1));
             }
 
-            r = _rng.RandiRange(0, 100);
+            r = Rng.IntRange(0, 100);
 
             if (r > (70 - difficultyFactor * 60))
             {
                 continue;
             }
 
-            int width = _rng.RandiRange(3, 15 - (int)Math.Round(6 * difficultyFactor));
-            int startX = _rng.RandiRange(2, _widthInTiles - width - 2);
+            int width = Rng.IntRange(3, 15 - (int)Math.Round(6 * difficultyFactor));
+            int startX = Rng.IntRange(2, _widthInTiles - width - 2);
 
             AddPlatform(startX, y, width);
         }
@@ -450,10 +461,10 @@ public partial class Arena : Node2D
 
         SaveAllPlayers();
         ShowEndScreen(winners);
-        CreateEndArena(winners);
+        GenerateEndArena(winners);
     }
 
-    private void CreateEndArena(string[] winners)
+    private void GenerateEndArena(string[] winners)
     {
         Ensure.IsNotNull(_tileSetToUse);
 
@@ -473,17 +484,37 @@ public partial class Arena : Node2D
             }
         }
 
-        Rect2 viewport = GetViewportRect();
-        int xPadding = 100;
+        int numPodiums = 3;
+        int podiumWidth = 6;
+        int podiumHeight = 6; // has to be divisible by numPodiums
+        int podiumHeightDifference = podiumHeight / numPodiums;
+        int podiumX = _widthInTiles / 2;
+        int podiumY = 13 + podiumHeight;
+
+        List<Tuple<int, int>> platformCoords = [];
+
+        // Add some platforms so that there are "fun" jumps to make
+        int startY = podiumY + podiumHeight + 10;
+        for (int y = startY; y < _heightInTiles; y += 6)
+        {
+            for (int x = Rng.IntRange(3, 7); x < _widthInTiles - 5; )
+            {
+                AddPlatform(x, y, 1);
+                platformCoords.Add(new Tuple<int, int>(x, y));
+                x += Rng.IntRange(2, 6);
+            }
+        }
 
         // Put all players back in the arena
         for (int i = 0; i < _jumpers.Count; i++)
         {
+            int platformNumber = Rng.IntRange(0, platformCoords.Count - 1);
+            (int platformX, int platformY) = platformCoords[platformNumber];
             Jumper jumper = _jumpers.ElementAt(i).Value;
 
             jumper.Position = new Vector2(
-                _rng.RandiRange(xPadding, (int)viewport.Size.X - xPadding),
-                _rng.RandiRange((int)(viewport.Size.Y / 2), (int)viewport.Size.Y - 100)
+                (platformX + 0.5f) * _tileSetToUse.TileSize.X,
+                platformY * _tileSetToUse.TileSize.Y - 5
             );
             jumper.Scale = new Vector2(1, 1);
             jumper.Velocity = new Vector2(0, 0);
@@ -496,13 +527,6 @@ public partial class Arena : Node2D
         camera.Position = new Vector2(0, 0);
 
         // Draw podiums
-        int numPodiums = 3;
-        int podiumWidth = 6;
-        int podiumHeight = 6; // has to be divisible by numPodiums
-        int podiumHeightDifference = podiumHeight / numPodiums;
-        int podiumX = _widthInTiles / 2;
-        int podiumY = 13 + podiumHeight;
-
         DrawRectangleOfTiles(podiumX, podiumY, podiumWidth, podiumHeight, new Vector2I(12, 1));
         DrawRectangleOfTiles(
             podiumX - podiumWidth,
@@ -538,21 +562,13 @@ public partial class Arena : Node2D
             }
 #pragma warning restore S2583 // Conditionally executed code should be reachable
 
-            int scale = winners.Length + 1 - i;
+            // Make the winners much bigger
+            int scale = Math.Max(2, 4 - i);
 
             jumper.Position = new Vector2(tileX * _tileSetToUse.TileSize.X, 50);
             jumper.Scale = new Vector2(scale, scale);
 
             jumper.SetCrazyParticles();
-        }
-
-        // Add some platforms so that there are "fun" jumps to make
-        for (int y = podiumY + podiumHeight + 15; y < _heightInTiles; y += 10)
-        {
-            int width = _widthInTiles / 3;
-            int startX = _widthInTiles / 3;
-
-            AddPlatform(startX, y, width);
         }
     }
 
@@ -660,10 +676,11 @@ public partial class Arena : Node2D
         GetLobbyOverlay().Visible = false;
 
         GameOverlay gameOverlay = GetGameOverlay();
-
         gameOverlay.Visible = true;
-
         gameOverlay.Init();
+
+        TimerOverlay timerOverlay = GetTimerOverlay();
+        timerOverlay.Init();
     }
 
     private void OnRedemption(object sender, OnRewardRedeemedArgs e)
@@ -684,7 +701,7 @@ public partial class Arena : Node2D
         {
             Jumper jumper = jumpersEntry.Value;
 
-            if (jumper.PlayerData.Name.ToLower() != displayName.ToLower())
+            if (!jumper.PlayerData.Name.Equals(displayName, StringComparison.CurrentCultureIgnoreCase))
             {
                 continue;
             }
