@@ -60,6 +60,8 @@ dotnet_diagnostic.SA1516.severity = warning
 dotnet_diagnostic.SA1600.severity = none
 # Enum elements should be documented
 dotnet_diagnostic.SA1602.severity = none
+# The documentation for parameter `param` is missing
+dotnet_diagnostic.SA1611.severity = none
 # Return value should always be documented
 dotnet_diagnostic.SA1615.severity = none
 # File name should match first type

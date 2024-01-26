@@ -60,7 +60,6 @@ public class SpriteFrameCreator
         }
     }
 
-    // TODO: test this later, thread-safe singleton
     public static SpriteFrameCreator Instance
     {
         get
