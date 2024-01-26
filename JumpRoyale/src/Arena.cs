@@ -15,6 +15,7 @@ public partial class Arena : Node2D
 
     private const string LobbyOverlayNodeName = "LobbyOverlay";
     private const string GameOverlayNodeName = "GameOverlay";
+    private const string TimerOverlayNodeName = "TimerOverlay";
     private const string EndScreenOverlayNodeName = "EndScreenOverlay";
     private const string CameraNodeName = "Camera";
     private const string CanvasLayerNodeName = "CanvasLayer";
@@ -279,6 +280,11 @@ public partial class Arena : Node2D
     private GameOverlay GetGameOverlay()
     {
         return GetNode<CanvasLayer>(CanvasLayerNodeName).GetNode<GameOverlay>(GameOverlayNodeName);
+    }
+
+    private TimerOverlay GetTimerOverlay()
+    {
+        return GetNode<CanvasLayer>(CanvasLayerNodeName).GetNode<TimerOverlay>(TimerOverlayNodeName);
     }
 
     private LobbyOverlay GetLobbyOverlay()
@@ -577,7 +583,8 @@ public partial class Arena : Node2D
             }
 #pragma warning restore S2583 // Conditionally executed code should be reachable
 
-            int scale = winners.Length + 1 - i;
+            // Make the winners much bigger
+            int scale = Math.Max(2, 4 - i);
 
             jumper.Position = new Vector2(tileX * _tileSetToUse.TileSize.X, 50);
             jumper.Scale = new Vector2(scale, scale);
@@ -690,10 +697,11 @@ public partial class Arena : Node2D
         GetLobbyOverlay().Visible = false;
 
         GameOverlay gameOverlay = GetGameOverlay();
-
         gameOverlay.Visible = true;
-
         gameOverlay.Init();
+
+        TimerOverlay timerOverlay = GetTimerOverlay();
+        timerOverlay.Init();
     }
 
     private void OnRedemption(object sender, OnRewardRedeemedArgs e)

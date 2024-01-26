@@ -14,7 +14,7 @@
       "preLaunchTask": "build",
       "program": "${env:GODOT4}",
       "args": [],
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/JumpRoyale",
       "stopAtEntry": false
     }
   ]
