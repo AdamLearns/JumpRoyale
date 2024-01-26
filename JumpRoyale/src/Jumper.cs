@@ -107,10 +107,9 @@ public partial class Jumper : CharacterBody2D
             particles.Visible = true;
             PlayerData.GlowColor = color.ToHtml(false);
         }
-        catch (Exception e)
+        catch (ArgumentOutOfRangeException e)
         {
             GD.Print($"Failed to set glow color to {colorString}", e);
-            throw;
         }
     }
 
