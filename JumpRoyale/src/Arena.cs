@@ -7,7 +7,6 @@ using System.Text.Json;
 using Godot;
 using TwitchChat;
 using TwitchLib.PubSub.Events;
-using TwitchLib.PubSub.Models.Responses.Messages.Redemption;
 
 public partial class Arena : Node2D
 {
@@ -713,18 +712,16 @@ public partial class Arena : Node2D
         timerOverlay.Init();
     }
 
-    private void OnRedemption(object sender, OnChannelPointsRewardRedeemedArgs e)
+    private void OnRedemption(object sender, OnRewardRedeemedArgs e)
     {
-        Redemption reward = e.RewardRedeemed.Redemption;
-
-        if (!reward.Id.Equals(Guid.Parse("f04bb300-d135-4670-a7ba-1d6761590042")))
+        if (!e.RewardId.Equals(Guid.Parse("f04bb300-d135-4670-a7ba-1d6761590042")))
         {
             return;
         }
 
-        GD.Print($"{reward.User.DisplayName} is redeeming a revive!");
+        GD.Print($"{e.DisplayName} is redeeming a revive!");
 
-        CallDeferred(nameof(RedeemRevive), reward.User.DisplayName);
+        CallDeferred(nameof(RedeemRevive), e.DisplayName);
     }
 
     private void RedeemRevive(string displayName)

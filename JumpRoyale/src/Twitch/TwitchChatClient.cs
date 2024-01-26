@@ -13,22 +13,24 @@ public class TwitchChatClient : BaseChatClient
 
     public event EventHandler<ChatMessageEventArgs>? OnMessageEvent;
 
-    public event EventHandler<OnChannelPointsRewardRedeemedArgs>? OnRedemptionEvent;
+    public event EventHandler<OnRewardRedeemedArgs>? OnRedemptionEvent;
 
     private void SubscribeToEvents()
     {
         TwitchPubSub.OnPubSubServiceConnected += OnPubSubServiceConnected;
-        TwitchPubSub.OnChannelPointsRewardRedeemed += OnChannelPointsRewardRedeemed;
+#pragma warning disable CS0618 // Type or member is obsolete
+        TwitchPubSub.OnRewardRedeemed += OnRewardRedeemed;
+#pragma warning restore CS0618 // Type or member is obsolete
 
         TwitchClient.OnJoinedChannel += OnJoinedChannel;
         TwitchClient.OnMessageReceived += OnMessageReceived;
         TwitchClient.OnConnected += OnConnected;
     }
 
-    private void OnChannelPointsRewardRedeemed(object sender, OnChannelPointsRewardRedeemedArgs e)
+    private void OnRewardRedeemed(object sender, OnRewardRedeemedArgs e)
     {
         Console.WriteLine(TwitchConstants.OnRewardRedeemMessage);
-        Console.WriteLine(e.RewardRedeemed.Redemption.Id);
+        Console.WriteLine(e);
 
         OnRedemptionEvent?.Invoke(this, e);
     }
@@ -47,7 +49,10 @@ public class TwitchChatClient : BaseChatClient
     {
         Console.WriteLine(TwitchConstants.OnPubSubConnected);
 
-        TwitchPubSub.ListenToChannelPoints(Configuration.ChannelId);
+#pragma warning disable CS0618 // Type or member is obsolete
+        TwitchPubSub.ListenToRewards(Configuration.ChannelId);
+#pragma warning restore CS0618 // Type or member is obsolete
+
         TwitchPubSub.SendTopics();
     }
 
