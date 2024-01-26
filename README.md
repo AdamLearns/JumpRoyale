@@ -144,6 +144,7 @@ Sending `char <choice>` in the chat allows you to change your character graphic.
         -   `cd JumpRoyale` (i.e. your working directory should contain `JumpRoyale/JumpRoyale` and there should be `Jump Royale.csproj` in it)
         -   `dotnet user-secrets set twitch_access_token <your access token>`
         -   `dotnet user-secrets set twitch_channel_name <your channel name>`
+        -   `dotnet user-secrets set twitch_channel_id <your channel id>`
     -   Ensure that you have a `GODOT4` environment variable:
         -   Windows: modify system properties to set the environment variable to something like `C:\myPath\Godot_vx.y.z-stable_mono_win64.exe`
         -   macOS: modify your shell's start-up script to add: `export GODOT4="/Applications/Godot_mono.app/Contents/MacOS/Godot"`

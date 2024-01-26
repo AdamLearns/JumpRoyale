@@ -56,8 +56,8 @@ public partial class Arena : Node2D
 
         TwitchChatClient twitchChatClient = new();
 
-        twitchChatClient.OnRedemption += OnRedemption;
-        twitchChatClient.OnMessage += OnMessage;
+        twitchChatClient.OnRedemptionEvent += OnRedemption;
+        twitchChatClient.OnMessageEvent += OnMessage;
         GetLobbyOverlay().TimerDone += OnLobbyTimerDone;
         GetGameOverlay().TimerDone += OnGameTimerDone;
 
@@ -98,7 +98,7 @@ public partial class Arena : Node2D
         }
     }
 
-    private void OnMessage(object sender, MessageEventArgs e)
+    private void OnMessage(object sender, ChatMessageEventArgs e)
     {
         // This is kind of a workaround for now to have a top level Defer and be able to pass objects around inside,
         // which can't be converted to Godot's Variant. We still have to pull the required data separately, because `e`
@@ -538,11 +538,10 @@ public partial class Arena : Node2D
         int startY = podiumY + podiumHeight + 10;
         for (int y = startY; y < _heightInTiles; y += 6)
         {
-            for (int x = Rng.IntRange(3, 7); x < _widthInTiles - 5; )
+            for (int x = Rng.IntRange(3, 7); x < _widthInTiles - 5; x += Rng.IntRange(2, 6))
             {
                 AddPlatform(x, y, 1);
                 platformCoords.Add(new Tuple<int, int>(x, y));
-                x += Rng.IntRange(2, 6);
             }
         }
 
