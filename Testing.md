@@ -11,7 +11,9 @@
 
 ## Requirements
 
-The game is locked at `.Net 6.0`. You can download it from dotnet downloads [here](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
+[.NET 8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) is required in order to build this project.
+
+If you are developing with **Visual Studio**, make sure your editor is up to date and you have `.NET 8.0 runtime` available in your Visual Studio Installer components, otherwise the editor will report errors on all C#12.0 features.
 
 ---
 
@@ -20,6 +22,9 @@ The game is locked at `.Net 6.0`. You can download it from dotnet downloads [her
 -   Run `dotnet restore`
 -   **Rebuild** the solution (`.NET: Rebuild` task in VSCode, in Visual Studio: `Build -> Rebuild`)
 -   If developing with VSCode, run `Reload Window` task from Command Palette, wait for projects to load, then run `.NET: Rebuild` task again. The test runner should discover tests and they should be ready to go
+
+> [!note]
+> There is a (rare) weird bug in VSCode that causes some tests to fail if you just rerun all tests without rebuilding. This function **will** rebuild the solution first and discover new tests, but I haven't found out yet why those builds are different :eyes:
 
 ---
 

@@ -91,24 +91,24 @@ Sending `char <choice>` in the chat allows you to change your character graphic.
 
 | choice |                                                                          preview                                                                           |
 | :----: | :--------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| **1**  |  ![char1](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%201/Clothes%201/Character1M_1_idle_0.png?raw=true)   |
-| **2**  |  ![char2](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%201/Clothes%202/Character1M_2_idle_0.png?raw=true)   |
-| **3**  |  ![char3](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%201/Clothes%203/Character1M_3_idle_0.png?raw=true)   |
-| **4**  |  ![char4](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%202/Clothes%201/Character2M_1_idle_0.png?raw=true)   |
-| **5**  |  ![char5](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%202/Clothes%202/Character2M_2_idle_0.png?raw=true)   |
-| **6**  |  ![char6](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%202/Clothes%203/Character2M_3_idle_0.png?raw=true)   |
-| **7**  |  ![char7](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%203/Clothes%201/Character3M_1_idle_0.png?raw=true)   |
-| **8**  |  ![char8](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%203/Clothes%202/Character3M_2_idle_0.png?raw=true)   |
-| **9**  |  ![char9](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Male/Character%203/Clothes%203/Character3M_3_idle_0.png?raw=true)   |
-| **10** | ![char10](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%201/Clothes%201/Character1F_1_idle_0.png?raw=true) |
-| **11** | ![char11](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%201/Clothes%202/Character1F_2_idle_0.png?raw=true) |
-| **12** | ![char12](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%201/Clothes%203/Character1F_3_idle_0.png?raw=true) |
-| **13** | ![char13](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%202/Clothes%201/Character2F_1_idle_0.png?raw=true) |
-| **14** | ![char14](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%202/Clothes%202/Character2F_2_idle_0.png?raw=true) |
-| **15** | ![char15](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%202/Clothes%203/Character2F_3_idle_0.png?raw=true) |
-| **16** | ![char16](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%203/Clothes%201/Character3F_1_idle_0.png?raw=true) |
-| **17** | ![char17](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%203/Clothes%202/Character3F_2_idle_0.png?raw=true) |
-| **18** | ![char18](https://github.com/AdamLearns/JumpRoyale/blob/main/assets/sprites/characters/Female/Character%203/Clothes%203/Character3F_3_idle_0.png?raw=true) |
+| **1**  |  ![char1](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Male/Character%201/Clothes%201/Character1M_1_idle_0.png?raw=true)   |
+| **2**  |  ![char2](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Male/Character%201/Clothes%202/Character1M_2_idle_0.png?raw=true)   |
+| **3**  |  ![char3](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Male/Character%201/Clothes%203/Character1M_3_idle_0.png?raw=true)   |
+| **4**  |  ![char4](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Male/Character%202/Clothes%201/Character2M_1_idle_0.png?raw=true)   |
+| **5**  |  ![char5](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Male/Character%202/Clothes%202/Character2M_2_idle_0.png?raw=true)   |
+| **6**  |  ![char6](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Male/Character%202/Clothes%203/Character2M_3_idle_0.png?raw=true)   |
+| **7**  |  ![char7](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Male/Character%203/Clothes%201/Character3M_1_idle_0.png?raw=true)   |
+| **8**  |  ![char8](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Male/Character%203/Clothes%202/Character3M_2_idle_0.png?raw=true)   |
+| **9**  |  ![char9](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Male/Character%203/Clothes%203/Character3M_3_idle_0.png?raw=true)   |
+| **10** | ![char10](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Female/Character%201/Clothes%201/Character1F_1_idle_0.png?raw=true) |
+| **11** | ![char11](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Female/Character%201/Clothes%202/Character1F_2_idle_0.png?raw=true) |
+| **12** | ![char12](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Female/Character%201/Clothes%203/Character1F_3_idle_0.png?raw=true) |
+| **13** | ![char13](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Female/Character%202/Clothes%201/Character2F_1_idle_0.png?raw=true) |
+| **14** | ![char14](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Female/Character%202/Clothes%202/Character2F_2_idle_0.png?raw=true) |
+| **15** | ![char15](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Female/Character%202/Clothes%203/Character2F_3_idle_0.png?raw=true) |
+| **16** | ![char16](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Female/Character%203/Clothes%201/Character3F_1_idle_0.png?raw=true) |
+| **17** | ![char17](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Female/Character%203/Clothes%202/Character3F_2_idle_0.png?raw=true) |
+| **18** | ![char18](https://github.com/AdamLearns/JumpRoyale/blob/main/JumpRoyale/assets/sprites/characters/Female/Character%203/Clothes%203/Character3F_3_idle_0.png?raw=true) |
 
 -   `glow [color]`: change your glow color. This is for subscribers, VIPs, and moderators only.
     -   If `color` isn't specified, it'll take the color of your Twitch name.
@@ -132,22 +132,31 @@ Sending `char <choice>` in the chat allows you to change your character graphic.
 ## Building, running, testing
 
 -   Prerequisites:
-    -   Install [DotNet](https://dotnet.microsoft.com/en-us/download)
+    -   Install [DotNet 8](https://dotnet.microsoft.com/en-us/download)
     -   Install [Godot ≥4.2](https://godotengine.org/download/windows/)
     -   Clone this repo
     -   Generate a twitch token for your twitch account: <https://twitchtokengenerator.com/>. You only need the scopes "chat:read" and "chat:edit" for now. Copy the **access token** and set it:
-        -   `cd JumpRoyale/JumpRoyale`
+        -   `cd JumpRoyale` (i.e. your working directory should contain `JumpRoyale/JumpRoyale` and there should be `Jump Royale.csproj` in it)
         -   `dotnet user-secrets set twitch_access_token <your access token>`
         -   `dotnet user-secrets set twitch_channel_name <your channel name>`
     -   Ensure that you have a `GODOT4` environment variable:
         -   Windows: modify system properties to set the environment variable to something like `C:\myPath\Godot_vx.y.z-stable_mono_win64.exe`
         -   macOS: modify your shell's start-up script to add: `export GODOT4="/Applications/Godot_mono.app/Contents/MacOS/Godot"`
 -   Building:
+    -   Navigate to the root directory with `Jump Royale.sln`
     -   Run `dotnet restore`
+    -   Rebuild solution:
+        -   **VSCode**: Run `dotnet build --no-incremental` (or run `.NET: Rebuild` task if you have C# Dev Kit extension)
+        -   **Visual Studio**: Build -> Rebuild Solution
     -   Open in Godot
     -   Click "Build" in Godot itself
 -   Running:
     -   Same as "building", but click "Run" in Godot
+
+> [!note]
+> When developing with VSCode, if any changes were made in the `.editorconfig` file, you **need to** reload your window, because it will not pick up the changes immediately. Open `Command Palette` and run `Developer: Reload Window` task. This will most likely happen when switching to another branch that has different rules in `.editorconfig`, so you might see warnings from old cached config.
+>
+> On another note, you sometimes have to rebuild the solution for static analysis to detect the fixes (VSCode only).
 
 ### Testing
 
