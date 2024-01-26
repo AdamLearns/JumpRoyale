@@ -159,7 +159,7 @@ public class ChatCommandParserTests
     [Test]
     public void CanRejectInvalidGlowColors()
     {
-        List<string> invalidColors = ["1234", "90 8da", "ffdd1", "v90909", "8888888", "l", "2"];
+        List<string> invalidColors = ["12342", "90 8da", "ffdd1", "v90909", "8888888", "l", "2"];
 
         foreach (string color in invalidColors)
         {
@@ -222,5 +222,48 @@ public class ChatCommandParserTests
                 Assert.That(arguments.ToList().TrueForAll(argument => argument is not null));
             }
         }
+    }
+
+    /// <summary>
+    /// This test makes sure that when we try to execute commands like "glow" or any other command specified by in the
+    /// CommandParser, we get a valid code name in return if there was a literal name provided by the user.
+    /// </summary>
+    [Test]
+    public void CanDetectColorNames()
+    {
+        List<string> colorInputs = ["red red", "blue f0c", "f0c green"];
+
+        foreach (string colors in colorInputs)
+        {
+            // Test for space and non-space arguments
+            List<string> commandInputs = [$"glow {colors}", $"glow{colors}"];
+
+            foreach (string input in commandInputs)
+            {
+                ChatCommandParser command = new(input);
+
+                string?[] arguments = command.ArgumentsAsStrings();
+
+                // If this evaluates to null, it means the command parser could not find the color name. The test color
+                // inside the ColorProvider was either removed or renamed (or if the CommandParser was modified),
+                // which caused the color to be returned as null, failing the name detection.
+                Assert.That(arguments.ToList().TrueForAll(argument => argument is not null), $"Command: {input}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// This test makes sure that when we pass literal "random" as namecolor argument, we won't fail the first
+    /// validation check and pass this as an argument for a random color. This is the only whitelisted workaround.
+    /// </summary>
+    [Test]
+    public void AllowsRandomAsColorName()
+    {
+        ChatCommandParser command = new("namecolor RaNdOm");
+
+        string? argument = command.ArgumentsAsStrings()[0];
+
+        Assert.That(argument, Is.Not.Null);
+        Assert.That(argument.Equals("random", StringComparison.CurrentCultureIgnoreCase));
     }
 }

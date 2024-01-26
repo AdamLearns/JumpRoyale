@@ -148,6 +148,10 @@ public partial class Arena : Node2D
             case string when CommandMatcher.MatchesGlow(command.Name, isPrivileged):
                 HandleGlow(jumper, stringArguments[0], hexColor);
                 break;
+
+            case string when CommandMatcher.MatchesNamecolor(command.Name, isPrivileged):
+                HandleNamecolor(jumper, stringArguments[0]);
+                break;
         }
     }
 
@@ -165,7 +169,7 @@ public partial class Arena : Node2D
 
         if (!_allPlayerData.Players.TryGetValue(userId, out PlayerData? playerData))
         {
-            playerData = new(hexColor, randomCharacterChoice);
+            playerData = new(hexColor, randomCharacterChoice, Jumper.DefaultPlayerNameColor.ToHtml());
         }
 
         _allPlayerData.Players[userId] = playerData;
@@ -191,6 +195,8 @@ public partial class Arena : Node2D
 
         if (!isPrivileged)
         {
+            // Reset the name with default color
+            jumper.SetPlayerName();
             jumper.DisableGlow();
         }
 
@@ -220,6 +226,30 @@ public partial class Arena : Node2D
         jumper.SetCharacter(choice);
     }
 
+    private void HandleNamecolor(Jumper jumper, string? nameColor)
+    {
+        string? color = nameColor;
+
+        // We only want to pick a random color when requested by the user to not regenerate it if there was garbage
+        // sent with the command or nothing at all to not give a false impression of the input having an
+        // effect on the color, e.g. sending "znmxbc" and picking a random color for this
+        if (color is not null && color.Equals("random", StringComparison.CurrentCultureIgnoreCase))
+        {
+            color = Rng.RandomHex();
+        }
+
+        // If the specified color was invalid (garbage message) or omitted, don't do anything
+        // to not change the currently selected color
+        if (!Color.HtmlIsValid(color) || color is null)
+        {
+            return;
+        }
+
+        jumper.PlayerData.NameColor = color;
+        jumper.SetPlayerName();
+        jumper.FlashPlayerName();
+    }
+
     private void HandleJump(Jumper jumper, string direction, int? angle, int? jumpPower)
     {
         if (!IsAllowedToJump())
@@ -230,6 +260,7 @@ public partial class Arena : Node2D
         JumpCommand command = new(direction, angle, jumpPower);
 
         jumper.Jump(command.Angle, command.Power);
+        jumper.FlashPlayerName();
     }
 
     /// <summary>
@@ -659,7 +690,7 @@ public partial class Arena : Node2D
 
             if (showName)
             {
-                jumper.PlayerWon();
+                jumper.DisableNameFadeout();
             }
         }
 
@@ -721,6 +752,8 @@ public partial class Arena : Node2D
 
             jumper.Position = thirdHighestJumper.Position;
             jumper.Velocity = thirdHighestJumper.Velocity;
+
+            jumper.FlashPlayerName();
 
             break;
         }

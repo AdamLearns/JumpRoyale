@@ -115,6 +115,8 @@ public class ChatCommandDetectionTests
             string when CommandMatcher.MatchesCharacterChange(command.Name, isPrivileged)
                 => new(chatMessage, command.Name, true),
             string when CommandMatcher.MatchesGlow(command.Name, isPrivileged) => new(chatMessage, command.Name, true),
+            string when CommandMatcher.MatchesNamecolor(command.Name, isPrivileged)
+                => new(chatMessage, command.Name, true),
 
             // The below return is here just to check if there were cases when nothing was caught by
             // pattern matching

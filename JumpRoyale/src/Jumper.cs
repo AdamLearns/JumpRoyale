@@ -4,13 +4,22 @@ using Godot;
 
 public partial class Jumper : CharacterBody2D
 {
+    public const string DefaultColorName = "white";
+
+    public static readonly Color DefaultPlayerNameColor = Colors.White;
+
     private const string SpriteNodeName = "Sprite";
     private const string NameNodeName = "Name";
     private const string ParticleSystemNodeName = "Glow";
     private const float NameFadeoutTime = 5000f;
 
-    private bool _wasOnFloor;
+    /// <summary>
+    /// Used to block the fadeout in some situations, e.g. at the start of the game. This is automatically set to true
+    /// on every jump.
+    /// </summary>
+    private bool _canFadePlayerName;
     private bool _lastJumpZeroAngle;
+    private bool _wasOnFloor;
 
     // Get the gravity from the project settings to be synced with RigidBody nodes.
     private float _gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle();
@@ -21,8 +30,6 @@ public partial class Jumper : CharacterBody2D
     /// Stores the game time as timestamp for the font fadeout timer.
     /// </summary>
     private ulong _fontVisibilityTimerStartTime;
-
-    private bool _hasJumped;
 
     // This property is externally set by Init and there is no constructor on this class, so it can not be initialized
     // inside here. It will never become null unless some external method does a really bad job parsing the player
@@ -36,12 +43,29 @@ public partial class Jumper : CharacterBody2D
         Name = userName;
         PlayerData = playerData;
 
-        GetNode<RichTextLabel>(NameNodeName).Text = "[center]" + userName + "[/center]";
+        // Initialize player name with default color. This will use the color from PlayerData, if set
+        SetPlayerName();
 
         if (playerData.GlowColor != null)
         {
             SetGlow(playerData.GlowColor);
         }
+    }
+
+    public void SetPlayerName(string? newColor = null)
+    {
+        // If no color was specified use Default instead
+        string colorOverride = newColor ?? DefaultColorName;
+
+        // If JSON data was incomplete, e.g. first run or property was just null (new player), use the above override
+        string colorName = PlayerData.NameColor ?? colorOverride;
+
+        // Note: ToHTML() excludes alpha component to avoid transparent names
+        string colorCode = Color.FromString(colorName, DefaultPlayerNameColor).ToHtml(false);
+
+        RichTextLabel nameLabel = GetNode<RichTextLabel>(NameNodeName);
+
+        nameLabel.Text = $"[center][color={colorCode}]{PlayerData.Name}[/color][/center]";
     }
 
     public void SetCrazyParticles()
@@ -118,19 +142,18 @@ public partial class Jumper : CharacterBody2D
             _jumpVelocity = _jumpVelocity.Normalized() * (float)normalizedPower;
 
             PlayerData.NumJumps++;
-            SetNameAlpha(1f);
 
-            _hasJumped = true;
+            _canFadePlayerName = true;
             _lastJumpZeroAngle = angle == 90; // 0 in the command is expressed here as 90.
-
-            ResetNameTimer();
         }
     }
 
-    public void PlayerWon()
+    /// <summary>
+    /// Stops the name fadeout until the player jumps again.
+    /// </summary>
+    public void DisableNameFadeout()
     {
-        // Reset their _hasJumped property so that their name will be visible until they jump again.
-        _hasJumped = false;
+        _canFadePlayerName = false;
     }
 
     public void SetColor(string hexColor)
@@ -209,6 +232,15 @@ public partial class Jumper : CharacterBody2D
         }
     }
 
+    /// <summary>
+    /// Resets the alpha component to 1 on player's name label and resets the name fadeout timer.
+    /// </summary>
+    public void FlashPlayerName()
+    {
+        SetNameAlpha(1f);
+        ResetNameTimer();
+    }
+
     private void ResetNameTimer()
     {
         _fontVisibilityTimerStartTime = Time.GetTicksMsec();
@@ -218,7 +250,7 @@ public partial class Jumper : CharacterBody2D
 
     private void UpdateNameTransparency()
     {
-        float alpha = _hasJumped ? CalculateFontAlpha() : 1f;
+        float alpha = _canFadePlayerName ? CalculateFontAlpha() : 1f;
 
         SetNameAlpha(alpha);
     }

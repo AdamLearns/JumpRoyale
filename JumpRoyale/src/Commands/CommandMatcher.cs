@@ -17,6 +17,7 @@ public static class CommandMatcher
     public static readonly ImmutableList<string> GlowCommandAliases = ["glow"];
     public static readonly ImmutableList<string> JoinCommandAliases = ["join"];
     public static readonly ImmutableList<string> JumpCommandAliases = ["j", "l", "r", "u"];
+    public static readonly ImmutableList<string> NamecolorCommandAliases = ["namecolor"];
     public static readonly ImmutableList<string> UnglowCommandAliases = ["unglow"];
 
     static CommandMatcher()
@@ -29,6 +30,7 @@ public static class CommandMatcher
             GlowCommandAliases,
             JoinCommandAliases,
             JumpCommandAliases,
+            NamecolorCommandAliases,
             UnglowCommandAliases,
         ];
         List<string> allAliases = [];
@@ -61,6 +63,11 @@ public static class CommandMatcher
     public static bool MatchesJump(string commandName, bool isPrivileged = true)
     {
         return MatchesCommandAliasPattern(JumpCommandAliases, commandName, isPrivileged);
+    }
+
+    public static bool MatchesNamecolor(string commandName, bool isPrivileged = true)
+    {
+        return MatchesCommandAliasPattern(NamecolorCommandAliases, commandName, isPrivileged);
     }
 
     public static bool MatchesUnglow(string commandName, bool isPrivileged = true)
