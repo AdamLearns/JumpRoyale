@@ -10,7 +10,7 @@ public class ChannelConfiguration(ConfigurationBuilder config)
 {
     private readonly IConfigurationRoot _configuration = config.Build();
 
-    public string AccessToken
+    public string? AccessToken
     {
         get => TryGetPropertyFromConfig(TwitchConstants.TwitchAccessTokenKey);
     }
@@ -29,7 +29,7 @@ public class ChannelConfiguration(ConfigurationBuilder config)
     {
         // When trying to access an unset configuration key, throw an appropriate exception type with custom message. If
         // more configuration keys are added and we don't have a specific exception for that, we will throw a generic
-        // exception. This is only for readability purposes, messages are set through TwitchConstants
+        // exception. This is only for readability purposes messages are set through TwitchConstants.
         string? value =
             _configuration[index]
             ?? throw index switch

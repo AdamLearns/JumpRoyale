@@ -58,7 +58,11 @@ public class TwitchChatClient : BaseChatClient
 
     private void OnMessageReceived(object sender, OnMessageReceivedArgs e)
     {
-        bool isPrivileged = e.ChatMessage.IsSubscriber || e.ChatMessage.IsModerator || e.ChatMessage.IsVip;
+        bool isPrivileged =
+            e.ChatMessage.IsSubscriber
+            || e.ChatMessage.IsModerator
+            || e.ChatMessage.IsVip
+            || e.ChatMessage.IsBroadcaster;
 
         HandleChatMessage(
             e.ChatMessage.UserId,
