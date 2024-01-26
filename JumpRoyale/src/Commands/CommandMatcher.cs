@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 
 /// <summary>
 /// Provides a set of methods for pattern matching of command names extracted from a chat message.
@@ -14,33 +13,34 @@ using System.Linq;
 /// </remarks>
 public static class CommandMatcher
 {
-    public static readonly ImmutableList<string> CharCommandAliases = ImmutableList.Create("char");
-    public static readonly ImmutableList<string> GlowCommandAliases = ImmutableList.Create("glow");
-    public static readonly ImmutableList<string> JoinCommandAliases = ImmutableList.Create("join");
-    public static readonly ImmutableList<string> JumpCommandAliases = ImmutableList.Create("j", "l", "r", "u");
-    public static readonly ImmutableList<string> UnglowCommandAliases = ImmutableList.Create("unglow");
+    public static readonly ImmutableList<string> CharCommandAliases = ["char"];
+    public static readonly ImmutableList<string> GlowCommandAliases = ["glow"];
+    public static readonly ImmutableList<string> JoinCommandAliases = ["join"];
+    public static readonly ImmutableList<string> JumpCommandAliases = ["j", "l", "r", "u"];
+    public static readonly ImmutableList<string> NamecolorCommandAliases = ["namecolor"];
+    public static readonly ImmutableList<string> UnglowCommandAliases = ["unglow"];
 
     static CommandMatcher()
     {
         // Warning: whenever a new alias list is added, add it to this list below! It will automatically
         // expose a list of all commands combined for display and testing purposes
         List<ImmutableList<string>> availableAliases =
-            new()
-            {
-                CharCommandAliases,
-                GlowCommandAliases,
-                JoinCommandAliases,
-                JumpCommandAliases,
-                UnglowCommandAliases,
-            };
-        List<string> allAliases = new();
+        [
+            CharCommandAliases,
+            GlowCommandAliases,
+            JoinCommandAliases,
+            JumpCommandAliases,
+            NamecolorCommandAliases,
+            UnglowCommandAliases,
+        ];
+        List<string> allAliases = [];
 
         foreach (ImmutableList<string> aliases in availableAliases)
         {
-            allAliases.AddRange(aliases.ToArray());
+            allAliases.AddRange([.. aliases]);
         }
 
-        AvailableCommands = ImmutableList.Create(allAliases.ToArray());
+        AvailableCommands = [.. allAliases];
     }
 
     public static ImmutableList<string> AvailableCommands { get; private set; }
@@ -63,6 +63,11 @@ public static class CommandMatcher
     public static bool MatchesJump(string commandName, bool isPrivileged = true)
     {
         return MatchesCommandAliasPattern(JumpCommandAliases, commandName, isPrivileged);
+    }
+
+    public static bool MatchesNamecolor(string commandName, bool isPrivileged = true)
+    {
+        return MatchesCommandAliasPattern(NamecolorCommandAliases, commandName, isPrivileged);
     }
 
     public static bool MatchesUnglow(string commandName, bool isPrivileged = true)
