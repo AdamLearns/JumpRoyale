@@ -438,8 +438,6 @@ public partial class Arena : Node2D
 
             if (r < 6 + difficultyFactor * 40)
             {
-                // TODO: DrawRectangleOfTiles draws blocks _downward_, this means that part of them
-                //       will suddenly appear on screen
                 int blockWidth = 2 + (int)(difficultyFactor * 24);
                 int blockX = Rng.IntRange(2, _widthInTiles - 1 - blockWidth);
 
@@ -528,7 +526,7 @@ public partial class Arena : Node2D
         int startY = podiumY + podiumHeight + 10;
         for (int y = startY; y < _heightInTiles; y += 6)
         {
-            for (int x = Rng.IntRange(3, 7); x < _widthInTiles - 5; )
+            for (int x = Rng.IntRange(3, 7); x < _widthInTiles - 5;)
             {
                 AddPlatform(x, y, 1);
                 platformCoords.Add(new Tuple<int, int>(x, y));

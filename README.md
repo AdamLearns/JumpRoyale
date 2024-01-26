@@ -8,8 +8,9 @@ A platformer controlled through Twitch chat to be played on my stream during sho
     -   [Customizing your character](#customizing-your-character)
     -   [Extras](#extras)
     -   [Background](#background)
-    -   [Building, running, testing](#building-running-testing)
+    -   [Building, running, testing, development](#building-running-testing-development)
         -   [Testing](#testing)
+        -   [Development](#development)
         -   [Adding a new command](#adding-a-new-command)
     -   [Credits](#credits)
 
@@ -133,7 +134,7 @@ Sending `char <choice>` in the chat allows you to change your character graphic.
 
 ---
 
-## Building, running, testing
+## Building, running, testing, development
 
 -   Prerequisites:
     -   Install [DotNet 8](https://dotnet.microsoft.com/en-us/download)
@@ -165,6 +166,16 @@ Sending `char <choice>` in the chat allows you to change your character graphic.
 ### Testing
 
 Refer to [Testing README](Testing.md)
+
+### Development
+
+With VSCode, we heavily recommend installing the following Microsoft extensions:
+
+-   [C#](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
+-   Additionally, [C# Dev Kit](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit) is recommended for extra editor features: Testing, automatic Package Management and Project/Solution Explorer, but it is recommended to uninstall `IntelliCode for C# Dev Kit` from this pack; it only gets in the way.
+-   Repository will recommend installing [CSharpier](https://marketplace.visualstudio.com/items?itemName=csharpier.csharpier-vscode) extension, we recommend installing this
+    extension as a default formatter, because [the C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp) only provides fixes for whitespaces and CSharpier
+    can actually handle line breaks in a way that it makes sense. Don't install as a global tool (updates will cause conflicts and the extension will not know which version to use).
 
 ### Adding a new command
 
