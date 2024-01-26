@@ -3,7 +3,7 @@ using Godot;
 
 public partial class GameOverlay : VFlowContainer
 {
-    public static readonly int GameLength = 150;
+    public static readonly int GameLength = 150; // in seconds
 
     private const string NumPlayersNodeName = "NumPlayers";
     private const string HeightOutputNodeName = "HeightOutput";

@@ -12,11 +12,11 @@ offset_right = -960.0
 grow_horizontal = 2
 script = ExtResource("1_gy4ca")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Background" type="Sprite2D" parent="."]
 position = Vector2(1013, 36)
 texture = ExtResource("2_r3xmd")
 
-[node name="Timer" type="Label" parent="Sprite2D"]
+[node name="Timer" type="Label" parent="Background"]
 offset_left = -28.0
 offset_top = -19.0
 offset_right = 28.0
