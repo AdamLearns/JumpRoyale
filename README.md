@@ -158,11 +158,11 @@ Refer to [Testing README](Testing.md)
 
 With VSCode, we heavily recommend installing the following Microsoft extensions:
 
--   C# `ms-dotnettools.csharp`
--   Additionally, *C# Dev Kit* `ms-dotnettools.csdevkit` is recommended for extra editor features: Testing, automatic Package Management and Project/Solution Explorer, but it is recommended to uninstall `IntelliCode for C# Dev Kit` from this pack, it only gets in the way
--   Repository will recommend installing CSharpier `csharpier.csharpier-vscode` extension, we recommend installing this
-    extension as a default formatter, because `ms-dotnettools.csharp` only provides fixes for whitespaces and CSharpier
-    can actually handle line breaks in a way that it makes sense. Don't install it global tool (updates will cause conflicts and the extension will not know which version to use).
+-   [C#](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
+-   Additionally, [C# Dev Kit](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit) is recommended for extra editor features: Testing, automatic Package Management and Project/Solution Explorer, but it is recommended to uninstall `IntelliCode for C# Dev Kit` from this pack; it only gets in the way.
+-   Repository will recommend installing [CSharpier](https://marketplace.visualstudio.com/items?itemName=csharpier.csharpier-vscode) extension, we recommend installing this
+    extension as a default formatter, because [the C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp) only provides fixes for whitespaces and CSharpier
+    can actually handle line breaks in a way that it makes sense. Don't install as a global tool (updates will cause conflicts and the extension will not know which version to use).
 
 ### Adding a new command
 
