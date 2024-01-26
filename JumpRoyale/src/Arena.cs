@@ -405,9 +405,34 @@ public partial class Arena : Node2D
             AddPlatform(startX, y, width);
         }
 
+        for (int y = _ceilingHeight - 1; y >= _ceilingHeight - ArenaHeightInTiles; y--)
+        {
+            float difficultyFactor = GetDifficultyFactor(y);
+
+            // Rarely, make a solid block to add some variety
+            int r = Rng.IntRange(0, 100);
+
+            if (r < 6 + difficultyFactor * 40)
+            {
+                int blockWidth = 2 + (int)(difficultyFactor * 24);
+                int blockX = Rng.IntRange(2, _widthInTiles - 1 - blockWidth);
+
+                DrawRectangleOfTiles(blockX, y + 1, blockWidth, blockWidth, new Vector2I(12, 1));
+            }
+        }
+
         _generatedMaxHeight = _ceilingHeight;
 
         AddChild(_lobbyTilemap);
+    }
+
+    /// <summary>
+    /// Returns a difficulty factor that goes from 0 to 1 linearly as Y decreases.
+    /// </summary>
+    /// <param name="y">A Y coordinate in tiles.</param>
+    private float GetDifficultyFactor(int y)
+    {
+        return (float)Math.Min(0, y) / -ArenaHeightInTiles;
     }
 
     private void GenerateProceduralPlatforms()
@@ -430,21 +455,8 @@ public partial class Arena : Node2D
         // Add platforms higher up;
         for (int y = _generatedMaxHeight - 1; y >= cameraPosInTiles; y--)
         {
-            // This goes from 0 to 1 linearly as Y decreases
-            float difficultyFactor = (float)Math.Min(0, y) / -ArenaHeightInTiles;
-
-            // Rarely, make a solid block to add some variety
+            float difficultyFactor = GetDifficultyFactor(y);
             int r = Rng.IntRange(0, 100);
-
-            if (r < 6 + difficultyFactor * 40)
-            {
-                int blockWidth = 2 + (int)(difficultyFactor * 24);
-                int blockX = Rng.IntRange(2, _widthInTiles - 1 - blockWidth);
-
-                DrawRectangleOfTiles(blockX, y + 1, blockWidth, blockWidth, new Vector2I(12, 1));
-            }
-
-            r = Rng.IntRange(0, 100);
 
             if (r > (70 - difficultyFactor * 60))
             {
@@ -526,7 +538,7 @@ public partial class Arena : Node2D
         int startY = podiumY + podiumHeight + 10;
         for (int y = startY; y < _heightInTiles; y += 6)
         {
-            for (int x = Rng.IntRange(3, 7); x < _widthInTiles - 5;)
+            for (int x = Rng.IntRange(3, 7); x < _widthInTiles - 5; )
             {
                 AddPlatform(x, y, 1);
                 platformCoords.Add(new Tuple<int, int>(x, y));
