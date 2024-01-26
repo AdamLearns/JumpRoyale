@@ -167,6 +167,13 @@ public class ChatCommandParser
         {
             string input = parameters[i];
 
+            // Workaround to allow "random" color later, since this fails the validation check
+            if (input.Equals("random", StringComparison.CurrentCultureIgnoreCase))
+            {
+                arguments.Add(input);
+                continue;
+            }
+
             // If a valid Hex was provided, just add it and proceed with other arguments
             if (Color.HtmlIsValid(input))
             {
