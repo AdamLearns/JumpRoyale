@@ -209,6 +209,12 @@ public partial class Arena : Node2D
     {
         string glowColor = userHexColor is not null ? userHexColor : twitchChatHexColor;
 
+        // The player could have sent "random" as his color choice, so we have to translate it to random Hex color
+        if (glowColor.Equals("random", StringComparison.CurrentCultureIgnoreCase))
+        {
+            glowColor = Rng.RandomHex();
+        }
+
         jumper.SetGlow(glowColor);
     }
 
