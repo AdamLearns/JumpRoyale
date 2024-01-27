@@ -170,7 +170,7 @@ public class ChatCommandParser
             // Workaround to allow "random" color later, since this fails the validation check
             if (input.Equals("random", StringComparison.CurrentCultureIgnoreCase))
             {
-                arguments.Add(input);
+                arguments.Add(Rng.RandomHex());
                 continue;
             }
 
