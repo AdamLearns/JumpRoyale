@@ -169,7 +169,7 @@ public partial class Arena : Node2D
 
         if (!_allPlayerData.Players.TryGetValue(userId, out PlayerData? playerData))
         {
-            playerData = new(hexColor, randomCharacterChoice, Jumper.DefaultPlayerNameColor.ToHtml());
+            playerData = new(hexColor, randomCharacterChoice, hexColor);
         }
 
         _allPlayerData.Players[userId] = playerData;

@@ -4,14 +4,13 @@ using Godot;
 
 public partial class Jumper : CharacterBody2D
 {
-    public const string DefaultColorName = "white";
-
-    public static readonly Color DefaultPlayerNameColor = Colors.White;
-
+    private const string DefaultColorName = "white";
     private const string SpriteNodeName = "Sprite";
     private const string NameNodeName = "Name";
     private const string ParticleSystemNodeName = "Glow";
     private const float NameFadeoutTime = 5000f;
+
+    private static readonly Color DefaultPlayerNameColor = Colors.White;
 
     /// <summary>
     /// Used to block the fadeout in some situations, e.g. at the start of the game. This is automatically set to true
@@ -52,19 +51,11 @@ public partial class Jumper : CharacterBody2D
         }
     }
 
-    public void SetPlayerName(bool forceDefaultColor = false)
+    public void SetPlayerName(bool isPrivileged = false)
     {
-        // If JSON data was incomplete, e.g. first run or property was just null (new player), use the default color
-        string colorName = PlayerData.NameColor ?? DefaultColorName;
-
         // There can be situations when we would want to force a default color despite the choice, the main reason is
-        // when the player becomes unprivileged after the subscription runs out
-        if (forceDefaultColor)
-        {
-            // Note: we are not overwriting the previous color from PlayerData, so the player can have his color back
-            // when privileged again
-            colorName = DefaultColorName;
-        }
+        // when the player becomes unprivileged after the subscription runs out or gets unmodded/unVIP'd
+        string colorName = isPrivileged ? DefaultColorName : PlayerData.NameColor;
 
         // Note: ToHTML() excludes alpha component to avoid transparent names
         string colorCode = Color.FromString(colorName, DefaultPlayerNameColor).ToHtml(false);
