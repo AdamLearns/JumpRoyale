@@ -1,3 +1,5 @@
+using System.Runtime.Serialization;
+
 // Note to contributors: do not rename anything in this class without updating the corresponding JSON data on disk.
 public class PlayerData(string glowColor, int characterChoice, string nameColor, bool isPrivileged)
 {
@@ -43,9 +45,14 @@ public class PlayerData(string glowColor, int characterChoice, string nameColor,
     /// also be used for commands, that are partially privileged, like extra cosmetics inside a some command.
     ///
     /// <para>
+    /// This property will not be a part of the Json data.
+    /// </para>
+    ///
+    /// <para>
     /// Example: <c>char</c> command allows to select a character from given range, but can some selections can only be
     /// applied to privileged users.
     /// </para>
     /// </summary>
-    public bool IsPrivileged { get; set; } = isPrivileged;
+    [IgnoreDataMember]
+    public bool IsPrivileged { get; private set; } = isPrivileged;
 }
