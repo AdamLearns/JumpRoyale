@@ -169,7 +169,11 @@ public partial class Arena : Node2D
 
         if (!_allPlayerData.Players.TryGetValue(userId, out PlayerData? playerData))
         {
-            playerData = new(hexColor, randomCharacterChoice, hexColor);
+            playerData = new(hexColor, randomCharacterChoice, hexColor, isPrivileged)
+            {
+                // Update the current privilege state so it can be used by other features
+                IsPrivileged = isPrivileged,
+            };
         }
 
         _allPlayerData.Players[userId] = playerData;
@@ -192,13 +196,8 @@ public partial class Arena : Node2D
         // either cosmetic or on the jumper himself, because we have to read the input from playerData,
         // which has to be sent to the jumper through .Init() first.
         jumper.SetCharacter(playerData.CharacterChoice);
-
-        if (!isPrivileged)
-        {
-            // Reset the name with default color
-            jumper.SetPlayerName(true);
-            jumper.DisableGlow();
-        }
+        jumper.SetPlayerName();
+        jumper.SetGlow();
 
         _jumpers.Add(userId, jumper);
 
@@ -207,9 +206,17 @@ public partial class Arena : Node2D
 
     private void HandleGlow(Jumper jumper, string? userHexColor, string twitchChatHexColor)
     {
-        string glowColor = userHexColor is not null ? userHexColor : twitchChatHexColor;
+        string? glowColor = userHexColor;
 
-        jumper.SetGlow(glowColor);
+        // Use Twitch color if the provided argument was invalid.
+        // Maybe it should behave just like `namecolor` instead: doing nothing on invalid color?
+        if (Color.HtmlIsValid(glowColor) || glowColor is null)
+        {
+            glowColor = twitchChatHexColor;
+        }
+
+        jumper.PlayerData.GlowColor = glowColor;
+        jumper.SetGlow();
     }
 
     private void HandleUnglow(Jumper jumper)

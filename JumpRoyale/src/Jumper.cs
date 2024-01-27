@@ -4,13 +4,10 @@ using Godot;
 
 public partial class Jumper : CharacterBody2D
 {
-    private const string DefaultColorName = "white";
     private const string SpriteNodeName = "Sprite";
     private const string NameNodeName = "Name";
     private const string ParticleSystemNodeName = "Glow";
     private const float NameFadeoutTime = 5000f;
-
-    private static readonly Color DefaultPlayerNameColor = Colors.White;
 
     /// <summary>
     /// Used to block the fadeout in some situations, e.g. at the start of the game. This is automatically set to true
@@ -42,23 +39,14 @@ public partial class Jumper : CharacterBody2D
         Name = userName;
         PlayerData = playerData;
 
-        // Initialize player name with default color. This will use the color from PlayerData, if set
         SetPlayerName();
-
-        if (playerData.GlowColor != null)
-        {
-            SetGlow(playerData.GlowColor);
-        }
+        SetGlow();
     }
 
-    public void SetPlayerName(bool isPrivileged = false)
+    public void SetPlayerName()
     {
-        // There can be situations when we would want to force a default color despite the choice, the main reason is
-        // when the player becomes unprivileged after the subscription runs out or gets unmodded/unVIP'd
-        string colorName = isPrivileged ? DefaultColorName : PlayerData.NameColor;
-
         // Note: ToHTML() excludes alpha component to avoid transparent names
-        string colorCode = Color.FromString(colorName, DefaultPlayerNameColor).ToHtml(false);
+        string colorCode = Color.FromString(PlayerData.NameColor, GameConstants.DefaultNameColor).ToHtml(false);
 
         RichTextLabel nameLabel = GetNode<RichTextLabel>(NameNodeName);
 
@@ -92,22 +80,25 @@ public partial class Jumper : CharacterBody2D
         }
     }
 
-    public void SetGlow(string colorString)
+    /// <summary>
+    /// Enables the Glow (particles) on this Jumper, if privileged (automatically disables glow otherwise).
+    /// </summary>
+    public void SetGlow()
     {
-        try
-        {
-            CpuParticles2D particles = GetGlowNode();
-            Color color = Color.FromHtml(colorString);
+        string colorString = PlayerData.GlowColor;
 
-            color = new Color(color.R, color.G, color.B, 1f);
-            particles.SelfModulate = color;
-            particles.Visible = true;
-            PlayerData.GlowColor = color.ToHtml(false);
-        }
-        catch (ArgumentOutOfRangeException e)
+        if (!PlayerData.IsPrivileged)
         {
-            GD.Print($"Failed to set glow color to {colorString}", e);
+            DisableGlow();
+            return;
         }
+
+        CpuParticles2D particles = GetGlowNode();
+        Color color = Color.FromHtml(colorString);
+        color.A = 1f;
+
+        particles.SelfModulate = color;
+        particles.Visible = true;
     }
 
     public void DisableGlow()
