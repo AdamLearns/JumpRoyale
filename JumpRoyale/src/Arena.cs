@@ -196,7 +196,7 @@ public partial class Arena : Node2D
         if (!isPrivileged)
         {
             // Reset the name with default color
-            jumper.SetPlayerName();
+            jumper.SetPlayerName(true);
             jumper.DisableGlow();
         }
 

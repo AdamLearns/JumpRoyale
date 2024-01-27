@@ -52,13 +52,18 @@ public partial class Jumper : CharacterBody2D
         }
     }
 
-    public void SetPlayerName(string? newColor = null)
+    public void SetPlayerName(bool forceDefaultColor = false)
     {
-        // If no color was specified use Default instead
-        string colorOverride = newColor ?? DefaultColorName;
+        // If JSON data was incomplete, e.g. first run or property was just null (new player), use the default color
+        string colorName = PlayerData.NameColor ?? DefaultColorName;
 
-        // If JSON data was incomplete, e.g. first run or property was just null (new player), use the above override
-        string colorName = PlayerData.NameColor ?? colorOverride;
+        // There can be situations when we would want to force a default color despite the choice, the main reason is
+        // when the player becomes unprivileged after the subscription runs out
+        if (forceDefaultColor)
+        {
+            PlayerData.NameColor = DefaultColorName;
+            colorName = DefaultColorName;
+        }
 
         // Note: ToHTML() excludes alpha component to avoid transparent names
         string colorCode = Color.FromString(colorName, DefaultPlayerNameColor).ToHtml(false);
