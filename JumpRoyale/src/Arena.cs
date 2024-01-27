@@ -169,11 +169,7 @@ public partial class Arena : Node2D
 
         if (!_allPlayerData.Players.TryGetValue(userId, out PlayerData? playerData))
         {
-            playerData = new(hexColor, randomCharacterChoice, hexColor, isPrivileged)
-            {
-                // Update the current privilege state so it can be used by other features
-                IsPrivileged = isPrivileged,
-            };
+            playerData = new(hexColor, randomCharacterChoice, hexColor, isPrivileged);
         }
 
         _allPlayerData.Players[userId] = playerData;
