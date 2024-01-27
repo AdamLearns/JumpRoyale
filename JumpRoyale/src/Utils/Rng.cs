@@ -1,18 +1,19 @@
+using System;
 using Godot;
 
 /// <summary>
-/// Exposes a <c>RandomNumberGenerator</c> instance.
+/// Exposes a <c>Random</c> instance.
 /// </summary>
 public static class Rng
 {
-    private static readonly RandomNumberGenerator _rng = new();
+    private static readonly Random _rng = new();
 
     /// <summary>
     /// Alias of <c>RandiRange</c> (inclusive int).
     /// </summary>
     public static int IntRange(int min, int max)
     {
-        return _rng.RandiRange(min, max);
+        return _rng.Next(min, max);
     }
 
     /// <summary>
@@ -20,6 +21,6 @@ public static class Rng
     /// </summary>
     public static string RandomHex()
     {
-        return new Color(_rng.Randf(), _rng.Randf(), _rng.Randf(), 1).ToHtml(false);
+        return new Color(_rng.NextSingle(), _rng.NextSingle(), _rng.NextSingle(), 1).ToHtml(false);
     }
 }
