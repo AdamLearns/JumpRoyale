@@ -61,7 +61,8 @@ public partial class Jumper : CharacterBody2D
         // when the player becomes unprivileged after the subscription runs out
         if (forceDefaultColor)
         {
-            PlayerData.NameColor = DefaultColorName;
+            // Note: we are not overwriting the previous color from PlayerData, so the player can have his color back
+            // when privileged again
             colorName = DefaultColorName;
         }
 
