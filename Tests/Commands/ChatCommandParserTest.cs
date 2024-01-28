@@ -261,7 +261,6 @@ public class ChatCommandParserTests
     public void AllowsRandomAsColorName()
     {
         ChatCommandParser command = new("namecolor RaNdOm");
-
         string? argument = command.ArgumentsAsStrings()[0];
 
         Assert.That(argument, Is.Not.Null);

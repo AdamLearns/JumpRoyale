@@ -1,26 +1,44 @@
 using System;
-using Godot;
+using System.Security.Cryptography;
 
-/// <summary>
-/// Exposes a <c>Random</c> instance.
-/// </summary>
 public static class Rng
 {
-    private static readonly Random _rng = new();
+    private static readonly RandomNumberGenerator _rng = RandomNumberGenerator.Create();
 
     /// <summary>
-    /// Alias of <c>RandiRange</c> (inclusive int).
+    /// Returns a random integer from specified range (right-inclusive).
     /// </summary>
     public static int IntRange(int min, int max)
     {
-        return _rng.Next(min, max);
+        uint range = (uint)(max - min + 1);
+        uint number = GetNumber() % range;
+
+        return (int)(number + min);
     }
 
     /// <summary>
-    /// Returns a random Hex color, excluding Alpha component.
+    /// Returns a random float between 0 and 1.
+    /// </summary>
+    public static float RandomFloat()
+    {
+        return (float)GetNumber() / uint.MaxValue;
+    }
+
+    /// <summary>
+    /// Returns a random Godot Color.
     /// </summary>
     public static string RandomHex()
     {
-        return new Color(_rng.NextSingle(), _rng.NextSingle(), _rng.NextSingle(), 1).ToHtml(false);
+        return new Godot.Color(RandomFloat(), RandomFloat(), RandomFloat(), 1).ToHtml(false);
+    }
+
+    private static uint GetNumber()
+    {
+        byte[] bytes = new byte[4];
+
+        // Fill the bytes with random sequence
+        _rng.GetBytes(bytes);
+
+        return BitConverter.ToUInt32(bytes, 0);
     }
 }
