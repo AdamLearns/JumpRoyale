@@ -169,14 +169,15 @@ public partial class Arena : Node2D
 
         if (!_allPlayerData.Players.TryGetValue(userId, out PlayerData? playerData))
         {
-            playerData = new(hexColor, randomCharacterChoice, hexColor, isPrivileged);
+            playerData = new(hexColor, randomCharacterChoice, hexColor);
         }
 
         _allPlayerData.Players[userId] = playerData;
 
-        // Even if the player already existed, we may need to update their name.
+        // Even if the player already existed, we may need to update their name and privileged status.
         playerData.Name = userName;
         playerData.UserId = userId;
+        playerData.IsPrivileged = isPrivileged;
 
         Jumper jumper = (Jumper)_jumperScene.Instantiate();
         Rect2 viewport = GetViewportRect();
@@ -206,7 +207,7 @@ public partial class Arena : Node2D
 
         // Use Twitch color if the provided argument was invalid.
         // Maybe it should behave just like `namecolor` instead: doing nothing on invalid color?
-        if (Color.HtmlIsValid(glowColor) || glowColor is null)
+        if (!Color.HtmlIsValid(glowColor) || glowColor is null)
         {
             glowColor = twitchChatHexColor;
         }

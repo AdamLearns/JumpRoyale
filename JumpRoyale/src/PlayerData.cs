@@ -1,7 +1,7 @@
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 // Note to contributors: do not rename anything in this class without updating the corresponding JSON data on disk.
-public class PlayerData(string glowColor, int characterChoice, string nameColor, bool isPrivileged)
+public class PlayerData(string glowColor, int characterChoice, string nameColor)
 {
     private string _nameColor = nameColor;
 
@@ -53,6 +53,6 @@ public class PlayerData(string glowColor, int characterChoice, string nameColor,
     /// applied to privileged users.
     /// </para>
     /// </summary>
-    [IgnoreDataMember]
-    public bool IsPrivileged { get; private set; } = isPrivileged;
+    [JsonIgnore]
+    public bool IsPrivileged { get; set; } = false;
 }
