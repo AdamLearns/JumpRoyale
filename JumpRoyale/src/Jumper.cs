@@ -46,7 +46,7 @@ public partial class Jumper : CharacterBody2D
     public void SetPlayerName()
     {
         // Note: ToHTML() excludes alpha component to avoid transparent names
-        string colorCode = Color.FromString(PlayerData.NameColor, GameConstants.DefaultNameColor).ToHtml(false);
+        string colorCode = Color.FromString(PlayerData.PlayerNameColor, GameConstants.DefaultNameColor).ToHtml(false);
 
         RichTextLabel nameLabel = GetNode<RichTextLabel>(NameNodeName);
 

@@ -239,7 +239,7 @@ public partial class Arena : Node2D
             return;
         }
 
-        jumper.PlayerData.NameColor = nameColor;
+        jumper.PlayerData.PlayerNameColor = nameColor;
         jumper.SetPlayerName();
         jumper.FlashPlayerName();
     }
