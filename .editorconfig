@@ -79,6 +79,8 @@ dotnet_diagnostic.SA1633.severity = none
 dotnet_diagnostic.S112.severity = none
 # No commented code blocks (questionable, sometimes)
 dotnet_diagnostic.S125.severity = none
+# Refactor your code not to use hardcoded absolute paths or URIs
+dotnet_diagnostic.S1075.severity = none
 # Require protected constructor in non static class
 dotnet_diagnostic.S1118.severity = none
 # Loop should be simplified with LINQ expressions
