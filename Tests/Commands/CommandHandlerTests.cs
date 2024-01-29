@@ -15,7 +15,7 @@ public class CommandHandlerTests
         {
             CommandHandler commandHandler = new(command, "12345", "fakeUser", "ffffff", true);
 
-            CommandHandler.Something? matchedCommand = commandHandler.GetExecutableCommand();
+            CommandHandler.Something? matchedCommand = commandHandler.TryGetCommandFromChatMessage();
 
             Assert.That(matchedCommand is not null && commandHandler.ExecutedCommand.Name == command);
         }

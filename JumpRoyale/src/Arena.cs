@@ -132,7 +132,7 @@ public partial class Arena : Node2D
     {
         CommandHandler commandHandler = new(message, senderId, senderName, hexColor, isPrivileged) { Arena = this };
 
-        commandHandler.ParseMessage();
+        commandHandler.ProcessMessage();
     }
 
     private void SetBackground()

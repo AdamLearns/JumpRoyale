@@ -24,9 +24,12 @@ public class CommandHandler(string message, string senderId, string senderName, 
     [AllowNull]
     public Arena Arena { get; set; }
 
-    public void ParseMessage()
+    /// <summary>
+    /// Executes a command if the chat message contained a valid command alias.
+    /// </summary>
+    public void ProcessMessage()
     {
-        Something? command = GetExecutableCommand();
+        Something? command = TryGetCommandFromChatMessage();
 
         if (command is null)
         {
@@ -53,7 +56,10 @@ public class CommandHandler(string message, string senderId, string senderName, 
         command(jumper);
     }
 
-    public Something? GetExecutableCommand()
+    /// <summary>
+    /// Returns a command delegate if the chat message contained a valid command name.
+    /// </summary>
+    public Something? TryGetCommandFromChatMessage()
     {
         ExecutedCommand = new(_message.ToLower());
 

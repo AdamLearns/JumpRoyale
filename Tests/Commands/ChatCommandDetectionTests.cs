@@ -107,7 +107,7 @@ public class ChatCommandDetectionTests
             new(chatMessage.ToLower(), string.Empty, string.Empty, string.Empty, isPrivileged);
 
         // Returning a callable method means that out chat message managed to match appropriate command
-        CommandHandler.Something? command = commandHandler.GetExecutableCommand();
+        CommandHandler.Something? command = commandHandler.TryGetCommandFromChatMessage();
 
         return command is not null
             ? new(chatMessage, commandHandler.ExecutedCommand.Name, true)
