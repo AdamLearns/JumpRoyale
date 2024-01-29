@@ -11,8 +11,8 @@
 
 [node name="Arena" type="Node2D"]
 script = ExtResource("1_5vcv2")
-_jumperScene = ExtResource("2_6nvro")
-_tileSetToUse = ExtResource("3_cg3j3")
+JumperScene = ExtResource("2_6nvro")
+TileSetToUse = ExtResource("3_cg3j3")
 
 [node name="Camera" type="Camera2D" parent="."]
 anchor_mode = 0

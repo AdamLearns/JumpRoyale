@@ -10,8 +10,8 @@ using TwitchLib.PubSub.Events;
 
 public partial class Arena : Node2D
 {
-    private const int WallHeightInTiles = 15;
-    private const int ArenaHeightInTiles = 600;
+    public const int WallHeightInTiles = 15;
+    public const int ArenaHeightInTiles = 600;
 
     private const string LobbyOverlayNodeName = "LobbyOverlay";
     private const string GameOverlayNodeName = "GameOverlay";
@@ -21,15 +21,7 @@ public partial class Arena : Node2D
     private const string CanvasLayerNodeName = "CanvasLayer";
     private const string SaveLocation = "res://save_data/players.json";
 
-    private readonly Dictionary<string, Jumper> _jumpers = [];
-    private AllPlayerData _allPlayerData = new();
     private TileMap _lobbyTilemap = new();
-
-    [Export]
-    private PackedScene? _jumperScene;
-
-    [Export]
-    private TileSet? _tileSetToUse;
 
     private bool _hasGameEnded;
 
@@ -50,9 +42,25 @@ public partial class Arena : Node2D
     [Signal]
     public delegate void CameraSpeedChangedEventHandler(int speed);
 
+    /// <summary>
+    /// Gets all players keyed by their Twitch <c>userId</c> who joined the current session.
+    /// </summary>
+    public Dictionary<string, Jumper> Jumpers { get; init; } = [];
+
+    /// <summary>
+    /// Gets currently deserialized Json data of all players.
+    /// </summary>
+    public AllPlayerData AllPlayerData { get; private set; } = new();
+
+    [Export]
+    public PackedScene? JumperScene { get; private set; }
+
+    [Export]
+    public TileSet? TileSetToUse { get; private set; }
+
     public override void _Ready()
     {
-        _lobbyTilemap = new TileMap { Name = "TileMap", TileSet = _tileSetToUse };
+        _lobbyTilemap = new TileMap { Name = "TileMap", TileSet = TileSetToUse };
 
         TwitchChatClient twitchChatClient = new();
 
@@ -93,9 +101,23 @@ public partial class Arena : Node2D
         {
             for (int i = 0; i < 200; i++)
             {
-                HandleJoin(string.Empty + i, string.Empty + i, "#ffffff", false);
+                // Note: it does not matter that we instantiate this 200 times
+                CommandHandler commandHandler =
+                    new(string.Empty, string.Empty + i, string.Empty + i, "ffffff", false) { Arena = this };
+
+                commandHandler.SpawnFakePlayers();
             }
         }
+    }
+
+    /// <summary>
+    /// Players are allowed to jump only if the game is still running or if 5
+    /// seconds have passed since the game ended (that way players don't jump
+    /// off the podiums due to a stream delay).
+    /// </summary>
+    public bool IsAllowedToJump()
+    {
+        return _timeSinceGameEnd <= 0 || (DateTime.Now.Ticks - _timeSinceGameEnd) / TimeSpan.TicksPerMillisecond > 5000;
     }
 
     private void OnMessage(object sender, ChatMessageEventArgs e)
@@ -108,169 +130,9 @@ public partial class Arena : Node2D
 
     private void HandleCommands(string message, string senderId, string senderName, string hexColor, bool isPrivileged)
     {
-        ChatCommandParser command = new(message.ToLower());
+        CommandHandler commandHandler = new(message, senderId, senderName, hexColor, isPrivileged) { Arena = this };
 
-        string?[] stringArguments = command.ArgumentsAsStrings();
-        int?[] numericArguments = command.ArgumentsAsNumbers();
-
-        // Join is the only command that can be executed by everyone, whether joined or not.
-        // All the remaining commands are only available to those who joined the game
-        if (CommandMatcher.MatchesJoin(command.Name))
-        {
-            HandleJoin(senderId, senderName, hexColor, isPrivileged);
-            return;
-        }
-
-        if (!_jumpers.TryGetValue(senderId, out Jumper? jumper))
-        {
-            return;
-        }
-
-        // Important: when working with aliases that collide with each other, remember to use the
-        // proper order. E.g. Jump has `u` alias and if it was first on the list, it would
-        // execute if `unglow` was sent in the chat, because we don't use exact matching
-        switch (command.Name)
-        {
-            // -- Commands for all Chatters (active)
-            case string when CommandMatcher.MatchesUnglow(command.Name):
-                HandleUnglow(jumper);
-                break;
-
-            case string when CommandMatcher.MatchesJump(command.Name):
-                HandleJump(jumper, command.Name, numericArguments[0], numericArguments[1]);
-                break;
-
-            case string when CommandMatcher.MatchesCharacterChange(command.Name):
-                HandleCharacterChange(jumper, numericArguments[0]);
-                break;
-
-            // -- Commands for Mods, VIPs, Subs
-            case string when CommandMatcher.MatchesGlow(command.Name, isPrivileged):
-                HandleGlow(jumper, stringArguments[0], hexColor);
-                break;
-
-            case string when CommandMatcher.MatchesNamecolor(command.Name, isPrivileged):
-                HandleNamecolor(jumper, stringArguments[0]);
-                break;
-        }
-    }
-
-    private void HandleJoin(string userId, string userName, string hexColor, bool isPrivileged)
-    {
-        Ensure.IsNotNull(_jumperScene);
-        Ensure.IsNotNull(_tileSetToUse);
-
-        if (_jumpers.ContainsKey(userId))
-        {
-            return;
-        }
-
-        int randomCharacterChoice = Rng.IntRange(1, 18);
-
-        if (!_allPlayerData.Players.TryGetValue(userId, out PlayerData? playerData))
-        {
-            playerData = new(hexColor, randomCharacterChoice, Jumper.DefaultPlayerNameColor.ToHtml());
-        }
-
-        _allPlayerData.Players[userId] = playerData;
-
-        // Even if the player already existed, we may need to update their name.
-        playerData.Name = userName;
-        playerData.UserId = userId;
-
-        Jumper jumper = (Jumper)_jumperScene.Instantiate();
-        Rect2 viewport = GetViewportRect();
-        int tileHeight = _tileSetToUse.TileSize.Y;
-        int xPadding = _tileSetToUse.TileSize.X * 3;
-        int x = Rng.IntRange(xPadding, (int)viewport.Size.X - xPadding);
-        int y = ((int)(viewport.Size.Y / tileHeight) - 1 - WallHeightInTiles) * tileHeight;
-
-        jumper.Init(x, y, userName, playerData);
-        AddChild(jumper);
-
-        // Note: the following block requires the jumper to be initialized before performing any changes,
-        // either cosmetic or on the jumper himself, because we have to read the input from playerData,
-        // which has to be sent to the jumper through .Init() first.
-        jumper.SetCharacter(playerData.CharacterChoice);
-
-        if (!isPrivileged)
-        {
-            // Reset the name with default color
-            jumper.SetPlayerName();
-            jumper.DisableGlow();
-        }
-
-        _jumpers.Add(userId, jumper);
-
-        EmitSignal(SignalName.PlayerCountChange, _jumpers.Count);
-    }
-
-    private void HandleGlow(Jumper jumper, string? userHexColor, string twitchChatHexColor)
-    {
-        string glowColor = userHexColor is not null ? userHexColor : twitchChatHexColor;
-
-        jumper.SetGlow(glowColor);
-    }
-
-    private void HandleUnglow(Jumper jumper)
-    {
-        jumper.DisableGlow();
-    }
-
-    private void HandleCharacterChange(Jumper jumper, int? userChoice)
-    {
-        int choice = userChoice ?? Rng.IntRange(1, 18);
-
-        choice = Math.Clamp(choice, 1, 18);
-
-        jumper.SetCharacter(choice);
-    }
-
-    private void HandleNamecolor(Jumper jumper, string? nameColor)
-    {
-        string? color = nameColor;
-
-        // We only want to pick a random color when requested by the user to not regenerate it if there was garbage
-        // sent with the command or nothing at all to not give a false impression of the input having an
-        // effect on the color, e.g. sending "znmxbc" and picking a random color for this
-        if (color is not null && color.Equals("random", StringComparison.CurrentCultureIgnoreCase))
-        {
-            color = Rng.RandomHex();
-        }
-
-        // If the specified color was invalid (garbage message) or omitted, don't do anything
-        // to not change the currently selected color
-        if (!Color.HtmlIsValid(color) || color is null)
-        {
-            return;
-        }
-
-        jumper.PlayerData.NameColor = color;
-        jumper.SetPlayerName();
-        jumper.FlashPlayerName();
-    }
-
-    private void HandleJump(Jumper jumper, string direction, int? angle, int? jumpPower)
-    {
-        if (!IsAllowedToJump())
-        {
-            return;
-        }
-
-        JumpCommand command = new(direction, angle, jumpPower);
-
-        jumper.Jump(command.Angle, command.Power);
-        jumper.FlashPlayerName();
-    }
-
-    /// <summary>
-    /// Players are allowed to jump only if the game is still running or if 5
-    /// seconds have passed since the game ended (that way players don't jump
-    /// off the podiums due to a stream delay).
-    /// </summary>
-    private bool IsAllowedToJump()
-    {
-        return _timeSinceGameEnd <= 0 || (DateTime.Now.Ticks - _timeSinceGameEnd) / TimeSpan.TicksPerMillisecond > 5000;
+        commandHandler.ParseMessage();
     }
 
     private void SetBackground()
@@ -327,7 +189,7 @@ public partial class Arena : Node2D
                 );
             }
 
-            _allPlayerData = jsonResult;
+            AllPlayerData = jsonResult;
         }
         catch (JsonException e)
         {
@@ -338,19 +200,19 @@ public partial class Arena : Node2D
     private void SaveAllPlayers()
     {
         string filesystemLocation = ProjectSettings.GlobalizePath(SaveLocation);
-        string jsonString = JsonSerializer.Serialize(_allPlayerData);
+        string jsonString = JsonSerializer.Serialize(AllPlayerData);
 
         File.WriteAllText(filesystemLocation, jsonString);
     }
 
     private void GenerateLobby()
     {
-        Ensure.IsNotNull(_tileSetToUse);
+        Ensure.IsNotNull(TileSetToUse);
 
         Rect2 viewport = GetViewportRect();
 
-        _heightInTiles = (int)(viewport.Size.Y / _tileSetToUse.TileSize.Y);
-        _widthInTiles = (int)(viewport.Size.X / _tileSetToUse.TileSize.X);
+        _heightInTiles = (int)(viewport.Size.Y / TileSetToUse.TileSize.Y);
+        _widthInTiles = (int)(viewport.Size.X / TileSetToUse.TileSize.X);
 
         int floorY = _heightInTiles - 3;
 
@@ -437,7 +299,7 @@ public partial class Arena : Node2D
 
     private void GenerateProceduralPlatforms()
     {
-        Ensure.IsNotNull(_tileSetToUse);
+        Ensure.IsNotNull(TileSetToUse);
 
         Camera2D camera = GetNode<Camera2D>(CameraNodeName);
         Rect2 viewport = GetViewportRect();
@@ -445,7 +307,7 @@ public partial class Arena : Node2D
         // NOTE(Hop): GetScreenCenterPosition was the only way to get accurate viewport position
         //            without ignoring Position Smoothing
         float cameraPos = camera.GetScreenCenterPosition().Y - (viewport.Size.Y / 2);
-        int cameraPosInTiles = (int)(cameraPos / _tileSetToUse.TileSize.Y);
+        int cameraPosInTiles = (int)(cameraPos / TileSetToUse.TileSize.Y);
 
         if (cameraPosInTiles >= _generatedMaxHeight)
         {
@@ -507,7 +369,7 @@ public partial class Arena : Node2D
 
     private void GenerateEndArena(string[] winners)
     {
-        Ensure.IsNotNull(_tileSetToUse);
+        Ensure.IsNotNull(TileSetToUse);
 
         // Draw border around the whole arena and clear any platforms
         for (int x = 0; x < _widthInTiles; x++)
@@ -546,15 +408,15 @@ public partial class Arena : Node2D
         }
 
         // Put all players back in the arena
-        for (int i = 0; i < _jumpers.Count; i++)
+        for (int i = 0; i < Jumpers.Count; i++)
         {
             int platformNumber = Rng.IntRange(0, platformCoords.Count - 1);
             (int platformX, int platformY) = platformCoords[platformNumber];
-            Jumper jumper = _jumpers.ElementAt(i).Value;
+            Jumper jumper = Jumpers.ElementAt(i).Value;
 
             jumper.Position = new Vector2(
-                (platformX + 0.5f) * _tileSetToUse.TileSize.X,
-                platformY * _tileSetToUse.TileSize.Y - 5
+                (platformX + 0.5f) * TileSetToUse.TileSize.X,
+                platformY * TileSetToUse.TileSize.Y - 5
             );
             jumper.Scale = new Vector2(1, 1);
             jumper.Velocity = new Vector2(0, 0);
@@ -587,7 +449,7 @@ public partial class Arena : Node2D
         for (int i = 0; i < winners.Length; i++)
         {
             string userId = winners[i];
-            Jumper jumper = _jumpers[userId];
+            Jumper jumper = Jumpers[userId];
             int tileX = podiumX + (podiumWidth / 2);
 
             // This warning is only disabled due to a bug about false positives: https://github.com/SonarSource/sonar-dotnet/issues/8028
@@ -605,7 +467,7 @@ public partial class Arena : Node2D
             // Make the winners much bigger
             int scale = Math.Max(2, 4 - i);
 
-            jumper.Position = new Vector2(tileX * _tileSetToUse.TileSize.X, 50);
+            jumper.Position = new Vector2(tileX * TileSetToUse.TileSize.X, 50);
             jumper.Scale = new Vector2(scale, scale);
 
             jumper.SetCrazyParticles();
@@ -635,8 +497,8 @@ public partial class Arena : Node2D
         for (int i = 0; i < winners.Length; i++)
         {
             string userId = winners[i];
-            PlayerData playerData = _allPlayerData.Players[userId];
-            Jumper jumper = _jumpers[userId];
+            PlayerData playerData = AllPlayerData.Players[userId];
+            Jumper jumper = Jumpers[userId];
             int height = GetHeightFromYPosition(jumper.Position.Y);
             string totalHeight = Formatter.FormatBigNumber(playerData.TotalHeightAchieved);
 
@@ -650,7 +512,7 @@ public partial class Arena : Node2D
         }
 
         text.AppendLine();
-        text.Append($"Number of players this game: {_jumpers.Count}");
+        text.Append($"Number of players this game: {Jumpers.Count}");
         text.AppendLine().AppendLine();
         text.Append("YOU CAN NOW JUMP FREELY (until Adam gets back)!");
 
@@ -659,7 +521,7 @@ public partial class Arena : Node2D
 
     private List<Tuple<string, int>> GetPlayersByHeight()
     {
-        List<Tuple<string, int>> playersByHeight = _jumpers
+        List<Tuple<string, int>> playersByHeight = Jumpers
             .OrderByDescending(o => GetHeightFromYPosition(o.Value.Position.Y))
             .Select(o => new Tuple<string, int>(o.Key, GetHeightFromYPosition((int)o.Value.Position.Y)))
             .ToList();
@@ -672,9 +534,9 @@ public partial class Arena : Node2D
         List<Tuple<string, int>> playersByHeight = GetPlayersByHeight();
         string[] winners = playersByHeight.Take(3).Select(p => p.Item1).ToArray();
 
-        for (int i = 0; i < _jumpers.Count; i++)
+        for (int i = 0; i < Jumpers.Count; i++)
         {
-            Jumper jumper = _jumpers.ElementAt(i).Value;
+            Jumper jumper = Jumpers.ElementAt(i).Value;
             PlayerData playerData = jumper.PlayerData;
             bool showName = false;
 
@@ -737,7 +599,7 @@ public partial class Arena : Node2D
 
     private void RedeemRevive(string displayName)
     {
-        foreach (KeyValuePair<string, Jumper> jumpersEntry in _jumpers)
+        foreach (KeyValuePair<string, Jumper> jumpersEntry in Jumpers)
         {
             Jumper jumper = jumpersEntry.Value;
 
@@ -754,7 +616,7 @@ public partial class Arena : Node2D
             }
 
             string thirdHighestPlayerId = playersByHeight[2].Item1;
-            Jumper thirdHighestJumper = _jumpers[thirdHighestPlayerId];
+            Jumper thirdHighestJumper = Jumpers[thirdHighestPlayerId];
 
             GD.Print("Reviving " + displayName);
             GD.Print("Snapping to " + thirdHighestJumper.PlayerData.Name);
@@ -775,9 +637,9 @@ public partial class Arena : Node2D
             return;
         }
 
-        for (int i = 0; i < _jumpers.Count; i++)
+        for (int i = 0; i < Jumpers.Count; i++)
         {
-            Jumper jumper = _jumpers.ElementAt(i).Value;
+            Jumper jumper = Jumpers.ElementAt(i).Value;
             int height = GetHeightFromYPosition(jumper.Position.Y);
 
             if (height > 0)
@@ -791,10 +653,10 @@ public partial class Arena : Node2D
 
     private void MoveCamera()
     {
-        Ensure.IsNotNull(_tileSetToUse);
+        Ensure.IsNotNull(TileSetToUse);
 
         // Iterate over jumpers and check for the highest player
-        if (_jumpers.Count == 0 || _hasGameEnded)
+        if (Jumpers.Count == 0 || _hasGameEnded)
         {
             return;
         }
@@ -802,9 +664,9 @@ public partial class Arena : Node2D
         int lowestYValue = 999999;
         string playerName = string.Empty;
 
-        for (int i = 0; i < _jumpers.Count; i++)
+        for (int i = 0; i < Jumpers.Count; i++)
         {
-            Jumper jumper = _jumpers.ElementAt(i).Value;
+            Jumper jumper = Jumpers.ElementAt(i).Value;
 
             if (jumper.Position.Y < lowestYValue)
             {
@@ -816,7 +678,7 @@ public partial class Arena : Node2D
         int maxHeight = GetHeightFromYPosition(lowestYValue);
 
         // Make sure the camera doesn't go higher than 0
-        int tileHeight = _tileSetToUse.TileSize.Y;
+        int tileHeight = TileSetToUse.TileSize.Y;
 
         lowestYValue = Math.Min(lowestYValue - tileHeight * 16, 0);
 
