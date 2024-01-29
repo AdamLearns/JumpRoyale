@@ -40,6 +40,7 @@ public partial class Jumper : CharacterBody2D
         Position = new Vector2(x, y);
         Name = PlayerData.Name;
 
+        SetCharacter();
         SetPlayerName();
         SetGlow();
     }
@@ -66,11 +67,10 @@ public partial class Jumper : CharacterBody2D
         particles.Amount = Math.Min(particles.Amount * 5, 500);
     }
 
-    public void SetCharacter(int choice)
+    public void SetCharacter()
     {
-        PlayerData.CharacterChoice = choice;
-
         AnimatedSprite2D sprite = GetNode<AnimatedSprite2D>(SpriteNodeName);
+        int choice = PlayerData.CharacterChoice;
         string gender = choice > 9 ? "f" : "m";
         int charNumber = ((choice - 1) % 9 / 3) + 1;
         int clothingNumber = ((choice - 1) % 3) + 1;

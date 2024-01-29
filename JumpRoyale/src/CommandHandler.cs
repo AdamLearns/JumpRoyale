@@ -129,9 +129,6 @@ public class CommandHandler(string message, string senderId, string senderName, 
         int y = ((int)(viewport.Size.Y / tileHeight) - 1 - Arena.WallHeightInTiles) * tileHeight;
 
         jumper.Init(x, y, playerData);
-        jumper.SetCharacter(playerData.CharacterChoice);
-        jumper.SetPlayerName();
-        jumper.SetGlow();
 
         Arena.Jumpers.Add(userId, jumper);
         Arena.AddChild(jumper);
@@ -156,9 +153,8 @@ public class CommandHandler(string message, string senderId, string senderName, 
     {
         int choice = userChoice ?? Rng.IntRange(1, 18);
 
-        choice = Math.Clamp(choice, 1, 18);
-
-        jumper.SetCharacter(choice);
+        jumper.PlayerData.CharacterChoice = Math.Clamp(choice, 1, 18);
+        jumper.SetCharacter();
     }
 
     private void HandleNamecolor(Jumper jumper, string? userNameColor, string twitchChatHexColor)
