@@ -4,10 +4,6 @@ using Godot;
 
 public partial class Jumper : CharacterBody2D
 {
-    public const string DefaultColorName = "white";
-
-    public static readonly Color DefaultPlayerNameColor = Colors.White;
-
     private const string SpriteNodeName = "Sprite";
     private const string NameNodeName = "Name";
     private const string ParticleSystemNodeName = "Glow";
@@ -37,31 +33,25 @@ public partial class Jumper : CharacterBody2D
     [AllowNull]
     public PlayerData PlayerData { get; private set; }
 
-    public void Init(int x, int y, string userName, [NotNull] PlayerData playerData)
+    public void Init(int x, int y, [NotNull] PlayerData playerData)
     {
-        Position = new Vector2(x, y);
-        Name = userName;
         PlayerData = playerData;
 
-        // Initialize player name with default color. This will use the color from PlayerData, if set
-        SetPlayerName();
+        Position = new Vector2(x, y);
+        Name = PlayerData.Name;
 
-        if (playerData.GlowColor != null)
-        {
-            SetGlow(playerData.GlowColor);
-        }
+        SetPlayerName();
+        SetGlow();
     }
 
-    public void SetPlayerName(string? newColor = null)
+    /// <summary>
+    /// Sets the text value on this jumper's label to the current twitch username. This will also change the name color
+    /// if the twitch chatter was privileged (subscribed/mod/vip/streamer).
+    /// </summary>
+    public void SetPlayerName()
     {
-        // If no color was specified use Default instead
-        string colorOverride = newColor ?? DefaultColorName;
-
-        // If JSON data was incomplete, e.g. first run or property was just null (new player), use the above override
-        string colorName = PlayerData.NameColor ?? colorOverride;
-
         // Note: ToHTML() excludes alpha component to avoid transparent names
-        string colorCode = Color.FromString(colorName, DefaultPlayerNameColor).ToHtml(false);
+        string colorCode = Color.FromString(PlayerData.PlayerNameColor, GameConstants.DefaultNameColor).ToHtml(false);
 
         RichTextLabel nameLabel = GetNode<RichTextLabel>(NameNodeName);
 
@@ -95,22 +85,25 @@ public partial class Jumper : CharacterBody2D
         }
     }
 
-    public void SetGlow(string colorString)
+    /// <summary>
+    /// Enables the Glow (particles) on this Jumper, if privileged (automatically disables glow otherwise).
+    /// </summary>
+    public void SetGlow()
     {
-        try
-        {
-            CpuParticles2D particles = GetGlowNode();
-            Color color = Color.FromHtml(colorString);
+        string colorString = PlayerData.GlowColor;
 
-            color = new Color(color.R, color.G, color.B, 1f);
-            particles.SelfModulate = color;
-            particles.Visible = true;
-            PlayerData.GlowColor = color.ToHtml(false);
-        }
-        catch (ArgumentOutOfRangeException e)
+        if (!PlayerData.IsPrivileged)
         {
-            GD.Print($"Failed to set glow color to {colorString}", e);
+            DisableGlow();
+            return;
         }
+
+        CpuParticles2D particles = GetGlowNode();
+        Color color = Color.FromHtml(colorString);
+        color.A = 1f;
+
+        particles.SelfModulate = color;
+        particles.Visible = true;
     }
 
     public void DisableGlow()

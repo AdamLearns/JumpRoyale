@@ -1,25 +1,22 @@
-using Godot;
+using System;
 
-/// <summary>
-/// Exposes a <c>RandomNumberGenerator</c> instance.
-/// </summary>
 public static class Rng
 {
-    private static readonly RandomNumberGenerator _rng = new();
+    private static readonly Random _rng = new();
 
     /// <summary>
-    /// Alias of <c>RandiRange</c> (inclusive int).
+    /// Returns a random integer from specified range (right-inclusive).
     /// </summary>
     public static int IntRange(int min, int max)
     {
-        return _rng.RandiRange(min, max);
+        return _rng.Next(min, max);
     }
 
     /// <summary>
-    /// Returns a random Hex color, excluding Alpha component.
-    /// </summary>
+    /// Returns a random Godot Color.
+    /// ///. </summary>
     public static string RandomHex()
     {
-        return new Color(_rng.Randf(), _rng.Randf(), _rng.Randf(), 1).ToHtml(false);
+        return new Godot.Color(_rng.NextSingle(), _rng.NextSingle(), _rng.NextSingle(), 1).ToHtml(false);
     }
 }

@@ -83,7 +83,7 @@ public class CommandHandler(string message, string senderId, string senderName, 
             string when CommandMatcher.MatchesGlow(ExecutedCommand.Name, _isPrivileged)
                 => (jumper) => HandleGlow(jumper, stringArguments[0], _hexColor),
             string when CommandMatcher.MatchesNamecolor(ExecutedCommand.Name, _isPrivileged)
-                => (jumper) => HandleNamecolor(jumper, stringArguments[0]),
+                => (jumper) => HandleNamecolor(jumper, stringArguments[0], _hexColor),
             _ => null,
         };
     }
@@ -110,51 +110,41 @@ public class CommandHandler(string message, string senderId, string senderName, 
 
         if (!Arena.AllPlayerData.Players.TryGetValue(userId, out PlayerData? playerData))
         {
-            playerData = new(hexColor, randomCharacterChoice, Jumper.DefaultPlayerNameColor.ToHtml());
+            playerData = new(hexColor, randomCharacterChoice, hexColor);
         }
 
         Arena.AllPlayerData.Players[userId] = playerData;
 
-        // Even if the player already existed, we may need to update their name.
+        // Even if the player already existed, we may need to update their name and privileged status.
         playerData.Name = userName;
         playerData.UserId = userId;
+        playerData.IsPrivileged = isPrivileged;
 
         Jumper jumper = (Jumper)Arena.JumperScene.Instantiate();
+
         Rect2 viewport = Arena.GetViewportRect();
         int tileHeight = Arena.TileSetToUse.TileSize.Y;
         int xPadding = Arena.TileSetToUse.TileSize.X * 3;
         int x = Rng.IntRange(xPadding, (int)viewport.Size.X - xPadding);
         int y = ((int)(viewport.Size.Y / tileHeight) - 1 - Arena.WallHeightInTiles) * tileHeight;
 
-        jumper.Init(x, y, userName, playerData);
-        Arena.AddChild(jumper);
-
-        // Note: the following block requires the jumper to be initialized before performing any changes,
-        // either cosmetic or on the jumper himself, because we have to read the input from playerData,
-        // which has to be sent to the jumper through .Init() first.
+        jumper.Init(x, y, playerData);
         jumper.SetCharacter(playerData.CharacterChoice);
-
-        if (!isPrivileged)
-        {
-            // Reset the name with default color
-            jumper.SetPlayerName();
-            jumper.DisableGlow();
-        }
+        jumper.SetPlayerName();
+        jumper.SetGlow();
 
         Arena.Jumpers.Add(userId, jumper);
-
+        Arena.AddChild(jumper);
         Arena.EmitSignal(Arena.SignalName.PlayerCountChange, Arena.Jumpers.Count);
     }
 
     private void HandleGlow(Jumper jumper, string? userHexColor, string twitchChatHexColor)
     {
-        string? glowColor = userHexColor;
+        // Decide what to do if the color was null (invalid). Use Twitch color or return?
+        string glowColor = userHexColor ?? twitchChatHexColor;
 
-        // If just empty `glow` was sent, check if Glow existed in player data first, then fall back to Twitch color.
-        // This prevents overriding the user choice with Twitch color when sending Unglow -> Glow.
-        glowColor ??= jumper.PlayerData.GlowColor ?? twitchChatHexColor;
-
-        jumper.SetGlow(glowColor);
+        jumper.PlayerData.GlowColor = glowColor;
+        jumper.SetGlow();
     }
 
     private void HandleUnglow(Jumper jumper)
@@ -171,26 +161,12 @@ public class CommandHandler(string message, string senderId, string senderName, 
         jumper.SetCharacter(choice);
     }
 
-    private void HandleNamecolor(Jumper jumper, string? nameColor)
+    private void HandleNamecolor(Jumper jumper, string? userNameColor, string twitchChatHexColor)
     {
-        string? color = nameColor;
+        // Same as in Glow, decide what to do if the color was null (invalid). Use Twitch color or return?
+        string nameColor = userNameColor ?? twitchChatHexColor;
 
-        // We only want to pick a random color when requested by the user to not regenerate it if there was garbage
-        // sent with the command or nothing at all to not give a false impression of the input having an
-        // effect on the color, e.g. sending "znmxbc" and picking a random color for this
-        if (color is not null && color.Equals("random", StringComparison.CurrentCultureIgnoreCase))
-        {
-            color = Rng.RandomHex();
-        }
-
-        // If the specified color was invalid (garbage message) or omitted, don't do anything
-        // to not change the currently selected color
-        if (!Color.HtmlIsValid(color) || color is null)
-        {
-            return;
-        }
-
-        jumper.PlayerData.NameColor = color;
+        jumper.PlayerData.PlayerNameColor = nameColor;
         jumper.SetPlayerName();
         jumper.FlashPlayerName();
     }
