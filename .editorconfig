@@ -68,6 +68,8 @@ dotnet_diagnostic.SA1615.severity = none
 dotnet_diagnostic.SA1649.severity = none
 # Partial elements should be documented
 dotnet_diagnostic.SA1601.severity = none
+# Summary text should begin with: 'Gets a value'
+dotnet_diagnostic.SA1623.severity = none
 # File header (license, etc.)
 dotnet_diagnostic.SA1633.severity = none
 
