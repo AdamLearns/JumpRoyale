@@ -113,18 +113,17 @@ public class CommandHandler(string message, string senderId, string senderName, 
         }
 
         int randomCharacterChoice = Rng.IntRange(1, 18);
+        PlayerData? playerData = Arena.PlayerStats.GetPlayerById(userId);
 
-        if (!Arena.AllPlayerData.Players.TryGetValue(userId, out PlayerData? playerData))
-        {
-            playerData = new(hexColor, randomCharacterChoice, hexColor);
-        }
-
-        Arena.AllPlayerData.Players[userId] = playerData;
+        // If the player didn't exist in the Player Stats yet, create new data object for this player
+        playerData ??= new(hexColor, randomCharacterChoice, hexColor);
 
         // Even if the player already existed, we may need to update their name and privileged status.
         playerData.Name = userName;
         playerData.UserId = userId;
         playerData.IsPrivileged = isPrivileged;
+
+        Arena.PlayerStats.UpdatePlayerById(userId, playerData);
 
         Jumper jumper = (Jumper)Arena.JumperScene.Instantiate();
 
