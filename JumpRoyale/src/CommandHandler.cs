@@ -10,7 +10,7 @@ public class CommandHandler(string message, string senderId, string senderName, 
     private readonly string _hexColor = hexColor;
     private readonly bool _isPrivileged = isPrivileged;
 
-    public delegate void Something(Jumper jumper);
+    public delegate void CallableCommand(Jumper jumper);
 
     /// <summary>
     /// Gets the current instance of the executed command.
@@ -29,7 +29,7 @@ public class CommandHandler(string message, string senderId, string senderName, 
     /// </summary>
     public void ProcessMessage()
     {
-        Something? command = TryGetCommandFromChatMessage();
+        CallableCommand? command = TryGetCommandFromChatMessage();
 
         if (command is null)
         {
@@ -59,7 +59,7 @@ public class CommandHandler(string message, string senderId, string senderName, 
     /// <summary>
     /// Returns a command delegate if the chat message contained a valid command name.
     /// </summary>
-    public Something? TryGetCommandFromChatMessage()
+    public CallableCommand? TryGetCommandFromChatMessage()
     {
         ExecutedCommand = new(_message.ToLower());
 
