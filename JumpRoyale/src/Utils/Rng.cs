@@ -12,9 +12,14 @@ public static class Rng
         return _rng.Next(min, max);
     }
 
+    public static int RandomInt()
+    {
+        return _rng.Next();
+    }
+
     /// <summary>
     /// Returns a random Godot Color.
-    /// ///. </summary>
+    /// </summary>
     public static string RandomHex()
     {
         return new Godot.Color(_rng.NextSingle(), _rng.NextSingle(), _rng.NextSingle(), 1).ToHtml(false);
