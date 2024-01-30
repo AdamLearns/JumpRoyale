@@ -21,7 +21,7 @@ public class PlayerStats
     /// <summary>
     /// Defines where the path for player stats is located.
     /// </summary>
-    public string StatsFilePath { get; init; }
+    public string StatsFilePath { get; }
 
     /// <summary>
     /// Returns PlayerData indexed by specified player id, if he exists in the dictionary loaded from Json file. Returns
@@ -58,23 +58,21 @@ public class PlayerStats
 
     private void LoadPlayerData()
     {
-        // TODO: This currently throws an error if there were no players, which probably was not intended. If we are
-        // running the game for the first time, we will have no players and it will throw an exception, never allowing
-        // us to play the game. Change this to not throw on no players and only catch invalid json exception.
-        // TODO: also, add tests for this.
         if (!File.Exists(StatsFilePath))
         {
-            File.WriteAllText(StatsFilePath, "{}");
+            return;
         }
 
         string jsonString = File.ReadAllText(StatsFilePath);
 
         AllPlayerData? jsonResult = JsonSerializer.Deserialize<AllPlayerData>(jsonString);
 
-        // The following can only become null if the JSON input was literally `null`.
-        if (jsonResult is null || jsonResult.Players.Count == 0)
+        // We don't really need to do anything here, because later on serialization the file is rewritten anyway, so we
+        // don't care if there were no results. This will just automatically throw exception if the json was invalid,
+        // malformed or something changed within the structure that deserialization couldn't match.
+        if (jsonResult is null)
         {
-            throw new InvalidJsonDataException();
+            return;
         }
 
         AllPlayerData = jsonResult;
