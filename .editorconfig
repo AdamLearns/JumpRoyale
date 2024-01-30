@@ -28,6 +28,8 @@ generated_code = true
 dotnet_diagnostic.SA0001.severity = none
 # Require space after `new` keyword
 dotnet_diagnostic.SA1000.severity = none
+# Opening Parenthesis Must Be Spaced Correctly
+dotnet_diagnostic.SA1008.severity = none
 # Ignore cases for closing parenthesis being on new line
 # -- should not show this warning for multi-line constructors
 dotnet_diagnostic.SA1009.severity = none
