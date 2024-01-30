@@ -11,6 +11,9 @@ public class PlayerStatsTests
 
     /// <summary>
     /// Location of the Test directory, where the data will be read/written to.
+    /// <para>
+    /// This evaluates to: <c>absolute_path\\Tests\\bin\\Debug\\net8.0\\_TestData\\</c>.
+    /// </para>
     /// </summary>
     private string TestPath
     {
@@ -46,6 +49,12 @@ public class PlayerStatsTests
         {
             File.Delete(FullPath);
         }
+    }
+
+    [OneTimeTearDown]
+    public void OutputWorkingDirectory()
+    {
+        TestContext.WriteLine(FullPath);
     }
 
     /// <summary>
@@ -84,7 +93,7 @@ public class PlayerStatsTests
 
         Assert.DoesNotThrow(() =>
         {
-            // Having an empty object
+            // Having an empty object is still allowed, it just evaluates to empty collection
             File.WriteAllText(FullPath, "{}");
 
             state = _playerStats.LoadPlayerData();
