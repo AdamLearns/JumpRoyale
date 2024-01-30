@@ -51,12 +51,6 @@ public class PlayerStatsTests
         }
     }
 
-    [OneTimeTearDown]
-    public void OutputWorkingDirectory()
-    {
-        TestContext.WriteLine(FullPath);
-    }
-
     /// <summary>
     /// This test checks if the player stat loading method returns false if the file does not exist. The purpose of this
     /// test is to make sure the cleanup is done correctly and the condition was not changed inside that class.
