@@ -6,7 +6,7 @@ namespace Game;
 public class PlayerStatsTests
 {
     private readonly string _testFile = "data.json";
-    private PlayerStats _playerStats;
+
     private PlayerData _fakePlayer;
 
     /// <summary>
@@ -31,7 +31,7 @@ public class PlayerStatsTests
     [SetUp]
     public void SetUp()
     {
-        _playerStats = new(FullPath);
+        PlayerStats.Instance.StatsFilePath = FullPath;
         _fakePlayer = new(Rng.RandomHex(), Rng.IntRange(1, 18), Rng.RandomHex()) { UserId = "1", };
 
         // Create the directory on fresh deploy or after project cleanup
@@ -53,14 +53,29 @@ public class PlayerStatsTests
 
     /// <summary>
     /// This test checks if the player stat loading method returns false if the file does not exist. The purpose of this
-    /// test is to make sure the cleanup is done correctly and the condition was not changed inside that class.
+    /// test is to make sure the test cleanup is done correctly (file should not exist on start) and the condition was
+    /// not changed inside that class. We don't care if the file exists when loading or not.
     /// </summary>
     [Test]
     public void DoesNotThrowWhenFileNotExists()
     {
         Assert.DoesNotThrow(() =>
         {
-            _playerStats.LoadPlayerData();
+            PlayerStats.Instance.LoadPlayerData();
+        });
+    }
+
+    /// <summary>
+    /// Note: We only care if the path is correct during the serialization.
+    /// </summary>
+    [Test]
+    public void CanThrowIfPathWasUninitialized()
+    {
+        PlayerStats.Instance.StatsFilePath = null;
+
+        Assert.Throws<Exception>(() =>
+        {
+            PlayerStats.Instance.SaveAllPlayers();
         });
     }
 
@@ -79,7 +94,7 @@ public class PlayerStatsTests
             // Literal "null" can't be assigned to the AllPlayerData, so this should return early with false
             File.WriteAllText(FullPath, "null");
 
-            state = _playerStats.LoadPlayerData();
+            state = PlayerStats.Instance.LoadPlayerData();
         });
 
         Assert.That(state, Is.False);
@@ -90,7 +105,7 @@ public class PlayerStatsTests
             // Having an empty object is still allowed, it just evaluates to empty collection
             File.WriteAllText(FullPath, "{}");
 
-            state = _playerStats.LoadPlayerData();
+            state = PlayerStats.Instance.LoadPlayerData();
         });
 
         Assert.That(state, Is.True);
@@ -103,7 +118,7 @@ public class PlayerStatsTests
 
         Assert.Throws<JsonException>(() =>
         {
-            _playerStats.LoadPlayerData();
+            PlayerStats.Instance.LoadPlayerData();
         });
     }
 
@@ -116,14 +131,14 @@ public class PlayerStatsTests
     {
         // We should start with an empty dictionary, so we will add a fake player, serialize him and then attempt to
         // read him from the file, then make sure the same data is loaded
-        _playerStats.UpdatePlayerById(_fakePlayer.UserId, _fakePlayer);
-        _playerStats.SaveAllPlayers();
+        PlayerStats.Instance.UpdatePlayerById(_fakePlayer.UserId, _fakePlayer);
+        PlayerStats.Instance.SaveAllPlayers();
 
         // Start on a fresh stats instance
-        _playerStats = new(FullPath);
-        _playerStats.LoadPlayerData();
+        PlayerStats.Instance.AllPlayerData.Players.Clear();
+        PlayerStats.Instance.LoadPlayerData();
 
-        PlayerData? playerFromFile = _playerStats.GetPlayerById(_fakePlayer.UserId);
+        PlayerData? playerFromFile = PlayerStats.Instance.GetPlayerById(_fakePlayer.UserId);
 
         if (playerFromFile is null)
         {

@@ -113,7 +113,7 @@ public class CommandHandler(string message, string senderId, string senderName, 
         }
 
         int randomCharacterChoice = Rng.IntRange(1, 18);
-        PlayerData? playerData = Arena.PlayerStats.GetPlayerById(userId);
+        PlayerData? playerData = PlayerStats.Instance.GetPlayerById(userId);
 
         // If the player didn't exist in the Player Stats yet, create new data object for this player
         playerData ??= new(hexColor, randomCharacterChoice, hexColor);
@@ -123,7 +123,7 @@ public class CommandHandler(string message, string senderId, string senderName, 
         playerData.UserId = userId;
         playerData.IsPrivileged = isPrivileged;
 
-        Arena.PlayerStats.UpdatePlayerById(userId, playerData);
+        PlayerStats.Instance.UpdatePlayerById(userId, playerData);
 
         Jumper jumper = (Jumper)Arena.JumperScene.Instantiate();
 

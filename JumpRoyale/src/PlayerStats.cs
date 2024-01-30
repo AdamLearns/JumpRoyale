@@ -4,8 +4,27 @@ using System.Text.Json;
 /// <summary>
 /// Class responsible for loading Player Data from specified Json file (serialization and deserialization).
 /// </summary>
-public class PlayerStats(string filePath)
+public class PlayerStats
 {
+    private static readonly object _lock = new();
+
+    private static PlayerStats? _instance;
+
+    private PlayerStats() { }
+
+    public static PlayerStats Instance
+    {
+        get
+        {
+            lock (_lock)
+            {
+                _instance ??= new PlayerStats();
+            }
+
+            return _instance;
+        }
+    }
+
     /// <summary>
     /// Gets currently deserialized Json data of all players.
     /// </summary>
@@ -14,7 +33,7 @@ public class PlayerStats(string filePath)
     /// <summary>
     /// Defines where the path for player stats is located.
     /// </summary>
-    public string StatsFilePath { get; } = filePath;
+    public string? StatsFilePath { get; set; }
 
     /// <summary>
     /// Returns PlayerData indexed by specified player id, if he exists in the dictionary loaded from Json file. Returns
@@ -24,29 +43,6 @@ public class PlayerStats(string filePath)
     public PlayerData? GetPlayerById(string playerId)
     {
         return AllPlayerData.Players.TryGetValue(playerId, out PlayerData? playerData) ? playerData : null;
-    }
-
-    /// <summary>
-    /// Updates the indexed player with new player data.
-    /// </summary>
-    /// <remarks>
-    /// This only updates the dictionary entry, not the record in Json file.
-    /// </remarks>
-    /// <param name="playerId">Twitch User id.</param>
-    /// <param name="playerData">New player data.</param>
-    public void UpdatePlayerById(string playerId, PlayerData playerData)
-    {
-        AllPlayerData.Players[playerId] = playerData;
-    }
-
-    /// <summary>
-    /// Serializes all players and stores them in the Json file.
-    /// </summary>
-    public void SaveAllPlayers()
-    {
-        string jsonString = JsonSerializer.Serialize(AllPlayerData);
-
-        File.WriteAllText(StatsFilePath, jsonString);
     }
 
     /// <summary>
@@ -65,17 +61,49 @@ public class PlayerStats(string filePath)
 
         AllPlayerData? jsonResult = JsonSerializer.Deserialize<AllPlayerData>(jsonString);
 
-        // We don't really need to do anything here, because later on serialization the file is rewritten anyway, so we
-        // don't care if there were no results. This will just automatically throw exception if the json was invalid,
-        // malformed or something changed within the structure that deserialization couldn't match. If, for some reason,
-        // the file contained "null" in its contents, we can't assign it to the PlayerAllData, so we let it be empty.
         if (jsonResult is null)
         {
             return false;
         }
 
+        // If there was data in the json file, but we didn't get anything out of it, it probably means that main
+        // "players" property was changed, so we didn't match the required structure. Not sure what's the optimal length
+        // to test, but probably longer than: "{}". Maybe it doesn't matter here at all.
+        if (jsonResult.Players.Count == 0 && jsonString.Length > 4)
+        {
+            throw new InvalidJsonDataException();
+        }
+
         AllPlayerData = jsonResult;
 
         return true;
+    }
+
+    /// <summary>
+    /// Serializes all players and stores them in the Json file.
+    /// </summary>
+    public void SaveAllPlayers()
+    {
+        string jsonString = JsonSerializer.Serialize(AllPlayerData);
+
+        if (StatsFilePath is null || StatsFilePath.Length == 0)
+        {
+            throw new System.Exception("Path to the stats file was not initialized.");
+        }
+
+        File.WriteAllText(StatsFilePath, jsonString);
+    }
+
+    /// <summary>
+    /// Updates the indexed player with new player data.
+    /// </summary>
+    /// <remarks>
+    /// This only updates the dictionary entry, not the record in Json file.
+    /// </remarks>
+    /// <param name="playerId">Twitch User id.</param>
+    /// <param name="playerData">New player data.</param>
+    public void UpdatePlayerById(string playerId, PlayerData playerData)
+    {
+        AllPlayerData.Players[playerId] = playerData;
     }
 }

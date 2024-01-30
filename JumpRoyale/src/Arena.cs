@@ -50,9 +50,6 @@ public partial class Arena : Node2D
     [Export]
     public TileSet? TileSetToUse { get; private set; }
 
-    public PlayerStats PlayerStats { get; private set; } =
-        new(ProjectSettings.GlobalizePath(ResourcePathsConstants.PathToPlayerStats));
-
     public override void _Ready()
     {
         _lobbyTilemap = new TileMap { Name = "TileMap", TileSet = TileSetToUse };
@@ -66,7 +63,9 @@ public partial class Arena : Node2D
 
         SetBackground();
         GenerateLobby();
-        PlayerStats.LoadPlayerData();
+
+        PlayerStats.Instance.StatsFilePath = ProjectSettings.GlobalizePath(ResourcePathsConstants.PathToPlayerStats);
+        PlayerStats.Instance.LoadPlayerData();
     }
 
     public override void _PhysicsProcess(double delta)
@@ -316,7 +315,7 @@ public partial class Arena : Node2D
 
         string[] winners = ComputeStats();
 
-        PlayerStats.SaveAllPlayers();
+        PlayerStats.Instance.SaveAllPlayers();
         ShowEndScreen(winners);
         GenerateEndArena(winners);
     }
@@ -451,7 +450,7 @@ public partial class Arena : Node2D
         for (int i = 0; i < winners.Length; i++)
         {
             string userId = winners[i];
-            PlayerData playerData = PlayerStats.AllPlayerData.Players[userId];
+            PlayerData playerData = PlayerStats.Instance.AllPlayerData.Players[userId];
             Jumper jumper = Jumpers[userId];
             int height = GetHeightFromYPosition(jumper.Position.Y);
             string totalHeight = Formatter.FormatBigNumber(playerData.TotalHeightAchieved);
