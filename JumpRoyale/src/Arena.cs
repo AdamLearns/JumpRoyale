@@ -42,7 +42,7 @@ public partial class Arena : Node2D
     /// <summary>
     /// Gets all players keyed by their Twitch <c>userId</c> who joined the current session.
     /// </summary>
-    public Dictionary<string, Jumper> Jumpers { get; init; } = [];
+    public Dictionary<string, Jumper> Jumpers { get; } = [];
 
     [Export]
     public PackedScene? JumperScene { get; private set; }
