@@ -66,6 +66,7 @@ public partial class Arena : Node2D
 
         SetBackground();
         GenerateLobby();
+        PlayerStats.LoadPlayerData();
     }
 
     public override void _PhysicsProcess(double delta)

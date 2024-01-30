@@ -4,15 +4,8 @@ using System.Text.Json;
 /// <summary>
 /// Class responsible for loading Player Data from specified Json file (serialization and deserialization).
 /// </summary>
-public class PlayerStats
+public class PlayerStats(string filePath)
 {
-    public PlayerStats(string filePath)
-    {
-        StatsFilePath = filePath;
-
-        LoadPlayerData();
-    }
-
     /// <summary>
     /// Gets currently deserialized Json data of all players.
     /// </summary>
@@ -21,7 +14,7 @@ public class PlayerStats
     /// <summary>
     /// Defines where the path for player stats is located.
     /// </summary>
-    public string StatsFilePath { get; }
+    public string StatsFilePath { get; } = filePath;
 
     /// <summary>
     /// Returns PlayerData indexed by specified player id, if he exists in the dictionary loaded from Json file. Returns
@@ -56,11 +49,16 @@ public class PlayerStats
         File.WriteAllText(StatsFilePath, jsonString);
     }
 
-    private void LoadPlayerData()
+    /// <summary>
+    /// Attempts to read all the player data from Json file and stores it internally in <see cref="AllPlayerData"/>. If
+    /// there was no data inside (new file or empty object), returns early with state. It will only throw an exception
+    /// if the json was malformed or the structure didn't match the type.
+    /// </summary>
+    public bool LoadPlayerData()
     {
         if (!File.Exists(StatsFilePath))
         {
-            return;
+            return false;
         }
 
         string jsonString = File.ReadAllText(StatsFilePath);
@@ -72,9 +70,11 @@ public class PlayerStats
         // malformed or something changed within the structure that deserialization couldn't match.
         if (jsonResult is null)
         {
-            return;
+            return false;
         }
 
         AllPlayerData = jsonResult;
+
+        return true;
     }
 }
