@@ -55,11 +55,9 @@ public class PlayerData(string glowColor, int characterChoice, string nameColor)
     /// Defines this player's current <c>isPrivileged</c> status that was set upon joining the game. This property is
     /// mostly used by Join command to instantiate the player with previously customized privileged features, but it can
     /// also be used for commands, that are partially privileged, like extra cosmetics inside a some command.
-    ///
     /// <para>
     /// This property will not be a part of the Json data.
     /// </para>
-    ///
     /// <para>
     /// Example: <c>char</c> command allows to select a character from given range, but can some selections can only be
     /// applied to privileged users.
