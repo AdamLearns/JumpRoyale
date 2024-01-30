@@ -67,7 +67,8 @@ public class PlayerStats(string filePath)
 
         // We don't really need to do anything here, because later on serialization the file is rewritten anyway, so we
         // don't care if there were no results. This will just automatically throw exception if the json was invalid,
-        // malformed or something changed within the structure that deserialization couldn't match.
+        // malformed or something changed within the structure that deserialization couldn't match. If, for some reason,
+        // the file contained "null" in its contents, we can't assign it to the PlayerAllData, so we let it be empty.
         if (jsonResult is null)
         {
             return false;
