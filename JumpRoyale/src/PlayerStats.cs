@@ -88,10 +88,33 @@ public class PlayerStats
 
         if (StatsFilePath is null || StatsFilePath.Length == 0)
         {
-            throw new System.Exception("Path to the stats file was not initialized.");
+            throw new MissingStatsFilePathException();
         }
 
         File.WriteAllText(StatsFilePath, jsonString);
+    }
+
+    /// <summary>
+    /// Stores the player in the Players dictionary. Automatically keyed by the <c>userId</c> from provided
+    /// <c>playerData</c>.
+    /// </summary>
+    /// <param name="playerData">Game data of the player to store and to get <c>userId</c> from.</param>
+    /// <exception cref="NullPlayerDataException">When no player data was passed in.</exception>
+    /// <exception cref="DuplicatePlayerException">When trying to add an already existing player.</exception>
+    /// <exception cref="System.ArgumentException">Other exceptions related to Dictionary.</exception>
+    public void StorePlayer(PlayerData? playerData)
+    {
+        if (playerData is null)
+        {
+            throw new NullPlayerDataException();
+        }
+
+        if (AllPlayerData.Players.ContainsKey(playerData.UserId))
+        {
+            throw new DuplicatePlayerException();
+        }
+
+        AllPlayerData.Players.Add(playerData.UserId, playerData);
     }
 
     /// <summary>
