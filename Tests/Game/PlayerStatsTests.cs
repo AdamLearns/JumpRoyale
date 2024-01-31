@@ -10,7 +10,7 @@ public class PlayerStatsTests
     private PlayerData _fakePlayer;
 
     /// <summary>
-    /// Location of the Test directory, where the data will be read/written to.
+    /// Location of the Test directory, where the data will be read from/written to.
     /// <para>
     /// This evaluates to: <c>absolute_path\\Tests\\bin\\Debug\\net8.0\\_TestData\\</c>.
     /// </para>
@@ -32,7 +32,10 @@ public class PlayerStatsTests
     public void SetUp()
     {
         PlayerStats.Instance.StatsFilePath = FullPath;
-        _fakePlayer = new(Rng.RandomHex(), Rng.IntRange(1, 18), Rng.RandomHex()) { UserId = "1", };
+        _fakePlayer = new(Rng.RandomHex(), Rng.IntRange(1, 18), Rng.RandomHex())
+        {
+            UserId = Rng.RandomInt().ToString(),
+        };
 
         // Create the directory on fresh deploy or after project cleanup
         if (!Directory.Exists(TestPath))
@@ -49,6 +52,8 @@ public class PlayerStatsTests
         {
             File.Delete(FullPath);
         }
+
+        PlayerStats.Instance.AllPlayerData.Players.Clear();
     }
 
     /// <summary>
@@ -73,7 +78,7 @@ public class PlayerStatsTests
     {
         PlayerStats.Instance.StatsFilePath = null;
 
-        Assert.Throws<Exception>(() =>
+        Assert.Throws<MissingStatsFilePathException>(() =>
         {
             PlayerStats.Instance.SaveAllPlayers();
         });
@@ -109,6 +114,21 @@ public class PlayerStatsTests
         });
 
         Assert.That(state, Is.True);
+    }
+
+    /// <summary>
+    /// This test checks if the player loading method can throw an appropriate exception when the json file contained
+    /// actual data. We only need to deliberately change the main field name, we don't care if anything is inside.
+    /// </summary>
+    [Test]
+    public void CanThrowOnMismatchedJsonStructure()
+    {
+        File.WriteAllText(FullPath, """{"SomeStats":{}}""");
+
+        Assert.Throws<InvalidJsonDataException>(() =>
+        {
+            PlayerStats.Instance.LoadPlayerData();
+        });
     }
 
     [Test]
@@ -149,5 +169,66 @@ public class PlayerStatsTests
         string playerFromFileSerialized = JsonSerializer.Serialize(playerFromFile);
 
         Assert.That(fakeSerialized, Is.EqualTo(playerFromFileSerialized));
+    }
+
+    /// <summary>
+    /// This test just makes sure that we return the player we just saved through implemented methods.
+    /// </summary>
+    [Test]
+    public void CanSetAndGetPlayerById()
+    {
+        string id = _fakePlayer.UserId;
+
+        // Kind of simulate that we save the players, then in the next session we load them and at some point we have to
+        // take the specific player.
+        PlayerStats.Instance.StorePlayer(_fakePlayer);
+        PlayerStats.Instance.SaveAllPlayers();
+
+        // Clear the dictionary to make sure the players are being loaded correctly.
+        PlayerStats.Instance.AllPlayerData.Players.Clear();
+        PlayerStats.Instance.LoadPlayerData();
+
+        PlayerData? player = PlayerStats.Instance.GetPlayerById(id);
+
+        Assert.That(player?.UserId, Is.EqualTo(id));
+    }
+
+    /// <summary>
+    /// Just a sanity check.
+    /// </summary>
+    [Test]
+    public void CanThrowWhenAddingDuplicatePlayer()
+    {
+        PlayerStats.Instance.StorePlayer(_fakePlayer);
+
+        Assert.Throws<DuplicatePlayerException>(() =>
+        {
+            PlayerStats.Instance.StorePlayer(_fakePlayer);
+        });
+    }
+
+    /// <summary>
+    /// Just a sanity check. In reality, this should never happen, but maybe at some point the player was removed from
+    /// the dictionary for whatever reason or by mistake(?).
+    /// </summary>
+    [Test]
+    public void CanThrowWhenPassingNullPlayerData()
+    {
+        Assert.Throws<NullPlayerDataException>(() =>
+        {
+            PlayerStats.Instance.StorePlayer(null);
+        });
+    }
+
+    /// <summary>
+    /// This test just makes sure the method returns null. The purpose of a nullable return is to inform that we
+    /// probably did something wrong when loading or inserting new players.
+    /// </summary>
+    [Test]
+    public void ShouldReturnNullIfPlayerNotExists()
+    {
+        PlayerData? playerData = PlayerStats.Instance.GetPlayerById("????");
+
+        Assert.That(playerData, Is.Null);
     }
 }
