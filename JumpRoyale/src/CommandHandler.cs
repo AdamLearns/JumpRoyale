@@ -96,9 +96,10 @@ public class CommandHandler(string message, string senderId, string senderName, 
     /// </summary>
     public void SpawnFakePlayers()
     {
-        // A hacky workaround to have the player in the Stats, since they are now required
+        // A hacky workaround to have the player in the Stats, since they are now required - kind of how it would work
+        // when loading players from the save file
         // Caution: do not end the game with dummies, so they are not stored in the save. This method should not be here
-        // anyway
+        // anyway. Ultimately, we would have some trigger preventing the serialization if dummies were spawned
         PlayerData playerData = new(_hexColor, Rng.RandomInt(), _hexColor) { UserId = _senderId };
         PlayerStats.Instance.StorePlayer(playerData);
 

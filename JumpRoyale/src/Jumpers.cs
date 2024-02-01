@@ -59,12 +59,17 @@ public class Jumpers
         return _jumpers.TryGetValue(userId, out Jumper? jumper) ? jumper : throw new Exception();
     }
 
+    public Jumper GetHighestPlayer()
+    {
+        return AllJumpers().MaxBy(jumper => jumper.Position.Y) ?? throw new Exception("No jumpers in the collection.");
+    }
+
     public ReadOnlyCollection<Tuple<string, int>> SortJumpersByHeight()
     {
         return new(
             [
-                .. _jumpers.OrderByDescending(o => GetHeightFromYPosition(o.Value.Position.Y))
-                .Select(o => new Tuple<string, int>(o.Key, GetHeightFromYPosition((int)o.Value.Position.Y)))
+                .. _jumpers.OrderByDescending(o => HeightToPosition(o.Value.Position.Y))
+                .Select(o => new Tuple<string, int>(o.Key, HeightToPosition((int)o.Value.Position.Y)))
                 .ToList()
             ]
         );
@@ -75,8 +80,8 @@ public class Jumpers
     //
     // Note that ideally, the height should return 0 when you're on the lowest
     // floor, but that's probably not the case at the time of writing.
-    private int GetHeightFromYPosition(float y)
+    public int HeightToPosition(float y)
     {
-        return (int)(-1 * y);
+        return (int)(-1 * y + Arena.ViewportHeight);
     }
 }

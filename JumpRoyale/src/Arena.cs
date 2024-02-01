@@ -40,6 +40,8 @@ public partial class Arena : Node2D
     [Signal]
     public delegate void CameraSpeedChangedEventHandler(int speed);
 
+    public static int ViewportHeight { get; private set; }
+
     [Export]
     public PackedScene? JumperScene { get; private set; }
 
@@ -48,6 +50,10 @@ public partial class Arena : Node2D
 
     public override void _Ready()
     {
+        ViewportHeight = (int)GetViewportRect().Size.Y;
+        PlayerStats.Instance.StatsFilePath = ProjectSettings.GlobalizePath(ResourcePathsConstants.PathToPlayerStats);
+        PlayerStats.Instance.LoadPlayerData();
+
         _lobbyTilemap = new TileMap { Name = "TileMap", TileSet = TileSetToUse };
 
         TwitchChatClient twitchChatClient = new();
@@ -59,9 +65,6 @@ public partial class Arena : Node2D
 
         SetBackground();
         GenerateLobby();
-
-        PlayerStats.Instance.StatsFilePath = ProjectSettings.GlobalizePath(ResourcePathsConstants.PathToPlayerStats);
-        PlayerStats.Instance.LoadPlayerData();
     }
 
     public override void _PhysicsProcess(double delta)
@@ -447,7 +450,7 @@ public partial class Arena : Node2D
             string userId = winners[i];
             PlayerData playerData = PlayerStats.Instance.GetPlayerById(userId);
             Jumper jumper = Jumpers.Instance.GetById(userId);
-            int height = GetHeightFromYPosition(jumper.Position.Y);
+            int height = Jumpers.Instance.HeightToPosition(jumper.Position.Y);
             string totalHeight = Formatter.FormatBigNumber(playerData.TotalHeightAchieved);
 
             text.Append($"\t{i + 1}: {playerData.Name}. Height reached: {height}. ");
@@ -478,7 +481,7 @@ public partial class Arena : Node2D
             bool showName = false;
 
             playerData.NumPlays++;
-            playerData.TotalHeightAchieved += GetHeightFromYPosition(jumper.Position.Y);
+            playerData.TotalHeightAchieved += Jumpers.Instance.HeightToPosition(jumper.Position.Y);
 
             if (winners.Length > 0 && winners[0] == playerData.UserId)
             {
@@ -574,7 +577,7 @@ public partial class Arena : Node2D
 
         foreach (Jumper jumper in Jumpers.Instance.AllJumpers())
         {
-            int height = GetHeightFromYPosition(jumper.Position.Y);
+            int height = Jumpers.Instance.HeightToPosition(jumper.Position.Y);
 
             if (height > 0)
             {
@@ -594,20 +597,9 @@ public partial class Arena : Node2D
             return;
         }
 
-        int lowestYValue = 999999;
-        string playerName = string.Empty;
-
-        // Iterate over jumpers and check for the highest player
-        foreach (Jumper jumper in Jumpers.Instance.AllJumpers())
-        {
-            if (jumper.Position.Y < lowestYValue)
-            {
-                lowestYValue = (int)jumper.Position.Y;
-                playerName = jumper.Name;
-            }
-        }
-
-        int maxHeight = GetHeightFromYPosition(lowestYValue);
+        Jumper jumper = Jumpers.Instance.GetHighestPlayer();
+        int lowestYValue = (int)jumper.Position.Y;
+        int maxHeight = Jumpers.Instance.HeightToPosition(lowestYValue);
 
         // Make sure the camera doesn't go higher than 0
         int tileHeight = TileSetToUse.TileSize.Y;
@@ -618,16 +610,6 @@ public partial class Arena : Node2D
 
         camera.Position = new Vector2(0, lowestYValue);
 
-        EmitSignal(SignalName.MaxHeightChanged, playerName, maxHeight);
-    }
-
-    // Y decreases as you go up, so this converts it to a "height" property that
-    // increases as you go up.
-    //
-    // Note that ideally, the height should return 0 when you're on the lowest
-    // floor, but that's probably not the case at the time of writing.
-    private int GetHeightFromYPosition(float y)
-    {
-        return (int)(-1 * y + GetViewportRect().Size.Y);
+        EmitSignal(SignalName.MaxHeightChanged, jumper.Name, maxHeight);
     }
 }
