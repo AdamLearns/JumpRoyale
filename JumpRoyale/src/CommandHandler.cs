@@ -100,7 +100,7 @@ public class CommandHandler(string message, string senderId, string senderName, 
         // when loading players from the save file
         // Caution: do not end the game with dummies, so they are not stored in the save. This method should not be here
         // anyway. Ultimately, we would have some trigger preventing the serialization if dummies were spawned
-        PlayerData playerData = new(_hexColor, Rng.RandomInt(), _hexColor) { UserId = _senderId };
+        PlayerData playerData = new(_hexColor, Rng.RandomInt(), _hexColor) { UserId = _senderId, Name = _senderName, };
         PlayerStats.Instance.StorePlayer(playerData);
 
         HandleJoin(_senderId, _senderName, _hexColor, _isPrivileged);
