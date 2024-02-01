@@ -149,7 +149,7 @@ public class PlayerStatsTests
     {
         // We should start with an empty dictionary, so we will add a fake player, serialize him and then attempt to
         // read him from the file, then make sure the same data is loaded
-        PlayerStats.Instance.StorePlayer(_fakePlayer);
+        PlayerStats.Instance.UpdatePlayer(_fakePlayer);
         PlayerStats.Instance.SaveAllPlayers();
 
         // Start on a fresh stats instance
@@ -179,7 +179,7 @@ public class PlayerStatsTests
 
         // Kind of simulate that we save the players, then in the next session we load them and at some point we have to
         // take the specific player.
-        PlayerStats.Instance.StorePlayer(_fakePlayer);
+        PlayerStats.Instance.UpdatePlayer(_fakePlayer);
         PlayerStats.Instance.SaveAllPlayers();
 
         // Clear the dictionary to make sure the players are being loaded correctly.
@@ -189,33 +189,6 @@ public class PlayerStatsTests
         PlayerData? player = PlayerStats.Instance.GetPlayerById(id);
 
         Assert.That(player?.UserId, Is.EqualTo(id));
-    }
-
-    /// <summary>
-    /// Just a sanity check.
-    /// </summary>
-    [Test]
-    public void CanThrowWhenAddingDuplicatePlayer()
-    {
-        PlayerStats.Instance.StorePlayer(_fakePlayer);
-
-        Assert.Throws<DuplicatePlayerException>(() =>
-        {
-            PlayerStats.Instance.StorePlayer(_fakePlayer);
-        });
-    }
-
-    /// <summary>
-    /// Just a sanity check. In reality, this should never happen, but maybe at some point the player was removed from
-    /// the dictionary for whatever reason or by mistake(?).
-    /// </summary>
-    [Test]
-    public void CanThrowWhenPassingNullPlayerData()
-    {
-        Assert.Throws<NullPlayerDataException>(() =>
-        {
-            PlayerStats.Instance.StorePlayer(null);
-        });
     }
 
     /// <summary>
@@ -237,7 +210,7 @@ public class PlayerStatsTests
     [Test]
     public void CanUpdatePlayers()
     {
-        PlayerStats.Instance.StorePlayer(_fakePlayer);
+        PlayerStats.Instance.UpdatePlayer(_fakePlayer);
 
         _fakePlayer.Name = "NewName";
 
@@ -260,15 +233,15 @@ public class PlayerStatsTests
         });
     }
 
-    /// <summary>
-    /// Just a sanity check.
-    /// </summary>
     [Test]
-    public void CanThrowWhenUpdatingNonExistingPlayer()
+    public void TestsPlayerExistenceChecks()
     {
-        Assert.Throws<NonExistentPlayerException>(() =>
+        PlayerStats.Instance.UpdatePlayer(_fakePlayer);
+
+        Assert.Multiple(() =>
         {
-            PlayerStats.Instance.UpdatePlayer(FakePlayerData.Make());
+            Assert.That(PlayerStats.Instance.Exists(_fakePlayer.UserId), Is.True);
+            Assert.That(PlayerStats.Instance.Exists("nonexistentuserid"), Is.False);
         });
     }
 }
