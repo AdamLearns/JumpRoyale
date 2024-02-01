@@ -127,6 +127,29 @@ public class JumpCommandTests
         }
     }
 
+    [Test]
+    public void ExtraJumpAliasesProduceExpectedAngleResults()
+    {
+        Dictionary<string, int> commands =
+            new()
+            {
+                { "rrr", 150 },
+                { "jjj", 150 },
+                { "rr", 120 },
+                { "jj", 120 },
+                { "lll", 30 },
+                { "ll", 60 },
+                { "u", 90 },
+            };
+
+        foreach (string command in commands.Keys)
+        {
+            (JumpCommand jump, _, _) = GetJumpFromCommand(command);
+
+            Assert.That(jump.Angle, Is.EqualTo(commands[command]));
+        }
+    }
+
     /// <summary>
     /// Returns the processed Jump Command from the parsed chat command. The nullable is
     /// casted just for the sake of these tests.
