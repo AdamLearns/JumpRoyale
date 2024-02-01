@@ -7,8 +7,12 @@ using System.Text.Json;
 public class PlayerStats
 {
     private static readonly object _lock = new();
-
     private static PlayerStats? _instance;
+
+    /// <summary>
+    /// Gets currently deserialized Json data of all players.
+    /// </summary>
+    private readonly AllPlayerData _allPlayerData = new();
 
     private PlayerStats() { }
 
@@ -26,14 +30,14 @@ public class PlayerStats
     }
 
     /// <summary>
-    /// Gets currently deserialized Json data of all players.
-    /// </summary>
-    public AllPlayerData AllPlayerData { get; private set; } = new();
-
-    /// <summary>
     /// Defines where the path for player stats is located.
     /// </summary>
     public string? StatsFilePath { get; set; }
+
+    public void ClearPlayers()
+    {
+        _allPlayerData.Players.Clear();
+    }
 
     /// <summary>
     /// Returns PlayerData indexed by specified player id, if he exists in the dictionary loaded from Json file. Returns
@@ -42,7 +46,7 @@ public class PlayerStats
     /// <param name="playerId">Twitch User id.</param>
     public PlayerData? GetPlayerById(string playerId)
     {
-        return AllPlayerData.Players.TryGetValue(playerId, out PlayerData? playerData) ? playerData : null;
+        return _allPlayerData.Players.TryGetValue(playerId, out PlayerData? playerData) ? playerData : null;
     }
 
     /// <summary>
@@ -74,7 +78,7 @@ public class PlayerStats
             throw new InvalidJsonDataException();
         }
 
-        AllPlayerData = jsonResult;
+        _allPlayerData.Players = jsonResult.Players;
 
         return true;
     }
@@ -84,7 +88,7 @@ public class PlayerStats
     /// </summary>
     public void SaveAllPlayers()
     {
-        string jsonString = JsonSerializer.Serialize(AllPlayerData);
+        string jsonString = JsonSerializer.Serialize(_allPlayerData);
 
         if (StatsFilePath is null || StatsFilePath.Length == 0)
         {
@@ -109,12 +113,12 @@ public class PlayerStats
             throw new NullPlayerDataException();
         }
 
-        if (AllPlayerData.Players.ContainsKey(playerData.UserId))
+        if (_allPlayerData.Players.ContainsKey(playerData.UserId))
         {
             throw new DuplicatePlayerException();
         }
 
-        AllPlayerData.Players.Add(playerData.UserId, playerData);
+        _allPlayerData.Players.Add(playerData.UserId, playerData);
     }
 
     /// <summary>
@@ -127,6 +131,6 @@ public class PlayerStats
     /// <param name="playerData">New player data.</param>
     public void UpdatePlayerById(string playerId, PlayerData playerData)
     {
-        AllPlayerData.Players[playerId] = playerData;
+        _allPlayerData.Players[playerId] = playerData;
     }
 }

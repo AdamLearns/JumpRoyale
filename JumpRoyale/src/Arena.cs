@@ -450,7 +450,7 @@ public partial class Arena : Node2D
         for (int i = 0; i < winners.Length; i++)
         {
             string userId = winners[i];
-            PlayerData playerData = PlayerStats.Instance.AllPlayerData.Players[userId];
+            PlayerData? playerData = PlayerStats.Instance.GetPlayerById(userId) ?? throw new NullPlayerDataException();
             Jumper jumper = Jumpers[userId];
             int height = GetHeightFromYPosition(jumper.Position.Y);
             string totalHeight = Formatter.FormatBigNumber(playerData.TotalHeightAchieved);

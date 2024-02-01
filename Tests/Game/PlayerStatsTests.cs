@@ -53,7 +53,7 @@ public class PlayerStatsTests
             File.Delete(FullPath);
         }
 
-        PlayerStats.Instance.AllPlayerData.Players.Clear();
+        PlayerStats.Instance.ClearPlayers();
     }
 
     /// <summary>
@@ -155,7 +155,7 @@ public class PlayerStatsTests
         PlayerStats.Instance.SaveAllPlayers();
 
         // Start on a fresh stats instance
-        PlayerStats.Instance.AllPlayerData.Players.Clear();
+        PlayerStats.Instance.ClearPlayers();
         PlayerStats.Instance.LoadPlayerData();
 
         PlayerData? playerFromFile = PlayerStats.Instance.GetPlayerById(_fakePlayer.UserId);
@@ -185,7 +185,7 @@ public class PlayerStatsTests
         PlayerStats.Instance.SaveAllPlayers();
 
         // Clear the dictionary to make sure the players are being loaded correctly.
-        PlayerStats.Instance.AllPlayerData.Players.Clear();
+        PlayerStats.Instance.ClearPlayers();
         PlayerStats.Instance.LoadPlayerData();
 
         PlayerData? player = PlayerStats.Instance.GetPlayerById(id);
