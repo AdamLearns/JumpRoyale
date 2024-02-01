@@ -123,7 +123,7 @@ public class CommandHandler(string message, string senderId, string senderName, 
         playerData.UserId = userId;
         playerData.IsPrivileged = isPrivileged;
 
-        PlayerStats.Instance.UpdatePlayerById(userId, playerData);
+        PlayerStats.Instance.UpdatePlayer(playerData);
 
         Jumper jumper = (Jumper)Arena.JumperScene.Instantiate();
 

@@ -34,19 +34,24 @@ public class PlayerStats
     /// </summary>
     public string? StatsFilePath { get; set; }
 
+    /// <summary>
+    /// Clears the Players dictionary.
+    /// </summary>
     public void ClearPlayers()
     {
         _allPlayerData.Players.Clear();
     }
 
     /// <summary>
-    /// Returns PlayerData indexed by specified player id, if he exists in the dictionary loaded from Json file. Returns
-    /// null if no player was found.
+    /// Returns PlayerData indexed by specified player id, if he exists in the dictionary loaded from Json file.
     /// </summary>
     /// <param name="playerId">Twitch User id.</param>
-    public PlayerData? GetPlayerById(string playerId)
+    /// <exception cref="NullPlayerDataException">When no player was found under specified id.</exception>
+    public PlayerData GetPlayerById(string playerId)
     {
-        return _allPlayerData.Players.TryGetValue(playerId, out PlayerData? playerData) ? playerData : null;
+        return _allPlayerData.Players.TryGetValue(playerId, out PlayerData? playerData)
+            ? playerData
+            : throw new NullPlayerDataException();
     }
 
     /// <summary>
@@ -122,15 +127,27 @@ public class PlayerStats
     }
 
     /// <summary>
-    /// Updates the indexed player with new player data.
+    /// Updates the indexed player with new player data. Automatically keyed by the <c>userId</c> from provided
+    /// <c>playerData</c>.
     /// </summary>
     /// <remarks>
     /// This only updates the dictionary entry, not the record in Json file.
     /// </remarks>
-    /// <param name="playerId">Twitch User id.</param>
     /// <param name="playerData">New player data.</param>
-    public void UpdatePlayerById(string playerId, PlayerData playerData)
+    /// <exception cref="NullPlayerDataException">When no player data was passed in.</exception>
+    /// <exception cref="NonExistentPlayerException">When trying to update a missing player data.</exception>
+    public void UpdatePlayer(PlayerData? playerData)
     {
-        _allPlayerData.Players[playerId] = playerData;
+        if (playerData is null)
+        {
+            throw new NullPlayerDataException();
+        }
+
+        if (!_allPlayerData.Players.ContainsKey(playerData.UserId))
+        {
+            throw new NonExistentPlayerException();
+        }
+
+        _allPlayerData.Players[playerData.UserId] = playerData;
     }
 }

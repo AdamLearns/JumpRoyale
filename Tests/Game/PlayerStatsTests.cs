@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Tests;
 
 namespace Game;
 
@@ -32,10 +33,7 @@ public class PlayerStatsTests
     public void SetUp()
     {
         PlayerStats.Instance.StatsFilePath = FullPath;
-        _fakePlayer = new(Rng.RandomHex(), Rng.IntRange(1, 18), Rng.RandomHex())
-        {
-            UserId = Rng.RandomInt().ToString(),
-        };
+        _fakePlayer = FakePlayerData.Make();
 
         // Create the directory on fresh deploy or after project cleanup
         if (!Directory.Exists(TestPath))
@@ -151,7 +149,7 @@ public class PlayerStatsTests
     {
         // We should start with an empty dictionary, so we will add a fake player, serialize him and then attempt to
         // read him from the file, then make sure the same data is loaded
-        PlayerStats.Instance.UpdatePlayerById(_fakePlayer.UserId, _fakePlayer);
+        PlayerStats.Instance.StorePlayer(_fakePlayer);
         PlayerStats.Instance.SaveAllPlayers();
 
         // Start on a fresh stats instance
@@ -225,10 +223,52 @@ public class PlayerStatsTests
     /// probably did something wrong when loading or inserting new players.
     /// </summary>
     [Test]
-    public void ShouldReturnNullIfPlayerNotExists()
+    public void CanThrowIfPlayerNotExists()
     {
-        PlayerData? playerData = PlayerStats.Instance.GetPlayerById("????");
+        Assert.Throws<NullPlayerDataException>(() =>
+        {
+            PlayerStats.Instance.GetPlayerById("????");
+        });
+    }
 
-        Assert.That(playerData, Is.Null);
+    /// <summary>
+    /// This test makes sure that we can correctly replace the player data under user id from that data.
+    /// </summary>
+    [Test]
+    public void CanUpdatePlayers()
+    {
+        PlayerStats.Instance.StorePlayer(_fakePlayer);
+
+        _fakePlayer.Name = "NewName";
+
+        PlayerStats.Instance.UpdatePlayer(_fakePlayer);
+
+        PlayerData player = PlayerStats.Instance.GetPlayerById(_fakePlayer.UserId);
+
+        Assert.That(player.Name, Is.EqualTo("NewName"));
+    }
+
+    /// <summary>
+    /// Just a sanity check.
+    /// </summary>
+    [Test]
+    public void CanThrowWhenUpdatingFromNullData()
+    {
+        Assert.Throws<NullPlayerDataException>(() =>
+        {
+            PlayerStats.Instance.UpdatePlayer(null);
+        });
+    }
+
+    /// <summary>
+    /// Just a sanity check.
+    /// </summary>
+    [Test]
+    public void CanThrowWhenUpdatingNonExistingPlayer()
+    {
+        Assert.Throws<NonExistentPlayerException>(() =>
+        {
+            PlayerStats.Instance.UpdatePlayer(FakePlayerData.Make());
+        });
     }
 }
