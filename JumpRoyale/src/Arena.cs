@@ -312,7 +312,7 @@ public partial class Arena : Node2D
         _hasGameEnded = true;
         _timeSinceGameEnd = DateTime.Now.Ticks;
 
-        string[] winners = ComputeStats();
+        string[] winners = Jumpers.Instance.ComputeStats();
 
         PlayerStats.Instance.SaveAllPlayers();
         ShowEndScreen(winners);
@@ -470,44 +470,6 @@ public partial class Arena : Node2D
         endScreen.GetNode<Label>("Output").Text = text.ToString();
     }
 
-    private string[] ComputeStats()
-    {
-        ReadOnlyCollection<Tuple<string, int>> playersByHeight = Jumpers.Instance.SortJumpersByHeight();
-        string[] winners = playersByHeight.Take(3).Select(p => p.Item1).ToArray();
-
-        foreach (Jumper jumper in Jumpers.Instance.AllJumpers())
-        {
-            PlayerData playerData = jumper.PlayerData;
-            bool showName = false;
-
-            playerData.NumPlays++;
-            playerData.TotalHeightAchieved += Jumpers.Instance.HeightToPosition(jumper.Position.Y);
-
-            if (winners.Length > 0 && winners[0] == playerData.UserId)
-            {
-                playerData.Num1stPlaceWins++;
-                showName = true;
-            }
-            else if (winners.Length > 1 && winners[1] == playerData.UserId)
-            {
-                playerData.Num2ndPlaceWins++;
-                showName = true;
-            }
-            else if (winners.Length > 2 && winners[2] == playerData.UserId)
-            {
-                playerData.Num3rdPlaceWins++;
-                showName = true;
-            }
-
-            if (showName)
-            {
-                jumper.DisableNameFadeout();
-            }
-        }
-
-        return winners;
-    }
-
     private void OnLobbyTimerDone()
     {
         for (int x = 1; x < _widthInTiles - 1; x++)
@@ -597,7 +559,7 @@ public partial class Arena : Node2D
             return;
         }
 
-        Jumper jumper = Jumpers.Instance.GetHighestPlayer();
+        Jumper jumper = Jumpers.Instance.GetHighestJumper();
         int lowestYValue = (int)jumper.Position.Y;
         int maxHeight = Jumpers.Instance.HeightToPosition(lowestYValue);
 
