@@ -28,12 +28,15 @@ generated_code = true
 dotnet_diagnostic.SA0001.severity = none
 # Require space after `new` keyword
 dotnet_diagnostic.SA1000.severity = none
+# Opening Parenthesis Must Be Spaced Correctly
+dotnet_diagnostic.SA1008.severity = none
 # Ignore cases for closing parenthesis being on new line
 # -- should not show this warning for multi-line constructors
 dotnet_diagnostic.SA1009.severity = none
-# Opening square brackets should not be preceded by a space
+# Opening/Closing square brackets should not be preceded by a space
 # This is a C#12 specific issue related to formatters not being able to format collection expressions
 dotnet_diagnostic.SA1010.severity = none
+dotnet_diagnostic.SA1011.severity = none
 # Prefix local calls with `this`
 dotnet_diagnostic.SA1101.severity = none
 # Do not prefix local calls with `this`
@@ -79,6 +82,8 @@ dotnet_diagnostic.SA1633.severity = none
 dotnet_diagnostic.S112.severity = none
 # No commented code blocks (questionable, sometimes)
 dotnet_diagnostic.S125.severity = none
+# Refactor your code not to use hardcoded absolute paths or URIs
+dotnet_diagnostic.S1075.severity = none
 # Require protected constructor in non static class
 dotnet_diagnostic.S1118.severity = none
 # Loop should be simplified with LINQ expressions

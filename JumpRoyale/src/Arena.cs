@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using Godot;
 using TwitchChat;
 using TwitchLib.PubSub.Events;
@@ -19,7 +17,6 @@ public partial class Arena : Node2D
     private const string EndScreenOverlayNodeName = "EndScreenOverlay";
     private const string CameraNodeName = "Camera";
     private const string CanvasLayerNodeName = "CanvasLayer";
-    private const string SaveLocation = "res://save_data/players.json";
 
     private TileMap _lobbyTilemap = new();
 
@@ -45,12 +42,7 @@ public partial class Arena : Node2D
     /// <summary>
     /// Gets all players keyed by their Twitch <c>userId</c> who joined the current session.
     /// </summary>
-    public Dictionary<string, Jumper> Jumpers { get; init; } = [];
-
-    /// <summary>
-    /// Gets currently deserialized Json data of all players.
-    /// </summary>
-    public AllPlayerData AllPlayerData { get; private set; } = new();
+    public Dictionary<string, Jumper> Jumpers { get; } = [];
 
     [Export]
     public PackedScene? JumperScene { get; private set; }
@@ -71,7 +63,9 @@ public partial class Arena : Node2D
 
         SetBackground();
         GenerateLobby();
-        LoadPlayerData();
+
+        PlayerStats.Instance.StatsFilePath = ProjectSettings.GlobalizePath(ResourcePathsConstants.PathToPlayerStats);
+        PlayerStats.Instance.LoadPlayerData();
     }
 
     public override void _PhysicsProcess(double delta)
@@ -162,47 +156,6 @@ public partial class Arena : Node2D
     private LobbyOverlay GetLobbyOverlay()
     {
         return GetNode<CanvasLayer>(CanvasLayerNodeName).GetNode<LobbyOverlay>(LobbyOverlayNodeName);
-    }
-
-    private void LoadPlayerData()
-    {
-        string filesystemLocation = ProjectSettings.GlobalizePath(SaveLocation);
-
-        if (!File.Exists(filesystemLocation))
-        {
-            return;
-        }
-
-        string jsonString = File.ReadAllText(filesystemLocation);
-
-        try
-        {
-            AllPlayerData? jsonResult = JsonSerializer.Deserialize<AllPlayerData>(jsonString);
-
-            // This can only happen if the JSON input was literally `null`.
-            Ensure.IsNotNull(jsonResult);
-
-            if (jsonResult.Players.Count == 0)
-            {
-                GD.PushError(
-                    $"No records returned from the json string (length: {jsonString.Length}). Make sure the JSON string appears to be valid and contains data."
-                );
-            }
-
-            AllPlayerData = jsonResult;
-        }
-        catch (JsonException e)
-        {
-            GD.PushError(e.Message);
-        }
-    }
-
-    private void SaveAllPlayers()
-    {
-        string filesystemLocation = ProjectSettings.GlobalizePath(SaveLocation);
-        string jsonString = JsonSerializer.Serialize(AllPlayerData);
-
-        File.WriteAllText(filesystemLocation, jsonString);
     }
 
     private void GenerateLobby()
@@ -362,7 +315,7 @@ public partial class Arena : Node2D
 
         string[] winners = ComputeStats();
 
-        SaveAllPlayers();
+        PlayerStats.Instance.SaveAllPlayers();
         ShowEndScreen(winners);
         GenerateEndArena(winners);
     }
@@ -497,7 +450,7 @@ public partial class Arena : Node2D
         for (int i = 0; i < winners.Length; i++)
         {
             string userId = winners[i];
-            PlayerData playerData = AllPlayerData.Players[userId];
+            PlayerData playerData = PlayerStats.Instance.GetPlayerById(userId);
             Jumper jumper = Jumpers[userId];
             int height = GetHeightFromYPosition(jumper.Position.Y);
             string totalHeight = Formatter.FormatBigNumber(playerData.TotalHeightAchieved);
