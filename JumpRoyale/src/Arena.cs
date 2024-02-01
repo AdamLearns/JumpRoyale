@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using Godot;
@@ -38,11 +39,6 @@ public partial class Arena : Node2D
 
     [Signal]
     public delegate void CameraSpeedChangedEventHandler(int speed);
-
-    /// <summary>
-    /// Gets all players keyed by their Twitch <c>userId</c> who joined the current session.
-    /// </summary>
-    public Dictionary<string, Jumper> Jumpers { get; } = [];
 
     [Export]
     public PackedScene? JumperScene { get; private set; }
@@ -361,11 +357,10 @@ public partial class Arena : Node2D
         }
 
         // Put all players back in the arena
-        for (int i = 0; i < Jumpers.Count; i++)
+        foreach (Jumper jumper in Jumpers.Instance.AllJumpers())
         {
             int platformNumber = Rng.IntRange(0, platformCoords.Count - 1);
             (int platformX, int platformY) = platformCoords[platformNumber];
-            Jumper jumper = Jumpers.ElementAt(i).Value;
 
             jumper.Position = new Vector2(
                 (platformX + 0.5f) * TileSetToUse.TileSize.X,
@@ -402,7 +397,7 @@ public partial class Arena : Node2D
         for (int i = 0; i < winners.Length; i++)
         {
             string userId = winners[i];
-            Jumper jumper = Jumpers[userId];
+            Jumper jumper = Jumpers.Instance.GetById(userId);
             int tileX = podiumX + (podiumWidth / 2);
 
             // This warning is only disabled due to a bug about false positives: https://github.com/SonarSource/sonar-dotnet/issues/8028
@@ -451,7 +446,7 @@ public partial class Arena : Node2D
         {
             string userId = winners[i];
             PlayerData playerData = PlayerStats.Instance.GetPlayerById(userId);
-            Jumper jumper = Jumpers[userId];
+            Jumper jumper = Jumpers.Instance.GetById(userId);
             int height = GetHeightFromYPosition(jumper.Position.Y);
             string totalHeight = Formatter.FormatBigNumber(playerData.TotalHeightAchieved);
 
@@ -465,31 +460,20 @@ public partial class Arena : Node2D
         }
 
         text.AppendLine();
-        text.Append($"Number of players this game: {Jumpers.Count}");
+        text.Append($"Number of players this game: {Jumpers.Instance.Count}");
         text.AppendLine().AppendLine();
         text.Append("YOU CAN NOW JUMP FREELY (until Adam gets back)!");
 
         endScreen.GetNode<Label>("Output").Text = text.ToString();
     }
 
-    private List<Tuple<string, int>> GetPlayersByHeight()
-    {
-        List<Tuple<string, int>> playersByHeight = Jumpers
-            .OrderByDescending(o => GetHeightFromYPosition(o.Value.Position.Y))
-            .Select(o => new Tuple<string, int>(o.Key, GetHeightFromYPosition((int)o.Value.Position.Y)))
-            .ToList();
-
-        return playersByHeight;
-    }
-
     private string[] ComputeStats()
     {
-        List<Tuple<string, int>> playersByHeight = GetPlayersByHeight();
+        ReadOnlyCollection<Tuple<string, int>> playersByHeight = Jumpers.Instance.SortJumpersByHeight();
         string[] winners = playersByHeight.Take(3).Select(p => p.Item1).ToArray();
 
-        for (int i = 0; i < Jumpers.Count; i++)
+        foreach (Jumper jumper in Jumpers.Instance.AllJumpers())
         {
-            Jumper jumper = Jumpers.ElementAt(i).Value;
             PlayerData playerData = jumper.PlayerData;
             bool showName = false;
 
@@ -552,16 +536,14 @@ public partial class Arena : Node2D
 
     private void RedeemRevive(string displayName)
     {
-        foreach (KeyValuePair<string, Jumper> jumpersEntry in Jumpers)
+        foreach (Jumper jumper in Jumpers.Instance.AllJumpers())
         {
-            Jumper jumper = jumpersEntry.Value;
-
             if (!jumper.PlayerData.Name.Equals(displayName, StringComparison.CurrentCultureIgnoreCase))
             {
                 continue;
             }
 
-            List<Tuple<string, int>> playersByHeight = GetPlayersByHeight();
+            ReadOnlyCollection<Tuple<string, int>> playersByHeight = Jumpers.Instance.SortJumpersByHeight();
 
             if (playersByHeight.Count <= 2)
             {
@@ -569,7 +551,7 @@ public partial class Arena : Node2D
             }
 
             string thirdHighestPlayerId = playersByHeight[2].Item1;
-            Jumper thirdHighestJumper = Jumpers[thirdHighestPlayerId];
+            Jumper thirdHighestJumper = Jumpers.Instance.GetById(thirdHighestPlayerId);
 
             GD.Print("Reviving " + displayName);
             GD.Print("Snapping to " + thirdHighestJumper.PlayerData.Name);
@@ -590,9 +572,8 @@ public partial class Arena : Node2D
             return;
         }
 
-        for (int i = 0; i < Jumpers.Count; i++)
+        foreach (Jumper jumper in Jumpers.Instance.AllJumpers())
         {
-            Jumper jumper = Jumpers.ElementAt(i).Value;
             int height = GetHeightFromYPosition(jumper.Position.Y);
 
             if (height > 0)
@@ -608,8 +589,7 @@ public partial class Arena : Node2D
     {
         Ensure.IsNotNull(TileSetToUse);
 
-        // Iterate over jumpers and check for the highest player
-        if (Jumpers.Count == 0 || _hasGameEnded)
+        if (Jumpers.Instance.Count == 0 || _hasGameEnded)
         {
             return;
         }
@@ -617,10 +597,9 @@ public partial class Arena : Node2D
         int lowestYValue = 999999;
         string playerName = string.Empty;
 
-        for (int i = 0; i < Jumpers.Count; i++)
+        // Iterate over jumpers and check for the highest player
+        foreach (Jumper jumper in Jumpers.Instance.AllJumpers())
         {
-            Jumper jumper = Jumpers.ElementAt(i).Value;
-
             if (jumper.Position.Y < lowestYValue)
             {
                 lowestYValue = (int)jumper.Position.Y;

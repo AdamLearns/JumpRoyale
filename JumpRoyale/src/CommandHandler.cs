@@ -48,10 +48,7 @@ public class CommandHandler(string message, string senderId, string senderName, 
             }
         }
 
-        if (!Arena.Jumpers.TryGetValue(_senderId, out Jumper? jumper))
-        {
-            return;
-        }
+        Jumper jumper = Jumpers.Instance.GetById(_senderId);
 
         command(jumper);
     }
@@ -99,6 +96,12 @@ public class CommandHandler(string message, string senderId, string senderName, 
     /// </summary>
     public void SpawnFakePlayers()
     {
+        // A hacky workaround to have the player in the Stats, since they are now required
+        // Caution: do not end the game with dummies, so they are not stored in the save. This method should not be here
+        // anyway
+        PlayerData playerData = new(_hexColor, Rng.RandomInt(), _hexColor) { UserId = _senderId };
+        PlayerStats.Instance.StorePlayer(playerData);
+
         HandleJoin(_senderId, _senderName, _hexColor, _isPrivileged);
     }
 
@@ -107,16 +110,19 @@ public class CommandHandler(string message, string senderId, string senderName, 
         Ensure.IsNotNull(Arena.JumperScene);
         Ensure.IsNotNull(Arena.TileSetToUse);
 
-        if (Arena.Jumpers.ContainsKey(userId))
+        if (Jumpers.Instance.Exists(userId))
         {
             return;
         }
 
         int randomCharacterChoice = Rng.IntRange(1, 18);
-        PlayerData? playerData = PlayerStats.Instance.GetPlayerById(userId);
+
+        PlayerData playerData;
 
         // If the player didn't exist in the Player Stats yet, create new data object for this player
-        playerData ??= new(hexColor, randomCharacterChoice, hexColor);
+        playerData = PlayerStats.Instance.Exists(userId)
+            ? PlayerStats.Instance.GetPlayerById(userId)
+            : new(hexColor, randomCharacterChoice, hexColor);
 
         // Even if the player already existed, we may need to update their name and privileged status.
         playerData.Name = userName;
@@ -135,9 +141,9 @@ public class CommandHandler(string message, string senderId, string senderName, 
 
         jumper.Init(x, y, playerData);
 
-        Arena.Jumpers.Add(userId, jumper);
+        Jumpers.Instance.AddJumper(jumper);
         Arena.AddChild(jumper);
-        Arena.EmitSignal(Arena.SignalName.PlayerCountChange, Arena.Jumpers.Count);
+        Arena.EmitSignal(Arena.SignalName.PlayerCountChange, Jumpers.Instance.Count);
     }
 
     private void HandleGlow(Jumper jumper, string? userHexColor, string twitchChatHexColor)

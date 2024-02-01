@@ -42,6 +42,11 @@ public class PlayerStats
         _allPlayerData.Players.Clear();
     }
 
+    public bool Exists(string userId)
+    {
+        return _allPlayerData.Players.ContainsKey(userId);
+    }
+
     /// <summary>
     /// Returns PlayerData indexed by specified player id, if he exists in the dictionary loaded from Json file.
     /// </summary>
