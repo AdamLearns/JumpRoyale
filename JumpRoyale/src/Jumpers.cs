@@ -64,8 +64,8 @@ public class Jumpers
         return new(
             [
                 .. _jumpers.OrderByDescending(o => GetHeightFromYPosition(o.Value.Position.Y))
-            .Select(o => new Tuple<string, int>(o.Key, GetHeightFromYPosition((int)o.Value.Position.Y)))
-            .ToList()
+                .Select(o => new Tuple<string, int>(o.Key, GetHeightFromYPosition((int)o.Value.Position.Y)))
+                .ToList()
             ]
         );
     }
