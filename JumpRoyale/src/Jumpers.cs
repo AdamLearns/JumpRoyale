@@ -3,23 +3,26 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-public class Jumpers
+/// <summary>
+/// Class responsible for serving Jumper Dictionary-related logic.
+/// </summary>
+public class ActiveJumpers
 {
     private static readonly object _lock = new();
 
-    private static Jumpers? _instance;
+    private static ActiveJumpers? _instance;
 
     private readonly Dictionary<string, Jumper> _jumpers = [];
 
-    private Jumpers() { }
+    private ActiveJumpers() { }
 
-    public static Jumpers Instance
+    public static ActiveJumpers Instance
     {
         get
         {
             lock (_lock)
             {
-                _instance ??= new Jumpers();
+                _instance ??= new ActiveJumpers();
             }
 
             return _instance;

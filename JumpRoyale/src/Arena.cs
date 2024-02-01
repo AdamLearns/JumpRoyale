@@ -311,7 +311,7 @@ public partial class Arena : Node2D
         _hasGameEnded = true;
         _timeSinceGameEnd = DateTime.Now.Ticks;
 
-        string[] winners = Jumpers.Instance.ComputeStats();
+        string[] winners = ActiveJumpers.Instance.ComputeStats();
 
         PlayerStats.Instance.SaveAllPlayers();
         ShowEndScreen(winners);
@@ -359,7 +359,7 @@ public partial class Arena : Node2D
         }
 
         // Put all players back in the arena
-        foreach (Jumper jumper in Jumpers.Instance.AllJumpers())
+        foreach (Jumper jumper in ActiveJumpers.Instance.AllJumpers())
         {
             int platformNumber = Rng.IntRange(0, platformCoords.Count - 1);
             (int platformX, int platformY) = platformCoords[platformNumber];
@@ -399,7 +399,7 @@ public partial class Arena : Node2D
         for (int i = 0; i < winners.Length; i++)
         {
             string userId = winners[i];
-            Jumper jumper = Jumpers.Instance.GetById(userId);
+            Jumper jumper = ActiveJumpers.Instance.GetById(userId);
             int tileX = podiumX + (podiumWidth / 2);
 
             // This warning is only disabled due to a bug about false positives: https://github.com/SonarSource/sonar-dotnet/issues/8028
@@ -448,8 +448,8 @@ public partial class Arena : Node2D
         {
             string userId = winners[i];
             PlayerData playerData = PlayerStats.Instance.GetPlayerById(userId);
-            Jumper jumper = Jumpers.Instance.GetById(userId);
-            int height = Jumpers.Instance.HeightToPosition(jumper.Position.Y);
+            Jumper jumper = ActiveJumpers.Instance.GetById(userId);
+            int height = ActiveJumpers.Instance.HeightToPosition(jumper.Position.Y);
             string totalHeight = Formatter.FormatBigNumber(playerData.TotalHeightAchieved);
 
             text.Append($"\t{i + 1}: {playerData.Name}. Height reached: {height}. ");
@@ -462,7 +462,7 @@ public partial class Arena : Node2D
         }
 
         text.AppendLine();
-        text.Append($"Number of players this game: {Jumpers.Instance.Count}");
+        text.Append($"Number of players this game: {ActiveJumpers.Instance.Count}");
         text.AppendLine().AppendLine();
         text.Append("YOU CAN NOW JUMP FREELY (until Adam gets back)!");
 
@@ -500,14 +500,14 @@ public partial class Arena : Node2D
 
     private void RedeemRevive(string displayName)
     {
-        foreach (Jumper jumper in Jumpers.Instance.AllJumpers())
+        foreach (Jumper jumper in ActiveJumpers.Instance.AllJumpers())
         {
             if (!jumper.PlayerData.Name.Equals(displayName, StringComparison.CurrentCultureIgnoreCase))
             {
                 continue;
             }
 
-            ReadOnlyCollection<Tuple<string, int>> playersByHeight = Jumpers.Instance.SortJumpersByHeight();
+            ReadOnlyCollection<Tuple<string, int>> playersByHeight = ActiveJumpers.Instance.SortJumpersByHeight();
 
             if (playersByHeight.Count <= 2)
             {
@@ -515,7 +515,7 @@ public partial class Arena : Node2D
             }
 
             string thirdHighestPlayerId = playersByHeight[2].Item1;
-            Jumper thirdHighestJumper = Jumpers.Instance.GetById(thirdHighestPlayerId);
+            Jumper thirdHighestJumper = ActiveJumpers.Instance.GetById(thirdHighestPlayerId);
 
             GD.Print("Reviving " + displayName);
             GD.Print("Snapping to " + thirdHighestJumper.PlayerData.Name);
@@ -536,9 +536,9 @@ public partial class Arena : Node2D
             return;
         }
 
-        foreach (Jumper jumper in Jumpers.Instance.AllJumpers())
+        foreach (Jumper jumper in ActiveJumpers.Instance.AllJumpers())
         {
-            int height = Jumpers.Instance.HeightToPosition(jumper.Position.Y);
+            int height = ActiveJumpers.Instance.HeightToPosition(jumper.Position.Y);
 
             if (height > 0)
             {
@@ -553,14 +553,14 @@ public partial class Arena : Node2D
     {
         Ensure.IsNotNull(TileSetToUse);
 
-        if (Jumpers.Instance.Count == 0 || _hasGameEnded)
+        if (ActiveJumpers.Instance.Count == 0 || _hasGameEnded)
         {
             return;
         }
 
-        Jumper jumper = Jumpers.Instance.GetHighestJumper();
+        Jumper jumper = ActiveJumpers.Instance.GetHighestJumper();
         int lowestYValue = (int)jumper.Position.Y;
-        int maxHeight = Jumpers.Instance.HeightToPosition(lowestYValue);
+        int maxHeight = ActiveJumpers.Instance.HeightToPosition(lowestYValue);
 
         // Make sure the camera doesn't go higher than 0
         int tileHeight = TileSetToUse.TileSize.Y;

@@ -48,7 +48,7 @@ public class CommandHandler(string message, string senderId, string senderName, 
             }
         }
 
-        Jumper jumper = Jumpers.Instance.GetById(_senderId);
+        Jumper jumper = ActiveJumpers.Instance.GetById(_senderId);
 
         command(jumper);
     }
@@ -104,7 +104,7 @@ public class CommandHandler(string message, string senderId, string senderName, 
         Ensure.IsNotNull(Arena.JumperScene);
         Ensure.IsNotNull(Arena.TileSetToUse);
 
-        if (Jumpers.Instance.Exists(userId))
+        if (ActiveJumpers.Instance.Exists(userId))
         {
             return;
         }
@@ -135,9 +135,9 @@ public class CommandHandler(string message, string senderId, string senderName, 
 
         jumper.Init(x, y, playerData);
 
-        Jumpers.Instance.AddJumper(jumper);
+        ActiveJumpers.Instance.AddJumper(jumper);
         Arena.AddChild(jumper);
-        Arena.EmitSignal(Arena.SignalName.PlayerCountChange, Jumpers.Instance.Count);
+        Arena.EmitSignal(Arena.SignalName.PlayerCountChange, ActiveJumpers.Instance.Count);
     }
 
     private void HandleGlow(Jumper jumper, string? userHexColor, string twitchChatHexColor)
