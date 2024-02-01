@@ -121,7 +121,7 @@ public class PlayerStatsTests
     [Test]
     public void CanThrowOnMismatchedJsonStructure()
     {
-        File.WriteAllText(FullPath, """{"SomeStats":{}}""");
+        File.WriteAllText(FullPath, "{\"SomeStats\":{}}");
 
         Assert.Throws<InvalidJsonDataException>(() =>
         {
