@@ -95,7 +95,7 @@ public partial class Arena : Node2D
             {
                 // Note: it does not matter that we instantiate this 200 times
                 CommandHandler commandHandler =
-                    new(string.Empty, string.Empty + i, "Bot" + i, "ffffff", false) { Arena = this };
+                    new(string.Empty, i.ToString(), i.ToString(), "ffffff", false) { Arena = this };
 
                 commandHandler.SpawnFakePlayers();
             }
