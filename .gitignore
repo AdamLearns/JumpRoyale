@@ -25,3 +25,5 @@ bld/
 [Oo]bj/
 [Ll]og/
 
+# Coverate reports and test results from Coverlet
+Tests/TestResults/

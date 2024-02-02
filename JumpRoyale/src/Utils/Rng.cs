@@ -12,6 +12,11 @@ public static class Rng
         return _rng.Next(min, max);
     }
 
+    public static int RandomInt()
+    {
+        return _rng.Next();
+    }
+
     /// <summary>
     /// Returns a random Godot Color.
     /// </summary>

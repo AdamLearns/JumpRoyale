@@ -2,6 +2,11 @@
     <Analyzers>
         <Analyzer AnalyzerId="StyleCop.CSharp.DocumentationRules">
             <Rules>
+                <Rule Name="PropertySummaryDocumentationMustMatchAccessors">
+                    <RuleSettings>
+                        <BooleanProperty Name="Enabled">False</BooleanProperty>
+                    </RuleSettings>
+                </Rule>
                 <Rule Name="GenericTypeParametersMustBeDocumented">
                     <RuleSettings>
                         <BooleanProperty Name="Enabled">False</BooleanProperty>
@@ -152,7 +157,22 @@
                         <BooleanProperty Name="Enabled">False</BooleanProperty>
                     </RuleSettings>
                 </Rule>
+                <Rule Name="OpeningParenthesisMustBeSpacedCorrectly">
+                    <RuleSettings>
+                        <BooleanProperty Name="Enabled">False</BooleanProperty>
+                    </RuleSettings>
+                </Rule>
                 <Rule Name="ClosingParenthesisMustBeSpacedCorrectly">
+                    <RuleSettings>
+                        <BooleanProperty Name="Enabled">False</BooleanProperty>
+                    </RuleSettings>
+                </Rule>
+                <Rule Name="OpeningSquareBracketsMustBeSpacedCorrectly">
+                    <RuleSettings>
+                        <BooleanProperty Name="Enabled">False</BooleanProperty>
+                    </RuleSettings>
+                </Rule>
+                <Rule Name="ClosingSquareBracketsMustBeSpacedCorrectly">
                     <RuleSettings>
                         <BooleanProperty Name="Enabled">False</BooleanProperty>
                     </RuleSettings>
