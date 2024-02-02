@@ -42,6 +42,11 @@ public class PlayerStats
         _allPlayerData.Players.Clear();
     }
 
+    public bool Exists(string userId)
+    {
+        return _allPlayerData.Players.ContainsKey(userId);
+    }
+
     /// <summary>
     /// Returns PlayerData indexed by specified player id, if he exists in the dictionary loaded from Json file.
     /// </summary>
@@ -104,48 +109,24 @@ public class PlayerStats
     }
 
     /// <summary>
-    /// Stores the player in the Players dictionary. Automatically keyed by the <c>userId</c> from provided
-    /// <c>playerData</c>.
-    /// </summary>
-    /// <param name="playerData">Game data of the player to store and to get <c>userId</c> from.</param>
-    /// <exception cref="NullPlayerDataException">When no player data was passed in.</exception>
-    /// <exception cref="DuplicatePlayerException">When trying to add an already existing player.</exception>
-    /// <exception cref="System.ArgumentException">Other exceptions related to Dictionary.</exception>
-    public void StorePlayer(PlayerData? playerData)
-    {
-        if (playerData is null)
-        {
-            throw new NullPlayerDataException();
-        }
-
-        if (_allPlayerData.Players.ContainsKey(playerData.UserId))
-        {
-            throw new DuplicatePlayerException();
-        }
-
-        _allPlayerData.Players.Add(playerData.UserId, playerData);
-    }
-
-    /// <summary>
-    /// Updates the indexed player with new player data. Automatically keyed by the <c>userId</c> from provided
-    /// <c>playerData</c>.
+    /// Updates (or stores) the indexed player with new player data. Automatically keyed by the <c>userId</c> from
+    /// provided <c>playerData</c>.
+    /// <para>
+    /// Note: This was merged with Store, which called <c>dictionary.Add()</c>, but that requires exception handling,
+    /// but we can just directly access the index, which automatically overwrites the existing record. <c>UserId</b> is
+    /// unique anyway, so there is no way to get a duplicate unless we spawn bots with hardcoded ids.
+    /// </para>
     /// </summary>
     /// <remarks>
-    /// This only updates the dictionary entry, not the record in Json file.
+    /// This only updates the dictionary entry, not the record in Json file, this is handled later during serialization.
     /// </remarks>
     /// <param name="playerData">New player data.</param>
     /// <exception cref="NullPlayerDataException">When no player data was passed in.</exception>
-    /// <exception cref="NonExistentPlayerException">When trying to update a missing player data.</exception>
     public void UpdatePlayer(PlayerData? playerData)
     {
         if (playerData is null)
         {
             throw new NullPlayerDataException();
-        }
-
-        if (!_allPlayerData.Players.ContainsKey(playerData.UserId))
-        {
-            throw new NonExistentPlayerException();
         }
 
         _allPlayerData.Players[playerData.UserId] = playerData;

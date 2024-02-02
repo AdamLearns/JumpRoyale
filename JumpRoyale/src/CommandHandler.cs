@@ -48,12 +48,15 @@ public class CommandHandler(string message, string senderId, string senderName, 
             }
         }
 
-        if (!Arena.Jumpers.TryGetValue(_senderId, out Jumper? jumper))
+        try
+        {
+            Jumper jumper = ActiveJumpers.Instance.GetById(_senderId);
+            command(jumper);
+        }
+        catch (NullReferenceException)
         {
             return;
         }
-
-        command(jumper);
     }
 
     /// <summary>
@@ -107,16 +110,19 @@ public class CommandHandler(string message, string senderId, string senderName, 
         Ensure.IsNotNull(Arena.JumperScene);
         Ensure.IsNotNull(Arena.TileSetToUse);
 
-        if (Arena.Jumpers.ContainsKey(userId))
+        if (ActiveJumpers.Instance.Exists(userId))
         {
             return;
         }
 
         int randomCharacterChoice = Rng.IntRange(1, 18);
-        PlayerData? playerData = PlayerStats.Instance.GetPlayerById(userId);
+
+        PlayerData playerData;
 
         // If the player didn't exist in the Player Stats yet, create new data object for this player
-        playerData ??= new(hexColor, randomCharacterChoice, hexColor);
+        playerData = PlayerStats.Instance.Exists(userId)
+            ? PlayerStats.Instance.GetPlayerById(userId)
+            : new(hexColor, randomCharacterChoice, hexColor);
 
         // Even if the player already existed, we may need to update their name and privileged status.
         playerData.Name = userName;
@@ -135,9 +141,9 @@ public class CommandHandler(string message, string senderId, string senderName, 
 
         jumper.Init(x, y, playerData);
 
-        Arena.Jumpers.Add(userId, jumper);
+        ActiveJumpers.Instance.AddJumper(jumper);
         Arena.AddChild(jumper);
-        Arena.EmitSignal(Arena.SignalName.PlayerCountChange, Arena.Jumpers.Count);
+        Arena.EmitSignal(Arena.SignalName.PlayerCountChange, ActiveJumpers.Instance.Count);
     }
 
     private void HandleGlow(Jumper jumper, string? userHexColor, string twitchChatHexColor)

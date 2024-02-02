@@ -28,7 +28,7 @@ public class PlayerData(string glowColor, int characterChoice, string nameColor)
     /// This property is for Serialization purposes only and should not be used. If you need to return the color
     /// selected by players only if they are privileged, use <see cref="PlayerNameColor"/>.
     /// </remarks>
-    public string NameColor { get; private set; } = nameColor;
+    public string NameColor { get; private set; } = nameColor ?? GameConstants.DefaultNameColor.ToHtml(false);
 
     // Note that this can change between games since you can change your name on
     // Twitch, so this is just for convenience of looking at the JSON file and
