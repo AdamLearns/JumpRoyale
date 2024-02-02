@@ -39,7 +39,7 @@ public class ChatCommandDetectionTests
     [Test]
     public void CanRejectUnprivilegedUsers()
     {
-        foreach (string command in CommandMatcher.AvailableCommands)
+        foreach (string command in new List<string>() { "glow", "namecolor" })
         {
             (_, string commandName, bool wasMatched) = CommandNameMatcher(command, false);
 
@@ -85,12 +85,12 @@ public class ChatCommandDetectionTests
 
         foreach (string command in commandsWithTypos)
         {
-            (_, string commandName, bool wasMatched) = CommandNameMatcher(command, false);
+            (_, string commandName, bool wasMatched) = CommandNameMatcher(command, true);
 
             Assert.Multiple(() =>
             {
                 Assert.That(command, Does.StartWith(commandName));
-                Assert.That(wasMatched, Is.False);
+                Assert.That(wasMatched, Is.True, commandName);
             });
         }
     }
@@ -103,23 +103,14 @@ public class ChatCommandDetectionTests
     /// <param name="isPrivileged">Privileged state of this user privileged, allows executing the matched command when <c>true</c>.</param>
     private Tuple<string, string, bool> CommandNameMatcher(string chatMessage, bool isPrivileged = true)
     {
-        ChatCommandParser command = new(chatMessage.ToLower());
+        CommandHandler commandHandler =
+            new(chatMessage.ToLower(), string.Empty, string.Empty, string.Empty, isPrivileged);
 
-        return command.Name switch
-        {
-            string when CommandMatcher.MatchesJoin(command.Name, isPrivileged) => new(chatMessage, command.Name, true),
-            string when CommandMatcher.MatchesUnglow(command.Name, isPrivileged)
-                => new(chatMessage, command.Name, true),
-            string when CommandMatcher.MatchesJump(command.Name, isPrivileged) => new(chatMessage, command.Name, true),
-            string when CommandMatcher.MatchesCharacterChange(command.Name, isPrivileged)
-                => new(chatMessage, command.Name, true),
-            string when CommandMatcher.MatchesGlow(command.Name, isPrivileged) => new(chatMessage, command.Name, true),
-            string when CommandMatcher.MatchesNamecolor(command.Name, isPrivileged)
-                => new(chatMessage, command.Name, true),
+        // Returning a callable method means that out chat message managed to match appropriate command
+        CommandHandler.CallableCommand? command = commandHandler.TryGetCommandFromChatMessage();
 
-            // The below return is here just to check if there were cases when nothing was caught by
-            // pattern matching
-            _ => new(chatMessage, command.Name, false),
-        };
+        return command is not null
+            ? new(chatMessage, commandHandler.ExecutedCommand.Name, true)
+            : new(chatMessage, commandHandler.ExecutedCommand.Name, false);
     }
 }

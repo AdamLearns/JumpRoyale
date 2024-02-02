@@ -68,6 +68,8 @@ dotnet_diagnostic.SA1615.severity = none
 dotnet_diagnostic.SA1649.severity = none
 # Partial elements should be documented
 dotnet_diagnostic.SA1601.severity = none
+# Summary text should begin with: 'Gets a value'
+dotnet_diagnostic.SA1623.severity = none
 # File header (license, etc.)
 dotnet_diagnostic.SA1633.severity = none
 
@@ -111,6 +113,8 @@ dotnet_diagnostic.CA1822.severity = none
 dotnet_diagnostic.CA2213.severity = none
 # Not sufficiently specific exceptions
 dotnet_diagnostic.CA2201.severity = none
+# Use cryptographically secure random number generators when randomness is required for security
+dotnet_diagnostic.CA5394.severity = none
 # Match nullability of reference types in Delegates
 dotnet_diagnostic.CS8622.severity = none
 # Don't re-use primary constructor parameters
