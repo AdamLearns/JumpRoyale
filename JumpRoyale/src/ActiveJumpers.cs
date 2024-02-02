@@ -116,7 +116,7 @@ public class ActiveJumpers
     /// </summary>
     public Jumper GetHighestJumper()
     {
-        return AllJumpers().MaxBy(jumper => jumper.Position.Y) ?? throw new Exception("No jumpers in the collection.");
+        return AllJumpers().MinBy(jumper => jumper.Position.Y) ?? throw new Exception("No jumpers in the collection.");
     }
 
     /// <summary>
