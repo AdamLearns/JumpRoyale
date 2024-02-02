@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 
 /// <summary>
-/// Class responsible for serving Jumper Dictionary-related logic.
+/// Class responsible for serving Jumper Dictionary-related logic. Stores all Jumpers added at runtime.
 /// </summary>
 public class ActiveJumpers
 {
@@ -55,7 +55,7 @@ public class ActiveJumpers
 
     /// <summary>
     /// Takes all jumpers and increments their stats with the data from the current session. Winners will have their
-    /// special properties recalculated too (1st/2nd/3rd places).
+    /// special properties recalculated too (special, as in counters for 1st/2nd/3rd places).
     /// </summary>
     public string[] ComputeStats()
     {
@@ -134,8 +134,7 @@ public class ActiveJumpers
     }
 
     /// <summary>
-    /// Y decreases as you go up, so this converts it to a "height" property that
-    /// increases as you go up.
+    /// <c>Y</c> decreases as you go up, so this converts it to a <c>height</c> property that increases as you go up.
     /// <para>
     ///  Note that ideally, the height should return 0 when you're on the lowest floor, but that's probably not the case
     ///  at the time of writing.
