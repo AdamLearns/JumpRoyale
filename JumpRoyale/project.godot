@@ -15,7 +15,6 @@ run/main_scene="res://scenes/Arena.tscn"
 config/features=PackedStringArray("4.2", "C#", "Forward Plus")
 run/max_fps=60
 boot_splash/image="res://assets/sprites/splash.png"
-boot_splash/fullsize=false
 boot_splash/use_filter=false
 config/icon="res://assets/sprites/icon.svg"
 boot_splash/minimum_display_time=3000
