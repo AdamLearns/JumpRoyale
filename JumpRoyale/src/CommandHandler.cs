@@ -48,9 +48,15 @@ public class CommandHandler(string message, string senderId, string senderName, 
             }
         }
 
-        Jumper jumper = ActiveJumpers.Instance.GetById(_senderId);
-
-        command(jumper);
+        try
+        {
+            Jumper jumper = ActiveJumpers.Instance.GetById(_senderId);
+            command(jumper);
+        }
+        catch (NullReferenceException)
+        {
+            return;
+        }
     }
 
     /// <summary>

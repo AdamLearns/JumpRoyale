@@ -108,7 +108,7 @@ public class ActiveJumpers
     /// </summary>
     public Jumper GetById(string userId)
     {
-        return _jumpers.TryGetValue(userId, out Jumper? jumper) ? jumper : throw new Exception();
+        return _jumpers.TryGetValue(userId, out Jumper? jumper) ? jumper : throw new NullReferenceException();
     }
 
     /// <summary>
