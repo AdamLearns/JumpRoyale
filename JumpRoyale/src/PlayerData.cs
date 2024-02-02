@@ -61,7 +61,7 @@ public class PlayerData(string glowColor, int characterChoice, string nameColor)
     /// </para>
     ///
     /// <para>
-    /// Example: <c>char</c> command allows to select a character from given range, but can some selections can only be
+    /// Example: <c>char</c> command allows to select a character from given range, but some selections could only be
     /// applied to privileged users.
     /// </para>
     /// </summary>
