@@ -22,10 +22,15 @@ public partial class Jumper : CharacterBody2D
 
     private Vector2 _jumpVelocity;
 
+    public Vector2 _overrideVelocity;
+
     /// <summary>
     /// Stores the game time as timestamp for the font fadeout timer.
     /// </summary>
     private ulong _fontVisibilityTimerStartTime;
+
+    [Export]
+    public PackedScene? FireballScene { get; private set; }
 
     // This property is externally set by Init and there is no constructor on this class, so it can not be initialized
     // inside here. It will never become null unless some external method does a really bad job parsing the player
@@ -148,6 +153,37 @@ public partial class Jumper : CharacterBody2D
         _canFadePlayerName = false;
     }
 
+    public void ShootFireball([NotNull] Arena arena, float angle)
+    {
+        Ensure.IsNotNull(FireballScene);
+
+        Fireball fireball = (Fireball)FireballScene.Instantiate();
+
+        double power = 150;
+        double gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle();
+        double normalizedPower = Math.Sqrt(power * 5 * gravity);
+
+        fireball.Init(arena);
+        fireball.Scale = Scale;
+        float angleInRadians = Mathf.DegToRad(angle);
+        fireball.LinearVelocity =
+            new Vector2(Mathf.Cos(angleInRadians), Mathf.Sin(angleInRadians)) * (float)normalizedPower;
+        CollisionShape2D fireballCollider = fireball.GetNode<CollisionShape2D>("CollisionShape2D");
+        float largerFireballDimension = Mathf.Max(
+            fireballCollider.Shape.GetRect().Size.X,
+            fireballCollider.Shape.GetRect().Size.Y
+        );
+        CollisionShape2D jumperCollider = GetNode<CollisionShape2D>("CollisionShape2D");
+        float largerPlayerDimension = Mathf.Max(
+            jumperCollider.Shape.GetRect().Size.X,
+            jumperCollider.Shape.GetRect().Size.Y
+        );
+        fireball.Position =
+            Position + fireball.LinearVelocity.Normalized() * (largerFireballDimension + largerPlayerDimension);
+
+        arena.AddChild(fireball);
+    }
+
     public void SetColor(string hexColor)
     {
         AnimatedSprite2D sprite = GetNode<AnimatedSprite2D>(SpriteNodeName);
@@ -164,6 +200,12 @@ public partial class Jumper : CharacterBody2D
         {
             velocity.Y = 0;
             velocity.X = 0;
+        }
+
+        if (_overrideVelocity != Vector2.Zero)
+        {
+            velocity = _overrideVelocity;
+            _overrideVelocity = Vector2.Zero;
         }
 
         // Add the gravity.

@@ -105,6 +105,11 @@ public class CommandHandler(string message, string senderId, string senderName, 
         HandleJoin(_senderId, _senderName, _hexColor, _isPrivileged);
     }
 
+    public void SpawnAdam()
+    {
+        HandleJoin("47098493", "AdamLearnsLive", "ff00ff", true);
+    }
+
     private void HandleJoin(string userId, string userName, string hexColor, bool isPrivileged)
     {
         Ensure.IsNotNull(Arena.JumperScene);

@@ -66,6 +66,41 @@ public partial class Arena : Node2D
         GenerateLobby();
     }
 
+    public void CreateExplosion(Vector2 position)
+    {
+        List<Jumper> jumpersWithinDistance = new();
+
+        foreach (Jumper jumper in ActiveJumpers.Instance.AllJumpers())
+        {
+            float distance = (jumper.Position - position).Length();
+            GD.Print("Distance: " + distance);
+
+            if (distance <= 100)
+            {
+                jumpersWithinDistance.Add(jumper);
+            }
+        }
+
+        foreach (Jumper jumper in jumpersWithinDistance)
+        {
+            Vector2 direction = (jumper.Position - position).Normalized();
+            float distance = Mathf.Max(1, (jumper.Position - position).Length());
+            float force = 5000f / distance;
+
+            if (jumper.IsOnFloor())
+            {
+                if (direction.Y > 0)
+                {
+                    direction = new Vector2(direction.X, -direction.Y);
+                }
+
+                direction = new Vector2(direction.X, direction.Y * 5).Normalized();
+            }
+
+            jumper._overrideVelocity = direction * force;
+        }
+    }
+
     public override void _PhysicsProcess(double delta)
     {
         ModifyPlayerScales();
@@ -87,6 +122,23 @@ public partial class Arena : Node2D
         if (Input.IsPhysicalKeyPressed(Key.W) && Input.IsPhysicalKeyPressed(Key.Ctrl))
         {
             OnGameTimerDone();
+        }
+
+        if (Input.IsActionJustPressed("ui_right"))
+        {
+            try
+            {
+                Jumper jumper = ActiveJumpers.Instance.GetById("47098493");
+                jumper.ShootFireball(this, Rng.IntRange(0, 90) - 90);
+            }
+            catch (NullReferenceException)
+            {
+                GD.Print("Adam hasn't joined yet—type 'join'");
+                CommandHandler commandHandler =
+                    new(string.Empty, string.Empty, string.Empty, "ffffff", false) { Arena = this };
+
+                commandHandler.SpawnAdam();
+            }
         }
 
         if (Input.IsPhysicalKeyPressed(Key.B))
@@ -313,7 +365,7 @@ public partial class Arena : Node2D
 
         string[] winners = ActiveJumpers.Instance.ComputeStats();
 
-        PlayerStats.Instance.SaveAllPlayers();
+        // PlayerStats.Instance.SaveAllPlayers();
         ShowEndScreen(winners);
         GenerateEndArena(winners);
     }
@@ -521,7 +573,7 @@ public partial class Arena : Node2D
             GD.Print("Snapping to " + thirdHighestJumper.PlayerData.Name);
 
             jumper.Position = thirdHighestJumper.Position;
-            jumper.Velocity = thirdHighestJumper.Velocity;
+            jumper._overrideVelocity = thirdHighestJumper.Velocity;
 
             jumper.FlashPlayerName();
 
