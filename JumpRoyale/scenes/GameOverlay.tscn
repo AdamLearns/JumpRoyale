@@ -18,7 +18,7 @@ text = "Number of players goes here
 
 [node name="JumpInstructions" type="Label" parent="."]
 layout_mode = 2
-text = "Jump with \"j <angle> [power=100]\""
+text = "Jump with \"j <angle>\""
 
 [node name="HeightOutput" type="Label" parent="."]
 layout_mode = 2
