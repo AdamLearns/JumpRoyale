@@ -20,6 +20,11 @@ public partial class Jumper : CharacterBody2D
     // Get the gravity from the project settings to be synced with RigidBody nodes.
     private float _gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle();
 
+    /// <summary>
+    /// Previous X Velocity value of this jumper before MoveAndSlide was called. Used to bounce the jumper off the wall.
+    /// </summary>
+    private float _previousXVelocity;
+
     private Vector2 _jumpVelocity;
 
     /// <summary>
@@ -186,6 +191,11 @@ public partial class Jumper : CharacterBody2D
             _jumpVelocity = Vector2.Zero;
         }
 
+        if (IsOnWall())
+        {
+            velocity.X = _previousXVelocity * -0.75f;
+        }
+
         Velocity = velocity;
 
         if (Velocity.Y > 0)
@@ -211,6 +221,7 @@ public partial class Jumper : CharacterBody2D
 
         UpdateNameTransparency();
 
+        _previousXVelocity = Velocity.X;
         MoveAndSlide();
     }
 
