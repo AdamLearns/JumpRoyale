@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Godot;
 
@@ -10,6 +11,11 @@ public partial class Jumper : CharacterBody2D
     private const float NameFadeoutTime = 5000f;
 
     /// <summary>
+    /// Stores this jumper's position in the last frame. See <see cref="StorePosition"/>.
+    /// </summary>
+    private readonly HashSet<Vector2> _recentPosition = [];
+
+    /// <summary>
     /// Used to block the fadeout in some situations, e.g. at the start of the game. This is automatically set to true
     /// on every jump.
     /// </summary>
@@ -19,6 +25,12 @@ public partial class Jumper : CharacterBody2D
 
     // Get the gravity from the project settings to be synced with RigidBody nodes.
     private float _gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle();
+
+    /// <summary>
+    /// Indicated for how many frames this jumper has been in the same place under certain conditions. See <see
+    /// cref="StorePosition"/>.
+    /// </summary>
+    private int _framesSincePositionChange;
 
     /// <summary>
     /// Previous X Velocity value of this jumper before MoveAndSlide was called. Used to bounce the jumper off the wall.
@@ -222,7 +234,9 @@ public partial class Jumper : CharacterBody2D
         UpdateNameTransparency();
 
         _previousXVelocity = Velocity.X;
+
         MoveAndSlide();
+        StorePosition();
     }
 
     public void OnSpriteAnimationFinished()
@@ -280,5 +294,39 @@ public partial class Jumper : CharacterBody2D
     private void SetNameAlpha(float alpha)
     {
         GetNode<RichTextLabel>(NameNodeName).Modulate = new Color(1, 1, 1, alpha);
+    }
+
+    /// <summary>
+    /// Attempts to store the recent position after MoveAndSlide() call. If the position was not added to the HashSet,
+    /// it means that the position already existed and the jumper did not change his position, but this logic will only
+    /// be executed if the jumper was constantly touching the wall, was not grounded and was not touching the ceiling.
+    /// All this means that the jumper was stuck inside of a wall and his position has to be adjusted after x frames.
+    /// </summary>
+    private void StorePosition()
+    {
+        if (IsOnFloor() || !IsOnWall() || IsOnCeiling())
+        {
+            return;
+        }
+
+        bool added = _recentPosition.Add(Position);
+
+        // If the position was different (the result of successful addition to the HashSet), any previous positions will
+        // be cleared and the new position is stored. On a duplicate position, it could indicate the jumper got stuck.
+        if (added)
+        {
+            _framesSincePositionChange = 0;
+
+            // Remove the previous position and re-add the current
+            _recentPosition.Clear();
+            _recentPosition.Add(Position);
+        }
+
+        _framesSincePositionChange++;
+
+        if (_framesSincePositionChange >= 60)
+        {
+            Position += Vector2.Up * 16;
+        }
     }
 }
