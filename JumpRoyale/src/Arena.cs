@@ -308,6 +308,7 @@ public partial class Arena : Node2D
     private void OnGameTimerDone()
     {
         GetGameOverlay().Visible = false;
+        GetTimerOverlay().Visible = false;
         _hasGameEnded = true;
         _timeSinceGameEnd = DateTime.Now.Ticks;
 
