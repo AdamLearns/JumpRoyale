@@ -15,6 +15,8 @@ public partial class Jumper : CharacterBody2D
     /// </summary>
     private readonly HashSet<Vector2> _recentPosition = [];
 
+    private AnimatedSprite2D _animatedSprite2D = null!;
+
     /// <summary>
     /// Used to block the fadeout in some situations, e.g. at the start of the game. This is automatically set to true
     /// on every jump.
@@ -132,7 +134,9 @@ public partial class Jumper : CharacterBody2D
 
     public override void _Ready()
     {
-        GetNode<AnimatedSprite2D>(SpriteNodeName).AnimationFinished += OnSpriteAnimationFinished;
+        _animatedSprite2D = GetNode<AnimatedSprite2D>(SpriteNodeName);
+
+        _animatedSprite2D.AnimationFinished += OnSpriteAnimationFinished;
     }
 
     public void RandomJump()
@@ -181,15 +185,13 @@ public partial class Jumper : CharacterBody2D
             velocity.Y += _gravity * (float)delta;
         }
 
-        AnimatedSprite2D sprite = GetNode<AnimatedSprite2D>(SpriteNodeName);
-
         if (_jumpVelocity != Vector2.Zero)
         {
             velocity = _jumpVelocity;
 
             if (!_lastJumpZeroAngle)
             {
-                sprite.FlipH = velocity.X < 0;
+                _animatedSprite2D.FlipH = velocity.X < 0;
             }
 
             _jumpVelocity = Vector2.Zero;
@@ -202,24 +204,7 @@ public partial class Jumper : CharacterBody2D
 
         Velocity = velocity;
 
-        if (Velocity.Y > 0)
-        {
-            sprite.Play(JumperAnimations.AnimationJump);
-        }
-        else if (Velocity.Y < 0)
-        {
-            sprite.Play(JumperAnimations.AnimationFall);
-        }
-
-        bool justLanded = !_wasOnFloor && IsOnFloor();
-        bool stuckInAir =
-            (sprite.Animation == JumperAnimations.AnimationFall || sprite.Animation == JumperAnimations.AnimationJump)
-            && Velocity.Y == 0;
-
-        if (justLanded || stuckInAir)
-        {
-            sprite.Play(JumperAnimations.AnimationLand);
-        }
+        PlayNotGroundedAnimation();
 
         _wasOnFloor = IsOnFloor();
 
@@ -319,6 +304,29 @@ public partial class Jumper : CharacterBody2D
         if (_framesSincePositionChange >= 60)
         {
             Position += Vector2.Up * 16;
+        }
+    }
+
+    private void PlayNotGroundedAnimation()
+    {
+        // Going up -> Jump, down -> Fall. Removing the check causes infinite animation start
+        if (!IsOnFloor())
+        {
+            string animation = Velocity.Y < 0 ? JumperAnimations.AnimationJump : JumperAnimations.AnimationFall;
+
+            _animatedSprite2D.Play(animation);
+        }
+
+        // Describes a situation when we stopped, but the animation is still playing the Jump/Fall frames
+        bool hasLandedButStillAnimating =
+            (
+                _animatedSprite2D.Animation == JumperAnimations.AnimationFall
+                || _animatedSprite2D.Animation == JumperAnimations.AnimationJump
+            ) && Velocity.IsEqualApprox(Vector2.Zero);
+
+        if (hasLandedButStillAnimating)
+        {
+            _animatedSprite2D.Play(JumperAnimations.AnimationLand);
         }
     }
 }
