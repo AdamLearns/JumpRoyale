@@ -165,14 +165,6 @@ public partial class Jumper : CharacterBody2D
         _canFadePlayerName = false;
     }
 
-    public void SetColor(string hexColor)
-    {
-        AnimatedSprite2D sprite = GetNode<AnimatedSprite2D>(SpriteNodeName);
-
-        sprite.Modulate = Color.FromHtml(hexColor);
-        sprite.Modulate = new Color(sprite.Modulate.R, sprite.Modulate.G, sprite.Modulate.B, 1f);
-    }
-
     public override void _PhysicsProcess(double delta)
     {
         Vector2 velocity = Velocity;
