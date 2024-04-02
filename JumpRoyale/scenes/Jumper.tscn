@@ -122,7 +122,8 @@ initial_velocity_min = 25.0
 initial_velocity_max = 40.0
 damping_min = 20.0
 damping_max = 20.0
-scale_amount_max = 3.0
+scale_amount_min = 2.0
+scale_amount_max = 4.0
 scale_amount_curve = SubResource("Curve_43alo")
 color = Color(1, 1, 1, 0.501961)
 
