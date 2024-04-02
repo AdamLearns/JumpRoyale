@@ -197,23 +197,16 @@ public partial class Jumper : CharacterBody2D
             _jumpVelocity = Vector2.Zero;
         }
 
-        RotateInAir(delta);
-
-        if (IsOnWall())
-        {
-            velocity.X = _previousXVelocity * -0.75f;
-        }
-
         Velocity = velocity;
 
-        PlayNotGroundedAnimation();
+        RotateInAir(delta);
+        BounceOffWall();
 
         _wasOnFloor = IsOnFloor();
-
-        UpdateNameTransparency();
-
         _previousXVelocity = Velocity.X;
 
+        PlayNotGroundedAnimation();
+        UpdateNameTransparency();
         MoveAndSlide();
         StorePosition();
     }
@@ -273,6 +266,16 @@ public partial class Jumper : CharacterBody2D
     private void SetNameAlpha(float alpha)
     {
         GetNode<RichTextLabel>(NameNodeName).Modulate = new Color(1, 1, 1, alpha);
+    }
+
+    private void BounceOffWall()
+    {
+        if (!IsOnWall())
+        {
+            return;
+        }
+
+        Velocity = new(_previousXVelocity * -0.75f, Velocity.Y);
     }
 
     /// <summary>
