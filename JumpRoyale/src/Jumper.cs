@@ -16,6 +16,7 @@ public partial class Jumper : CharacterBody2D
     private readonly HashSet<Vector2> _recentPosition = [];
 
     private AnimatedSprite2D _animatedSprite2D = null!;
+    private RichTextLabel _nameLabel = null!;
 
     /// <summary>
     /// Used to block the fadeout in some situations, e.g. at the start of the game. This is automatically set to true
@@ -57,10 +58,34 @@ public partial class Jumper : CharacterBody2D
 
         Position = new Vector2(x, y);
         Name = PlayerData.Name;
+    }
+
+    public override void _Ready()
+    {
+        _animatedSprite2D = GetNode<AnimatedSprite2D>(SpriteNodeName);
+        _nameLabel = GetNode<RichTextLabel>(NameNodeName);
 
         SetCharacter();
         SetPlayerName();
         SetGlow();
+
+        _animatedSprite2D.AnimationFinished += OnSpriteAnimationFinished;
+    }
+
+    public override void _PhysicsProcess(double delta)
+    {
+        StopOnFloor();
+        ApplyInitialGravity(delta);
+        ApplyJumpVelocity();
+        RotateInAir(delta);
+        BounceOffWall();
+        PlayNotGroundedAnimation();
+        UpdateNameTransparency();
+
+        _previousXVelocity = Velocity.X;
+
+        MoveAndSlide();
+        StorePosition();
     }
 
     /// <summary>
@@ -72,9 +97,7 @@ public partial class Jumper : CharacterBody2D
         // Note: ToHTML() excludes alpha component to avoid transparent names
         string colorCode = Color.FromString(PlayerData.PlayerNameColor, GameConstants.DefaultNameColor).ToHtml(false);
 
-        RichTextLabel nameLabel = GetNode<RichTextLabel>(NameNodeName);
-
-        nameLabel.Text = $"[center][color={colorCode}]{PlayerData.Name}[/color][/center]";
+        _nameLabel.Text = $"[center][color={colorCode}]{PlayerData.Name}[/color][/center]";
     }
 
     public void SetCrazyParticles()
@@ -131,16 +154,9 @@ public partial class Jumper : CharacterBody2D
         particles.Visible = false;
     }
 
-    public override void _Ready()
-    {
-        _animatedSprite2D = GetNode<AnimatedSprite2D>(SpriteNodeName);
-
-        _animatedSprite2D.AnimationFinished += OnSpriteAnimationFinished;
-    }
-
     public void RandomJump()
     {
-        Jump(Rng.IntRange(45, 135), Rng.IntRange(10, 100));
+        Jump(Rng.IntRange(45, 135), Rng.IntRange(75, 100));
     }
 
     public void Jump(int angle, int power)
@@ -166,22 +182,6 @@ public partial class Jumper : CharacterBody2D
     public void DisableNameFadeout()
     {
         _canFadePlayerName = false;
-    }
-
-    public override void _PhysicsProcess(double delta)
-    {
-        StopOnFloor();
-        ApplyInitialGravity(delta);
-        ApplyJumpVelocity();
-        RotateInAir(delta);
-        BounceOffWall();
-        PlayNotGroundedAnimation();
-        UpdateNameTransparency();
-
-        _previousXVelocity = Velocity.X;
-
-        MoveAndSlide();
-        StorePosition();
     }
 
     public void OnSpriteAnimationFinished()
@@ -236,8 +236,7 @@ public partial class Jumper : CharacterBody2D
     private void ResetNameTimer()
     {
         _fontVisibilityTimerStartTime = Time.GetTicksMsec();
-
-        GetNode<RichTextLabel>(NameNodeName).Visible = true;
+        _nameLabel.Visible = true;
     }
 
     private void UpdateNameTransparency()
@@ -268,7 +267,7 @@ public partial class Jumper : CharacterBody2D
 
     private void SetNameAlpha(float alpha)
     {
-        GetNode<RichTextLabel>(NameNodeName).Modulate = new Color(1, 1, 1, alpha);
+        _nameLabel.Modulate = new Color(1, 1, 1, alpha);
     }
 
     /// <summary>
