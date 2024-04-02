@@ -209,7 +209,7 @@ public partial class Jumper : CharacterBody2D
     {
         Velocity = !_jumpVelocity.IsEqualApprox(Vector2.Zero) ? _jumpVelocity : Velocity;
 
-        // Flip the sprite base on our x velocity, but only if we recently jumped at a non-zero angle
+        // Flip the sprite based on our x velocity, but only if we recently jumped at a non-zero angle
         if (!Mathf.IsZeroApprox(Velocity.X) && !_lastJumpZeroAngle)
         {
             _animatedSprite2D.FlipH = Velocity.X < 0;
