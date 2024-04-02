@@ -174,15 +174,14 @@ public partial class Jumper : CharacterBody2D
         StopOnFloor();
         ApplyInitialGravity(delta);
         ApplyJumpVelocity();
-
         RotateInAir(delta);
         BounceOffWall();
+        PlayNotGroundedAnimation();
+        UpdateNameTransparency();
 
         _wasOnFloor = IsOnFloor();
         _previousXVelocity = Velocity.X;
 
-        PlayNotGroundedAnimation();
-        UpdateNameTransparency();
         MoveAndSlide();
         StorePosition();
     }
