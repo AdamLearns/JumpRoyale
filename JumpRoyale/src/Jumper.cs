@@ -360,11 +360,11 @@ public partial class Jumper : CharacterBody2D
         // Visualization, caps at J60. Approximately every +100 velocity on the plot is the next 10 angles:
         // https://www.wolframalpha.com/input?i=min%28max%28%284sin%28%28abs%28x%29%2F280%29+%2B+300%29%2B5%29%2C1%29%2C+7%29+%3Bx+from+0+to+700
         float velocity = Math.Abs(Velocity.X);
-        float rotationSpeedFromVelocity = (float)(4 * Math.Sin((velocity / 280) + 300) + 5);
-        float clampedRotation = Math.Clamp(rotationSpeedFromVelocity, 1, 7);
+        float rotationSpeedMultiplier = (float)(4 * Math.Sin((velocity / 280) + 300) + 5);
+        float clampedMultiplier = Math.Clamp(rotationSpeedMultiplier, 1, 7);
 
         // Calculate the rotation factor and flip the value if we are going left (rotating in the right direction)
-        float rotationFactor = 200 * (float)delta * (Velocity.X < 0 ? -1 : 1) * clampedRotation;
+        float rotationFactor = 200 * (float)delta * (Velocity.X < 0 ? -1 : 1) * clampedMultiplier;
 
         _animatedSprite2D.RotationDegrees = IsOnFloor() ? 0 : _animatedSprite2D.RotationDegrees + rotationFactor;
     }
