@@ -171,33 +171,9 @@ public partial class Jumper : CharacterBody2D
 
     public override void _PhysicsProcess(double delta)
     {
-        Vector2 velocity = Velocity;
-
-        if (IsOnFloor())
-        {
-            velocity.Y = 0;
-            velocity.X = 0;
-        }
-
-        // Add the gravity.
-        if (!IsOnFloor())
-        {
-            velocity.Y += _gravity * (float)delta;
-        }
-
-        if (_jumpVelocity != Vector2.Zero)
-        {
-            velocity = _jumpVelocity;
-
-            if (!_lastJumpZeroAngle)
-            {
-                _animatedSprite2D.FlipH = velocity.X < 0;
-            }
-
-            _jumpVelocity = Vector2.Zero;
-        }
-
-        Velocity = velocity;
+        StopOnFloor();
+        ApplyInitialGravity(delta);
+        ApplyJumpVelocity();
 
         RotateInAir(delta);
         BounceOffWall();
@@ -228,6 +204,36 @@ public partial class Jumper : CharacterBody2D
     {
         SetNameAlpha(1f);
         ResetNameTimer();
+    }
+
+    private void ApplyJumpVelocity()
+    {
+        Velocity = !_jumpVelocity.IsEqualApprox(Vector2.Zero) ? _jumpVelocity : Velocity;
+
+        // Flip the sprite base on our x velocity, but only if we recently jumped at a non-zero angle
+        if (!Mathf.IsZeroApprox(Velocity.X) && !_lastJumpZeroAngle)
+        {
+            _animatedSprite2D.FlipH = Velocity.X < 0;
+        }
+
+        // Reset the jump velocity to indicate that we should not continuously apply the calculated velocity
+        _jumpVelocity = Vector2.Zero;
+    }
+
+    private void ApplyInitialGravity(double delta)
+    {
+        if (!IsOnFloor())
+        {
+            Velocity = new(Velocity.X, Velocity.Y + _gravity * (float)delta);
+        }
+    }
+
+    private void StopOnFloor()
+    {
+        if (IsOnFloor())
+        {
+            Velocity = Vector2.Zero;
+        }
     }
 
     private void ResetNameTimer()
@@ -270,12 +276,10 @@ public partial class Jumper : CharacterBody2D
 
     private void BounceOffWall()
     {
-        if (!IsOnWall())
+        if (IsOnWall())
         {
-            return;
+            Velocity = new(_previousXVelocity * -0.75f, Velocity.Y);
         }
-
-        Velocity = new(_previousXVelocity * -0.75f, Velocity.Y);
     }
 
     /// <summary>
