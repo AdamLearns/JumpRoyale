@@ -7,7 +7,8 @@ public partial class Jumper : CharacterBody2D
 {
     private const string SpriteNodeName = "Sprite";
     private const string NameNodeName = "Name";
-    private const string ParticleSystemNodeName = "Glow";
+    private const string GlowParticlesNodeName = "Glow";
+    private const string JumpSmokeParticlesNodeName = "JumpSmoke";
     private const float NameFadeoutTime = 5000f;
 
     /// <summary>
@@ -17,7 +18,8 @@ public partial class Jumper : CharacterBody2D
 
     private AnimatedSprite2D _animatedSprite2D = null!;
     private RichTextLabel _nameLabel = null!;
-    private CpuParticles2D _cpuParticles2D = null!;
+    private CpuParticles2D _glowParticles = null!;
+    private CpuParticles2D _smokeParticles = null!;
 
     /// <summary>
     /// Used to block the fadeout in some situations, e.g. at the start of the game. This is automatically set to true
@@ -64,7 +66,8 @@ public partial class Jumper : CharacterBody2D
     {
         _animatedSprite2D = GetNode<AnimatedSprite2D>(SpriteNodeName);
         _nameLabel = GetNode<RichTextLabel>(NameNodeName);
-        _cpuParticles2D = GetNode<CpuParticles2D>(ParticleSystemNodeName);
+        _glowParticles = GetNode<CpuParticles2D>(GlowParticlesNodeName);
+        _smokeParticles = GetNode<CpuParticles2D>(JumpSmokeParticlesNodeName);
 
         SetCharacter();
         SetPlayerName();
@@ -104,7 +107,7 @@ public partial class Jumper : CharacterBody2D
     public void SetCrazyParticles()
     {
         // Make sure we can repeatedly call this function without unbounded growth.
-        _cpuParticles2D.Amount = Math.Min(_cpuParticles2D.Amount * 5, 500);
+        _glowParticles.Amount = Math.Min(_glowParticles.Amount * 5, 500);
     }
 
     public void SetCharacter()
@@ -144,13 +147,13 @@ public partial class Jumper : CharacterBody2D
         Color color = Color.FromHtml(colorString);
 
         color.A = 1f;
-        _cpuParticles2D.SelfModulate = color;
-        _cpuParticles2D.Visible = true;
+        _glowParticles.SelfModulate = color;
+        _glowParticles.Visible = true;
     }
 
     public void DisableGlow()
     {
-        _cpuParticles2D.Visible = false;
+        _glowParticles.Visible = false;
     }
 
     public void RandomJump()

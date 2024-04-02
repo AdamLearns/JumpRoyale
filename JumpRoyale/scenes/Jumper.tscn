@@ -90,7 +90,6 @@ collision_layer = 2
 script = ExtResource("1_jn4ug")
 
 [node name="Glow" type="CPUParticles2D" parent="."]
-visible = false
 position = Vector2(0, -14)
 amount = 20
 emission_shape = 2
@@ -104,6 +103,18 @@ damping_min = 100.0
 damping_max = 100.0
 angle_max = 360.0
 scale_amount_max = 3.0
+
+[node name="JumpSmoke" type="CPUParticles2D" parent="."]
+amount = 20
+explosiveness = 1.0
+direction = Vector2(0, -1)
+spread = 90.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 10.0
+initial_velocity_max = 20.0
+damping_min = 20.0
+damping_max = 20.0
+scale_amount_max = 2.0
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -16)
