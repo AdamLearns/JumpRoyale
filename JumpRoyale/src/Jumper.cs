@@ -356,7 +356,7 @@ public partial class Jumper : CharacterBody2D
         // Formula to automatically calculate the rotation speed based on the character's x jump velocity. The maximum
         // velocity is 700, but it's a bit too fast, so we want to clamp it at around 600. The formula was shortened and
         // tweaked to always output 1 at non-zero angle with low value, with a maximum of 7 at angle of 60, which should
-        // not increase linearly, but a bit slower at the start
+        // not increase linearly, but a bit slower at the start. Assuming the full power jump.
         // Visualization, caps at J60. Approximately every +100 velocity on the plot is the next 10 angles:
         // https://www.wolframalpha.com/input?i=min%28max%28%284sin%28%28abs%28x%29%2F280%29+%2B+300%29%2B5%29%2C1%29%2C+7%29+%3Bx+from+0+to+700
         float velocity = Math.Abs(Velocity.X);
