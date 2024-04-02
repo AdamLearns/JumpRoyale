@@ -19,7 +19,7 @@ public partial class Jumper : CharacterBody2D
     private AnimatedSprite2D _animatedSprite2D = null!;
     private RichTextLabel _nameLabel = null!;
     private CpuParticles2D _glowParticles = null!;
-    private CpuParticles2D _smokeParticles = null!;
+    private CpuParticles2D _jumpSmokeParticles = null!;
 
     /// <summary>
     /// Used to block the fadeout in some situations, e.g. at the start of the game. This is automatically set to true
@@ -67,7 +67,7 @@ public partial class Jumper : CharacterBody2D
         _animatedSprite2D = GetNode<AnimatedSprite2D>(SpriteNodeName);
         _nameLabel = GetNode<RichTextLabel>(NameNodeName);
         _glowParticles = GetNode<CpuParticles2D>(GlowParticlesNodeName);
-        _smokeParticles = GetNode<CpuParticles2D>(JumpSmokeParticlesNodeName);
+        _jumpSmokeParticles = GetNode<CpuParticles2D>(JumpSmokeParticlesNodeName);
 
         SetCharacter();
         SetPlayerName();
@@ -174,6 +174,9 @@ public partial class Jumper : CharacterBody2D
             _lastJumpZeroAngle = angle == 90; // 0 in the command is expressed here as 90.
 
             PlayerData.NumJumps++;
+
+            // Emit particles after executing the command
+            _jumpSmokeParticles.Restart();
         }
     }
 
