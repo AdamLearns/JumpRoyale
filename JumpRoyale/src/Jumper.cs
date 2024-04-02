@@ -17,6 +17,7 @@ public partial class Jumper : CharacterBody2D
 
     private AnimatedSprite2D _animatedSprite2D = null!;
     private RichTextLabel _nameLabel = null!;
+    private CpuParticles2D _cpuParticles2D = null!;
 
     /// <summary>
     /// Used to block the fadeout in some situations, e.g. at the start of the game. This is automatically set to true
@@ -55,7 +56,6 @@ public partial class Jumper : CharacterBody2D
     public void Init(int x, int y, [NotNull] PlayerData playerData)
     {
         PlayerData = playerData;
-
         Position = new Vector2(x, y);
         Name = PlayerData.Name;
     }
@@ -64,6 +64,7 @@ public partial class Jumper : CharacterBody2D
     {
         _animatedSprite2D = GetNode<AnimatedSprite2D>(SpriteNodeName);
         _nameLabel = GetNode<RichTextLabel>(NameNodeName);
+        _cpuParticles2D = GetNode<CpuParticles2D>(ParticleSystemNodeName);
 
         SetCharacter();
         SetPlayerName();
@@ -102,15 +103,12 @@ public partial class Jumper : CharacterBody2D
 
     public void SetCrazyParticles()
     {
-        CpuParticles2D particles = GetGlowNode();
-
         // Make sure we can repeatedly call this function without unbounded growth.
-        particles.Amount = Math.Min(particles.Amount * 5, 500);
+        _cpuParticles2D.Amount = Math.Min(_cpuParticles2D.Amount * 5, 500);
     }
 
     public void SetCharacter()
     {
-        AnimatedSprite2D sprite = GetNode<AnimatedSprite2D>(SpriteNodeName);
         int choice = PlayerData.CharacterChoice;
         string gender = choice > 9 ? "f" : "m";
         int charNumber = ((choice - 1) % 9 / 3) + 1;
@@ -118,11 +116,15 @@ public partial class Jumper : CharacterBody2D
 
         GD.Print("Choice: " + choice + " Gender: " + gender + " Char: " + charNumber + " Clothing: " + clothingNumber);
 
-        sprite.SpriteFrames = SpriteFrameCreator.Instance.GetSpriteFrames(gender, charNumber, clothingNumber);
+        _animatedSprite2D.SpriteFrames = SpriteFrameCreator.Instance.GetSpriteFrames(
+            gender,
+            charNumber,
+            clothingNumber
+        );
 
         if (IsOnFloor())
         {
-            sprite.Play(JumperAnimations.AnimationIdle);
+            _animatedSprite2D.Play(JumperAnimations.AnimationIdle);
         }
     }
 
@@ -139,19 +141,16 @@ public partial class Jumper : CharacterBody2D
             return;
         }
 
-        CpuParticles2D particles = GetGlowNode();
         Color color = Color.FromHtml(colorString);
-        color.A = 1f;
 
-        particles.SelfModulate = color;
-        particles.Visible = true;
+        color.A = 1f;
+        _cpuParticles2D.SelfModulate = color;
+        _cpuParticles2D.Visible = true;
     }
 
     public void DisableGlow()
     {
-        CpuParticles2D particles = GetGlowNode();
-
-        particles.Visible = false;
+        _cpuParticles2D.Visible = false;
     }
 
     public void RandomJump()
@@ -168,11 +167,10 @@ public partial class Jumper : CharacterBody2D
             _jumpVelocity.X = Mathf.Cos(Mathf.DegToRad(angle + 180));
             _jumpVelocity.Y = Mathf.Sin(Mathf.DegToRad(angle + 180));
             _jumpVelocity = _jumpVelocity.Normalized() * (float)normalizedPower;
-
-            PlayerData.NumJumps++;
-
             _canFadePlayerName = true;
             _lastJumpZeroAngle = angle == 90; // 0 in the command is expressed here as 90.
+
+            PlayerData.NumJumps++;
         }
     }
 
@@ -186,11 +184,9 @@ public partial class Jumper : CharacterBody2D
 
     public void OnSpriteAnimationFinished()
     {
-        AnimatedSprite2D sprite = GetNode<AnimatedSprite2D>(SpriteNodeName);
-
-        if (sprite.Animation == JumperAnimations.AnimationLand)
+        if (_animatedSprite2D.Animation == JumperAnimations.AnimationLand)
         {
-            sprite.Play(JumperAnimations.AnimationIdle);
+            _animatedSprite2D.Play(JumperAnimations.AnimationIdle);
         }
     }
 
@@ -258,11 +254,6 @@ public partial class Jumper : CharacterBody2D
         float diff = diffMs / NameFadeoutTime;
 
         return Math.Max(0, 1 - diff);
-    }
-
-    private CpuParticles2D GetGlowNode()
-    {
-        return GetNode<CpuParticles2D>(ParticleSystemNodeName);
     }
 
     private void SetNameAlpha(float alpha)
