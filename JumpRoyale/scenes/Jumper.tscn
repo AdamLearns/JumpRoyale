@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://bhke5myraos1m"]
+[gd_scene load_steps=20 format=3 uid="uid://bhke5myraos1m"]
 
 [ext_resource type="Script" path="res://src/Jumper.cs" id="1_jn4ug"]
 [ext_resource type="Texture2D" uid="uid://dpubrdjemodhh" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_idle_0.png" id="1_xnwtq"]
@@ -16,6 +16,10 @@
 [ext_resource type="Texture2D" uid="uid://cr7baxkpawx43" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_land_0.png" id="11_3fxgy"]
 [ext_resource type="Texture2D" uid="uid://de5vceaa85fe0" path="res://assets/sprites/characters/Male/Character 1/Clothes 1/Character1M_1_land_1.png" id="12_bwbvy"]
 [ext_resource type="Theme" uid="uid://nfhtrrji7j2u" path="res://scenes/Jumper.tres" id="16_fsbtc"]
+
+[sub_resource type="Curve" id="Curve_43alo"]
+_data = [Vector2(0, 0.010989), 0.0, 0.0, 0, 0, Vector2(0.0708661, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_1dd66"]
 animations = [{
@@ -90,7 +94,6 @@ collision_layer = 2
 script = ExtResource("1_jn4ug")
 
 [node name="Glow" type="CPUParticles2D" parent="."]
-visible = false
 position = Vector2(0, -14)
 amount = 20
 emission_shape = 2
@@ -104,6 +107,24 @@ damping_min = 100.0
 damping_max = 100.0
 angle_max = 360.0
 scale_amount_max = 3.0
+
+[node name="JumpSmoke" type="CPUParticles2D" parent="."]
+scale = Vector2(-1, -1)
+emitting = false
+amount = 20
+one_shot = true
+explosiveness = 1.0
+direction = Vector2(0, 1)
+spread = 90.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 25.0
+initial_velocity_max = 40.0
+damping_min = 20.0
+damping_max = 20.0
+scale_amount_min = 2.0
+scale_amount_max = 4.0
+scale_amount_curve = SubResource("Curve_43alo")
+color = Color(1, 1, 1, 0.501961)
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -16)
