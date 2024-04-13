@@ -100,6 +100,16 @@ public partial class Arena : Node2D
                 commandHandler.SpawnFakePlayers();
             }
         }
+
+        // Make everyone jump, no exceptions
+        if (Input.IsPhysicalKeyPressed(Key.J))
+        {
+            foreach (Jumper jumper in ActiveJumpers.Instance.AllJumpers())
+            {
+                jumper.RandomJump();
+                jumper.FlashPlayerName();
+            }
+        }
     }
 
     /// <summary>
