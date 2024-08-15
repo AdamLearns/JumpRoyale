@@ -20,6 +20,8 @@ public partial class Arena : Node2D
 
     private TileMap _lobbyTilemap = new();
 
+    private ArenaBuilder _arenaBuilder = null!;
+
     private bool _hasGameEnded;
 
     private int _ceilingHeight;
@@ -54,6 +56,7 @@ public partial class Arena : Node2D
         PlayerStats.Instance.LoadPlayerData();
 
         _lobbyTilemap = new TileMap { Name = "TileMap", TileSet = TileSetToUse };
+        _arenaBuilder = new(_lobbyTilemap);
 
         TwitchChatClient twitchChatClient = new();
 
