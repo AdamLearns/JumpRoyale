@@ -8,10 +8,10 @@ public partial class TimerOverlay : VFlowContainer
 
     private static readonly int GameLength = GameOverlay.GameLength;
 
-    private int _timerSeconds = GameLength;
-
     [Signal]
     public delegate void TimerDoneEventHandler();
+
+    public int TimerSeconds { get; private set; } = GameLength;
 
     public void Init()
     {
@@ -24,7 +24,7 @@ public partial class TimerOverlay : VFlowContainer
 
         UpdateTimer();
 
-        if (_timerSeconds <= 0)
+        if (TimerSeconds <= 0)
         {
             EmitSignal(SignalName.TimerDone);
             return;
@@ -35,14 +35,14 @@ public partial class TimerOverlay : VFlowContainer
 
     private void UpdateTimer()
     {
-        _timerSeconds--;
+        TimerSeconds--;
 
-        int seconds = _timerSeconds % 60;
-        int minutes = _timerSeconds / 60;
+        int seconds = TimerSeconds % 60;
+        int minutes = TimerSeconds / 60;
 
         GetNode<Label>(TimerNodeName).Text = $"{minutes}:{seconds:00}";
         Sprite2D sprite = GetNode<Sprite2D>(SpriteName);
-        if (_timerSeconds > 15)
+        if (TimerSeconds > 15)
         {
             sprite.Modulate = Colors.White;
             return;
