@@ -203,20 +203,20 @@ public partial class Arena : Node2D
         // Draw the vertical walls
         for (int y = wallStartY; y >= _ceilingHeight; y--)
         {
-            _lobbyTilemap.SetCell(0, new Vector2I(0, y), 0, new Vector2I(12, 1));
-            _lobbyTilemap.SetCell(0, new Vector2I(_widthInTiles - 1, y), 0, new Vector2I(12, 1));
+            _arenaBuilder.DrawPoint(0, y);
+            _arenaBuilder.DrawPoint(_widthInTiles - 1, y);
         }
 
         for (int y = wallStartY; y >= _ceilingHeight - 200; y--)
         {
-            _lobbyTilemap.SetCell(0, new Vector2I(0, y), 0, new Vector2I(12, 1));
-            _lobbyTilemap.SetCell(0, new Vector2I(_widthInTiles - 1, y), 0, new Vector2I(12, 1));
+            _arenaBuilder.DrawPoint(0, y);
+            _arenaBuilder.DrawPoint(_widthInTiles - 1, y);
         }
 
         // Draw the ceiling
         for (int x = 1; x < _widthInTiles - 1; x++)
         {
-            _lobbyTilemap.SetCell(0, new Vector2I(x, _ceilingHeight), 0, new Vector2I(12, 1));
+            _arenaBuilder.DrawPoint(x, _ceilingHeight);
         }
 
         // Generate some lobby platforms
@@ -243,7 +243,7 @@ public partial class Arena : Node2D
                 int blockWidth = 2 + (int)(difficultyFactor * 24);
                 int blockX = Rng.IntRange(2, _widthInTiles - 1 - blockWidth);
 
-                DrawRectangleOfTiles(blockX, y + 1, blockWidth, blockWidth, new Vector2I(12, 1));
+                DrawRectangleOfTiles(blockX, y + 1, blockWidth, blockWidth);
             }
         }
 
@@ -343,7 +343,7 @@ public partial class Arena : Node2D
             {
                 if (x == 0 || x == _widthInTiles - 1 || y == _heightInTiles - 1)
                 {
-                    _lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(12, 1));
+                    _arenaBuilder.DrawPoint(x, y);
                 }
                 else
                 {
@@ -393,21 +393,9 @@ public partial class Arena : Node2D
         camera.Position = new Vector2(0, 0);
 
         // Draw podiums
-        DrawRectangleOfTiles(podiumX, podiumY, podiumWidth, podiumHeight, new Vector2I(12, 1));
-        DrawRectangleOfTiles(
-            podiumX - podiumWidth,
-            podiumY,
-            podiumWidth,
-            podiumHeight - podiumHeightDifference,
-            new Vector2I(12, 1)
-        );
-        DrawRectangleOfTiles(
-            podiumX + podiumWidth,
-            podiumY,
-            podiumWidth,
-            podiumHeight - podiumHeightDifference * 2,
-            new Vector2I(12, 1)
-        );
+        DrawRectangleOfTiles(podiumX, podiumY, podiumWidth, podiumHeight);
+        DrawRectangleOfTiles(podiumX - podiumWidth, podiumY, podiumWidth, podiumHeight - podiumHeightDifference);
+        DrawRectangleOfTiles(podiumX + podiumWidth, podiumY, podiumWidth, podiumHeight - podiumHeightDifference * 2);
 
         // Place winners on podiums
         for (int i = 0; i < winners.Length; i++)
@@ -438,13 +426,13 @@ public partial class Arena : Node2D
         }
     }
 
-    private void DrawRectangleOfTiles(int leftX, int bottomY, int width, int height, Vector2I tileIndex)
+    private void DrawRectangleOfTiles(int leftX, int bottomY, int width, int height)
     {
         for (int x = leftX; x < leftX + width; x++)
         {
             for (int y = bottomY; y > bottomY - height; y--)
             {
-                _lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, tileIndex);
+                _arenaBuilder.DrawPoint(x, y);
             }
         }
     }
