@@ -228,7 +228,7 @@ public partial class Arena : Node2D
             int width = Rng.IntRange(3, 15);
             int startX = Rng.IntRange(2, _widthInTiles - width - 2);
 
-            AddPlatform(startX, y, width);
+            _arenaBuilder.DrawPlatform(startX, y, width);
         }
 
         for (int y = _ceilingHeight - 1; y >= _ceilingHeight - ArenaHeightInTiles; y--)
@@ -292,30 +292,10 @@ public partial class Arena : Node2D
             int width = Rng.IntRange(3, 15 - (int)Math.Round(6 * difficultyFactor));
             int startX = Rng.IntRange(2, _widthInTiles - width - 2);
 
-            AddPlatform(startX, y, width);
+            _arenaBuilder.DrawPlatform(startX, y, width);
         }
 
         _generatedMaxHeight = cameraPosInTiles;
-    }
-
-    private void AddPlatform(int x, int y, int width)
-    {
-        int endX = x + width - 1;
-
-        // Draw left side
-        _lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(17, 1));
-
-        // Draw middle
-        if (width > 2)
-        {
-            for (int i = x + 1; i < endX; i++)
-            {
-                _lobbyTilemap.SetCell(0, new Vector2I(i, y), 0, new Vector2I(18, 1));
-            }
-        }
-
-        // Draw right side
-        _lobbyTilemap.SetCell(0, new Vector2I(endX, y), 0, new Vector2I(19, 1));
     }
 
     private void OnGameTimerDone()
@@ -347,7 +327,7 @@ public partial class Arena : Node2D
                 }
                 else
                 {
-                    _lobbyTilemap.SetCell(0, new Vector2I(x, y), -1);
+                    _arenaBuilder.RemovePoint(x, y);
                 }
             }
         }
@@ -365,9 +345,9 @@ public partial class Arena : Node2D
         int startY = podiumY + podiumHeight + 10;
         for (int y = startY; y < _heightInTiles; y += 6)
         {
-            for (int x = Rng.IntRange(3, 7); x < _widthInTiles - 5; x += Rng.IntRange(2, 6))
+            for (int x = Rng.IntRange(3, 7); x < _widthInTiles - 5; x += Rng.IntRange(4, 6))
             {
-                AddPlatform(x, y, 1);
+                _arenaBuilder.DrawPlatform(x, y, 0);
                 platformCoords.Add(new Tuple<int, int>(x, y));
             }
         }
@@ -475,7 +455,7 @@ public partial class Arena : Node2D
     {
         for (int x = 1; x < _widthInTiles - 1; x++)
         {
-            _lobbyTilemap.SetCell(0, new Vector2I(x, _ceilingHeight), -1);
+            _arenaBuilder.RemovePoint(x, _ceilingHeight);
         }
 
         GetLobbyOverlay().Visible = false;
