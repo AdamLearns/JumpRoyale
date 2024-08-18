@@ -5,9 +5,13 @@ public class ArenaBuilder(TileMap tileMap)
     /// <summary>
     /// Defines at what Y in tiles the object type should change. For reference, the screen is 63 tiles tall on a 1080p
     /// screen and Y goes negative upwards. Important note: the current arena is placed one screen below the default
-    /// position, so the actual next screen is located at Y=0.
+    /// position, so the actual next screen is located at Y=0. The estimate average max height the players reach
+    /// during the game is around 3500px (actually -155 height in the game), so the last texture change should be
+    /// "almost" at the estimated max height. Despite the screen being 63 tiles tall, we change the object type every 50
+    /// tiles to give players a chance to see all the textures. With 63~ tiles per change, the last change occurs at
+    /// 4000px, which will barely be seen by players.
     /// </summary>
-    private readonly int[] _objectTypeChangeHeights = [0, -65, -130, -195];
+    private readonly int[] _objectTypeChangeHeights = [0, -50, -100, -150];
     private readonly TileMap _tileMap = tileMap;
 
     public void DrawPlatform(int x, int y, int width)
