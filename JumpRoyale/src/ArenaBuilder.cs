@@ -40,7 +40,7 @@ public class ArenaBuilder(TileMap tileMap)
         {
             < -195 => GameObjectType.Gold,
             < -130 => GameObjectType.Brick,
-            < -65 => GameObjectType.Clay,
+            < -65 => GameObjectType.Terracotta,
             < 0 => GameObjectType.Concrete,
             _ => GameObjectType.Stone,
         };

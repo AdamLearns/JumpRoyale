@@ -2,7 +2,7 @@ public enum GameObjectType
 {
     Stone,
     Concrete,
-    Clay,
+    Terracotta,
     Brick,
     Gold,
 }

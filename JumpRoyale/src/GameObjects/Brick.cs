@@ -1,11 +1,13 @@
-public record BrickObject : BaseObject
+public record Brick : BaseObject
 {
-    public BrickObject()
+    public Brick()
         : base(
             GameObjectAtlasCoords.BrickBlock,
             GameObjectAtlasCoords.BrickPlatformLeft,
             GameObjectAtlasCoords.BrickPlatformMiddle,
             GameObjectAtlasCoords.BrickPlatformRight
         )
-    { }
+    {
+        // Class intentionally left blank
+    }
 }

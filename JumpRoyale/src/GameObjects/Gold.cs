@@ -1,11 +1,13 @@
-public record GoldObject : BaseObject
+public record Gold : BaseObject
 {
-    public GoldObject()
+    public Gold()
         : base(
             GameObjectAtlasCoords.GoldBlock,
             GameObjectAtlasCoords.GoldPlatformLeft,
             GameObjectAtlasCoords.GoldPlatformMiddle,
             GameObjectAtlasCoords.GoldPlatformRight
         )
-    { }
+    {
+        // Class intentionally left blank
+    }
 }

@@ -1,11 +1,13 @@
-public record StoneObject : BaseObject
+public record Stone : BaseObject
 {
-    public StoneObject()
+    public Stone()
         : base(
             GameObjectAtlasCoords.StoneBlock,
             GameObjectAtlasCoords.StonePlatformLeft,
             GameObjectAtlasCoords.StonePlatformMiddle,
             GameObjectAtlasCoords.StonePlatformRight
         )
-    { }
+    {
+        // Class intentionally left blank
+    }
 }

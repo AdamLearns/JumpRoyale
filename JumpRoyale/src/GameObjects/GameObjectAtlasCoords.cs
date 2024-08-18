@@ -1,10 +1,13 @@
 using Godot;
 
+/// <summary>
+/// Helper class containing the atlas coords of different sprites, stored as named coords for convenience.
+/// </summary>
 public static class GameObjectAtlasCoords
 {
     public static readonly Vector2I StoneBlock = new(12, 1);
     public static readonly Vector2I ConcreteBlock = new(12, 5);
-    public static readonly Vector2I ClayBlock = new(12, 9);
+    public static readonly Vector2I TerracottaBlock = new(12, 9);
     public static readonly Vector2I BrickBlock = new(20, 6);
     public static readonly Vector2I GoldBlock = new(17, 9);
 
@@ -16,9 +19,9 @@ public static class GameObjectAtlasCoords
     public static readonly Vector2I ConcretePlatformMiddle = new(18, 2);
     public static readonly Vector2I ConcretePlatformRight = new(19, 2);
 
-    public static readonly Vector2I ClayPlatformLeft = new(13, 3);
-    public static readonly Vector2I ClayPlatformMiddle = new(14, 3);
-    public static readonly Vector2I ClayPlatformRight = new(15, 3);
+    public static readonly Vector2I TerracottaPlatformLeft = new(13, 3);
+    public static readonly Vector2I TerracottaPlatformMiddle = new(14, 3);
+    public static readonly Vector2I TerracottaPlatformRight = new(15, 3);
 
     public static readonly Vector2I BrickPlatformLeft = new(17, 3);
     public static readonly Vector2I BrickPlatformMiddle = new(18, 3);
