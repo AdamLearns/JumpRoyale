@@ -2,6 +2,12 @@ using Godot;
 
 public class ArenaBuilder(TileMap tileMap)
 {
+    /// <summary>
+    /// Defines at what Y in tiles the object type should change. For reference, the screen is 63 tiles tall on a 1080p
+    /// screen and Y goes negative upwards. Important note: the current arena is placed one screen below the default
+    /// position, so the actual next screen is located at Y=0.
+    /// </summary>
+    private readonly int[] _objectTypeChangeHeights = [0, -65, -130, -195];
     private readonly TileMap _tileMap = tileMap;
 
     public void DrawPlatform(int x, int y, int width)
@@ -38,11 +44,12 @@ public class ArenaBuilder(TileMap tileMap)
     {
         return y switch
         {
-            < -195 => GameObjectType.Gold,
-            < -130 => GameObjectType.Brick,
-            < -65 => GameObjectType.Terracotta,
-            < 0 => GameObjectType.Concrete,
-            _ => GameObjectType.Stone,
+            // Note: can't use a simple "< _objectTypeChangeHeights[3]", because it requires a constant value
+            var value when value < _objectTypeChangeHeights[3] => GameObjectType.Gold,
+            var value when value < _objectTypeChangeHeights[2] => GameObjectType.Brick,
+            var value when value < _objectTypeChangeHeights[1] => GameObjectType.Terracotta,
+            var value when value < _objectTypeChangeHeights[0] => GameObjectType.Concrete,
+            _ => GameObjectType.Stone // Default object will always be drawn first - the brown stone object
         };
     }
 
