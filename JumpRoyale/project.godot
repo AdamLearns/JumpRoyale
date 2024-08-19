@@ -34,6 +34,11 @@ project/assembly_name="Jump Royale"
 
 enabled=PackedStringArray()
 
+[gui]
+
+theme/default_font_hinting=0
+theme/default_font_multichannel_signed_distance_field=true
+
 [input]
 
 ui_left={
