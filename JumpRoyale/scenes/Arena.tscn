@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://src/Arena.cs" id="1_5vcv2"]
 [ext_resource type="PackedScene" uid="uid://bhke5myraos1m" path="res://scenes/Jumper.tscn" id="2_6nvro"]
-[ext_resource type="TileSet" uid="uid://d0rfikv8mlry3" path="res://scenes/TileSet.tres" id="3_cg3j3"]
+[ext_resource type="TileSet" uid="uid://d0rfikv8mlry3" path="res://Resources/TileSet.tres" id="3_cg3j3"]
 [ext_resource type="PackedScene" uid="uid://bvl6vnp0t3iy6" path="res://scenes/LobbyOverlay.tscn" id="4_2j1ab"]
 [ext_resource type="PackedScene" uid="uid://c5b384kxo0vyl" path="res://scenes/GameOverlay.tscn" id="5_5yfyu"]
 [ext_resource type="PackedScene" uid="uid://cibfccggfqmwh" path="res://scenes/EndScreenOverlay.tscn" id="6_eibxd"]
@@ -25,8 +25,10 @@ position_smoothing_speed = 0.02
 z_index = 1
 anchors_preset = 0
 anchor_right = 0.0
-offset_left = 549.0
-offset_right = 1464.0
+offset_left = 410.0
+offset_top = 118.0
+offset_right = 1512.0
+offset_bottom = 818.89
 grow_horizontal = 1
 size_flags_horizontal = 8
 
