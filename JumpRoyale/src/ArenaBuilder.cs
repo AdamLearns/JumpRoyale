@@ -16,14 +16,16 @@ public class ArenaBuilder(TileMap tileMap)
 
     public void DrawPlatform(int x, int y, int width)
     {
+        // Note: the smallest platform, for visual purposes, will always be 2 tiles wide, because we have to draw the
+        // left and the right side. The Width only determines the extension of the platform, which is the middle part
+        // and when we say "Draw Platform of Width 1", we mean a platform that is 1 tile wide + the left and right side.
         BaseObject gameObject = GameObject.Get(GetObjectType(y));
-        int endX = x + width - 1;
+        int endX = x + width + 1;
 
         // Draw left side of the platform
         DrawAt(x, y, gameObject.Left);
 
-        // Draw middle if width > 2
-        if (width > 2)
+        if (width > 0)
         {
             for (int i = x + 1; i < endX; i++)
             {
