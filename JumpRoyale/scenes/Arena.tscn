@@ -26,9 +26,9 @@ z_index = 1
 anchors_preset = 0
 anchor_right = 0.0
 offset_left = 410.0
-offset_top = 118.0
+offset_top = 24.0
 offset_right = 1512.0
-offset_bottom = 818.89
+offset_bottom = 724.89
 grow_horizontal = 1
 size_flags_horizontal = 8
 
