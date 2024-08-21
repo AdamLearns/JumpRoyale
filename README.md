@@ -1,5 +1,7 @@
 # JumpRoyale
 
+![image](https://github.com/user-attachments/assets/df7ca981-c375-4c01-a6ac-258529acaa60)
+
 A platformer controlled through Twitch chat to be played on my stream during short breaks.
 
 -   [JumpRoyale](#jumproyale)
