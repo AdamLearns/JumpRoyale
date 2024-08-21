@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://bvl6vnp0t3iy6"]
+[gd_scene load_steps=5 format=3 uid="uid://bvl6vnp0t3iy6"]
 
 [ext_resource type="Script" path="res://src/LobbyOverlay.cs" id="1_15rvs"]
 [ext_resource type="TileSet" uid="uid://c5tayfuvuqgs" path="res://UITileSet.tres" id="2_iuupr"]
 [ext_resource type="LabelSettings" uid="uid://b4hkbiiau0wu3" path="res://Resources/LobbyLabelSettings.tres" id="3_wrh45"]
+[ext_resource type="Texture2D" uid="uid://88m2watmfubl" path="res://assets/sprites/Examples.png" id="4_a1nhq"]
 
 [node name="LobbyOverlay" type="VFlowContainer"]
 anchors_preset = 10
@@ -34,10 +35,10 @@ label_settings = ExtResource("3_wrh45")
 texture_filter = 2
 layout_mode = 2
 text = "Jumping:
-    - j ANGLE: jump at a specific angle (-90 is left, 90 is right)
-    - j 15: jump slightly right
-    - L 15: jump slightly left 
-    - u: jump straight up"
+  - j ANGLE: jump at a specific angle (-90 is left, 90 is right)
+  - j 15: jump slightly right
+  - L 15: jump slightly left 
+  - u: jump straight up"
 label_settings = ExtResource("3_wrh45")
 
 [node name="LobbyTimer" type="Label" parent="."]
@@ -51,3 +52,8 @@ texture_filter = 2
 layout_mode = 2
 text = "Players: 0"
 label_settings = ExtResource("3_wrh45")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(798, 406)
+texture = ExtResource("4_a1nhq")
