@@ -232,7 +232,7 @@ public partial class Arena : Node2D
         for (int y = platformStartY; y >= platformEndY; y--)
         {
             int width = Rng.IntRange(3, 15);
-            int startX = Rng.IntRange(2, _widthInTiles - width - 2);
+            int startX = Rng.IntRange(2, _widthInTiles - width - 3);
 
             _arenaBuilder.DrawPlatform(startX, y, width);
         }
@@ -296,7 +296,7 @@ public partial class Arena : Node2D
             }
 
             int width = Rng.IntRange(3, 15 - (int)Math.Round(6 * difficultyFactor));
-            int startX = Rng.IntRange(2, _widthInTiles - width - 2);
+            int startX = Rng.IntRange(2, _widthInTiles - width - 3);
 
             _arenaBuilder.DrawPlatform(startX, y, width);
         }
