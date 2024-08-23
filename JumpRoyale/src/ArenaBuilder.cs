@@ -46,6 +46,11 @@ public class ArenaBuilder(TileMap tileMap)
 
     public void RemovePoint(int x, int y) => RemoveAt(x, y);
 
+    /// <summary>
+    /// Returns the object type based on the current height in the arena to visualize the progression of the game
+    /// (texture changes).
+    /// </summary>
+    /// <param name="y">Current height in the arena. Mind the negative Y.</param>
     private GameObjectType GetObjectType(int y)
     {
         return y switch
