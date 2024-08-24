@@ -54,7 +54,6 @@ offset_bottom = 40.0
 grow_horizontal = 1
 
 [node name="Background" type="Sprite2D" parent="."]
-modulate = Color(1, 1, 1, 0.25098)
 texture_repeat = 2
 position = Vector2(863.25, -3398.18)
 texture = ExtResource("7_xjx8h")
