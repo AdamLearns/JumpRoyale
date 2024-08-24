@@ -11,6 +11,11 @@ public partial class Arena : Node2D
     public const int WallHeightInTiles = 15;
     public const int ArenaHeightInTiles = 600;
 
+    /// <summary>
+    /// If the game timer reaches this value, players won't be able to revive anymore.
+    /// </summary>
+    public const int RevivePreventionCountdown = 30;
+
     private const string LobbyOverlayNodeName = "LobbyOverlay";
     private const string GameOverlayNodeName = "GameOverlay";
     private const string TimerOverlayNodeName = "TimerOverlay";
@@ -18,6 +23,7 @@ public partial class Arena : Node2D
     private const string CameraNodeName = "Camera";
     private const string CanvasLayerNodeName = "CanvasLayer";
 
+    private TimerOverlay _timerOverlay = null!;
     private TileMap _lobbyTilemap = new();
 
     private ArenaBuilder _arenaBuilder = null!;
@@ -55,6 +61,7 @@ public partial class Arena : Node2D
         PlayerStats.Instance.StatsFilePath = ProjectSettings.GlobalizePath(ResourcePathsConstants.PathToPlayerStats);
         PlayerStats.Instance.LoadPlayerData();
 
+        _timerOverlay = GetTimerOverlay();
         _lobbyTilemap = new TileMap { Name = "TileMap", TileSet = TileSetToUse };
         _arenaBuilder = new(_lobbyTilemap);
 
@@ -307,7 +314,7 @@ public partial class Arena : Node2D
     private void OnGameTimerDone()
     {
         GetGameOverlay().Visible = false;
-        GetTimerOverlay().Visible = false;
+        _timerOverlay.Visible = false;
         _hasGameEnded = true;
         _timeSinceGameEnd = DateTime.Now.Ticks;
 
@@ -469,9 +476,7 @@ public partial class Arena : Node2D
         GameOverlay gameOverlay = GetGameOverlay();
         gameOverlay.Visible = true;
         gameOverlay.Init();
-
-        TimerOverlay timerOverlay = GetTimerOverlay();
-        timerOverlay.Init();
+        _timerOverlay.Init();
     }
 
     private void OnRedemption(object sender, OnRewardRedeemedArgs e)
@@ -488,6 +493,11 @@ public partial class Arena : Node2D
 
     private void RedeemRevive(string displayName)
     {
+        if (_timerOverlay.TimerSeconds > RevivePreventionCountdown)
+        {
+            return;
+        }
+
         foreach (Jumper jumper in ActiveJumpers.Instance.AllJumpers())
         {
             if (!jumper.PlayerData.Name.Equals(displayName, StringComparison.CurrentCultureIgnoreCase))
