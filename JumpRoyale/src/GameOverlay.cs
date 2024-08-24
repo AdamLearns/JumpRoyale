@@ -11,41 +11,49 @@ public partial class GameOverlay : VFlowContainer
 
     private int _timerSeconds = GameLength;
 
+    private Arena _arena = null!;
+
+    private Camera2D _camera = null!;
+
+    private Label _cameraScrollSpeedLabel = null!;
+    private Label _playerCountLabel = null!;
+    private Label _heightOutputLabel = null!;
+
     [Signal]
     public delegate void TimerDoneEventHandler();
 
+    public string CurrentCameraSpeed => $"Camera speed: {_camera.PositionSmoothingSpeed} px/s";
+
     public override void _Ready()
     {
-        Arena arena = GetTree().Root.GetNode<Arena>("Arena");
+        _arena = GetTree().Root.GetNode<Arena>("Arena");
+        _camera = _arena.GetNode<Camera2D>("Camera");
+        _cameraScrollSpeedLabel = GetNode<Label>(CameraScrollSpeedNodeName);
+        _playerCountLabel = GetNode<Label>(NumPlayersNodeName);
+        _heightOutputLabel = GetNode<Label>(HeightOutputNodeName);
 
-        arena.PlayerCountChange += OnPlayerCountChange;
-        arena.MaxHeightChanged += OnMaxHeightChange;
+        _arena.PlayerCountChange += OnPlayerCountChange;
+        _arena.MaxHeightChanged += OnMaxHeightChange;
     }
 
     public void Init()
     {
         _ = StartTimer();
-
-        Arena arena = GetTree().Root.GetNode<Arena>("Arena");
-        Camera2D camera = arena.GetNode<Camera2D>("Camera");
-        GetNode<Label>(CameraScrollSpeedNodeName).Text = $"Camera speed: {camera.PositionSmoothingSpeed} px/s";
+        _cameraScrollSpeedLabel.Text = CurrentCameraSpeed;
     }
 
     public async Task StartTimer()
     {
         await ToSignal(GetTree().CreateTimer(1.0f), SceneTreeTimer.SignalName.Timeout);
 
-        UpdateTimer();
+        _timerSeconds--;
 
         if (_timerSeconds % 30 == 0)
         {
-            Arena arena = GetTree().Root.GetNode<Arena>("Arena");
-            Camera2D camera = arena.GetNode<Camera2D>("Camera");
             float scaleFactor = _timerSeconds == GameLength - 60 ? 3f : 2f;
 
-            camera.PositionSmoothingSpeed *= scaleFactor;
-
-            GetNode<Label>(CameraScrollSpeedNodeName).Text = $"Camera speed: {camera.PositionSmoothingSpeed} px/s";
+            _camera.PositionSmoothingSpeed *= scaleFactor;
+            _cameraScrollSpeedLabel.Text = CurrentCameraSpeed;
         }
 
         if (_timerSeconds <= 0)
@@ -60,17 +68,11 @@ public partial class GameOverlay : VFlowContainer
 
     public void OnPlayerCountChange(int numPlayers)
     {
-        GetNode<Label>(NumPlayersNodeName).Text = $"Players: {numPlayers}";
+        _playerCountLabel.Text = $"Players: {numPlayers}";
     }
 
     public void OnMaxHeightChange(string playerName, int height)
     {
-        GetNode<Label>(HeightOutputNodeName).Text =
-            $"Leader: {playerName} at height={Formatter.FormatBigNumber(height)}";
-    }
-
-    private void UpdateTimer()
-    {
-        _timerSeconds--;
+        _heightOutputLabel.Text = $"Leader: {playerName} at height: {Formatter.FormatBigNumber(height)}";
     }
 }
