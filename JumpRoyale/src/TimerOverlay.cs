@@ -13,10 +13,6 @@ public partial class TimerOverlay : VFlowContainer
 
     private const float ColorAlpha = 0.75f;
 
-    private static readonly int GameLength = GameOverlay.GameLength;
-
-    private int _timerSeconds = GameLength;
-
     private Color _defaultColor = new(1, 1, 1, ColorAlpha);
     private Color _flashColor = new(1, 0, 0, ColorAlpha);
 
@@ -26,6 +22,8 @@ public partial class TimerOverlay : VFlowContainer
 
     [Signal]
     public delegate void TimerDoneEventHandler();
+
+    public int TimerSeconds { get; private set; } = GameOverlay.GameLength;
 
     public override void _Ready()
     {
@@ -46,7 +44,7 @@ public partial class TimerOverlay : VFlowContainer
 
         UpdateTimer();
 
-        if (_timerSeconds <= 0)
+        if (TimerSeconds <= 0)
         {
             EmitSignal(SignalName.TimerDone);
 
@@ -58,14 +56,14 @@ public partial class TimerOverlay : VFlowContainer
 
     private void UpdateTimer()
     {
-        _timerSeconds--;
+        TimerSeconds--;
 
-        int seconds = _timerSeconds % 60;
-        int minutes = _timerSeconds / 60;
+        int seconds = TimerSeconds % 60;
+        int minutes = TimerSeconds / 60;
 
         _timerLabel.Text = $"{minutes}:{seconds:00}";
 
-        if (_timerSeconds > FinalCountdown)
+        if (TimerSeconds > FinalCountdown)
         {
             _sprite.Modulate = _defaultColor;
 
