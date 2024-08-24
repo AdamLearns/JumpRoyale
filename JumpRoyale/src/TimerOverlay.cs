@@ -6,12 +6,10 @@ public partial class TimerOverlay : VFlowContainer
     private const string SpriteName = "Background";
     private const string TimerNodeName = SpriteName + "/Timer";
 
-    private static readonly int GameLength = GameOverlay.GameLength;
-
     [Signal]
     public delegate void TimerDoneEventHandler();
 
-    public int TimerSeconds { get; private set; } = GameLength;
+    public int TimerSeconds { get; private set; } = GameOverlay.GameLength;
 
     public void Init()
     {
