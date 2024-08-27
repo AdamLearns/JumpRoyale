@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 
 public class ArenaBuilder(TileMap tileMap)
@@ -11,7 +12,14 @@ public class ArenaBuilder(TileMap tileMap)
     /// tiles to give players a chance to see all the textures. With 63~ tiles per change, the last change occurs at
     /// 4000px, which will barely be seen by players.
     /// </summary>
-    private readonly int[] _objectTypeChangeHeights = [0, -50, -100, -150];
+    private readonly KeyValuePair<int, GameObjectType>[] _objectHeightsAndTypes =
+    [
+        new(0, GameObjectType.Concrete),
+        new(-50, GameObjectType.Terracotta),
+        new(-100, GameObjectType.Brick),
+        new(-150, GameObjectType.Gold)
+    ];
+
     private readonly TileMap _tileMap = tileMap;
 
     /// <summary>
@@ -57,15 +65,17 @@ public class ArenaBuilder(TileMap tileMap)
     /// <param name="y">Current height in the arena. Mind the negative Y.</param>
     private GameObjectType GetObjectType(int y)
     {
-        return y switch
+        for (int i = _objectHeightsAndTypes.Length - 1; i >= 0; i--)
         {
-            // Note: can't use a simple "< _objectTypeChangeHeights[3]", because it requires a constant value
-            var value when value < _objectTypeChangeHeights[3] => GameObjectType.Gold,
-            var value when value < _objectTypeChangeHeights[2] => GameObjectType.Brick,
-            var value when value < _objectTypeChangeHeights[1] => GameObjectType.Terracotta,
-            var value when value < _objectTypeChangeHeights[0] => GameObjectType.Concrete,
-            _ => GameObjectType.Stone // Default object will always be drawn first - the brown stone object
-        };
+            KeyValuePair<int, GameObjectType> pair = _objectHeightsAndTypes[i];
+
+            if (y < pair.Key)
+            {
+                return pair.Value;
+            }
+        }
+
+        return GameObjectType.Stone;
     }
 
     private void DrawAt(int x, int y, Vector2I obj)
