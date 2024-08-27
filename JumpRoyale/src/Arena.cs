@@ -149,17 +149,11 @@ public partial class Arena : Node2D
 
     private void SetBackground()
     {
-        Sprite2D background = GetNode<Sprite2D>("Background");
+        Sprite2D backgroundNode = GetNode<Sprite2D>("Background");
+        string[] backgrounds = ["Bricks", "Tiles", "TilesAlt", "BrickWallAlt", "BrickWall", "BricksAlt"];
+        string background = backgrounds[Rng.IntRange(0, backgrounds.Length - 1)];
 
-        // Note: old backgrounds, which still are present in the project
-        // Note2: the old backgrounds use "modulate = Color(1, 1, 1, 0.25098)" in the editor, because they are bright,
-        // the modulate has been removed for new textures and were made darker through image editing. Revert this change
-        // if the old backgrounds are used again.
-        // string[] colors = ["Blue", "Brown", "Gray", "Green", "Pink", "Purple", "Yellow"];
-        string[] colors = ["Bricks", "Tiles", "TilesAlt", "BrickWallAlt", "BrickWall", "BricksAlt"];
-        string color = colors[Rng.IntRange(0, colors.Length - 1)];
-
-        background.Texture = ResourceLoader.Load<Texture2D>($"res://assets/sprites/backgrounds/{color}.png");
+        backgroundNode.Texture = ResourceLoader.Load<Texture2D>($"res://assets/sprites/backgrounds/{background}.png");
     }
 
     private FlowContainer GetEndScreenOverlay()
