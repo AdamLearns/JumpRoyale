@@ -23,14 +23,17 @@ position_smoothing_speed = 0.02
 
 [node name="LobbyOverlay" parent="CanvasLayer" instance=ExtResource("4_2j1ab")]
 z_index = 1
-anchors_preset = 0
-anchor_right = 0.0
-offset_left = 410.0
-offset_top = 24.0
-offset_right = 1512.0
-offset_bottom = 724.89
-grow_horizontal = 1
-size_flags_horizontal = 8
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -203.0
+offset_top = -92.0
+offset_right = 203.0
+offset_bottom = 92.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="GameOverlay" parent="CanvasLayer" instance=ExtResource("5_5yfyu")]
 z_index = 1
@@ -41,10 +44,10 @@ offset_bottom = 515.0
 
 [node name="EndScreenOverlay" parent="CanvasLayer" instance=ExtResource("6_eibxd")]
 visible = false
-offset_left = -1877.0
-offset_top = 29.0
-offset_right = -70.0
-offset_bottom = 432.0
+offset_left = 48.0
+offset_top = 48.0
+offset_right = 191.0
+offset_bottom = 103.0
 
 [node name="TimerOverlay" parent="CanvasLayer" instance=ExtResource("7_f58o7")]
 anchors_preset = 0

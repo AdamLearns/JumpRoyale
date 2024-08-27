@@ -22,6 +22,7 @@ public partial class Arena : Node2D
     private const string EndScreenOverlayNodeName = "EndScreenOverlay";
     private const string CameraNodeName = "Camera";
     private const string CanvasLayerNodeName = "CanvasLayer";
+    private const string EndScreenOutput = "%EndScreenOutput";
 
     private TimerOverlay _timerOverlay = null!;
     private TileMap _lobbyTilemap = new();
@@ -162,9 +163,9 @@ public partial class Arena : Node2D
         background.Texture = ResourceLoader.Load<Texture2D>($"res://assets/sprites/backgrounds/{color}.png");
     }
 
-    private FlowContainer GetEndScreenOverlay()
+    private PanelContainer GetEndScreenOverlay()
     {
-        return GetNode<CanvasLayer>(CanvasLayerNodeName).GetNode<FlowContainer>(EndScreenOverlayNodeName);
+        return GetNode<CanvasLayer>(CanvasLayerNodeName).GetNode<PanelContainer>(EndScreenOverlayNodeName);
     }
 
     private GameOverlay GetGameOverlay()
@@ -434,7 +435,7 @@ public partial class Arena : Node2D
     {
         GetEndScreenOverlay().Visible = true;
 
-        FlowContainer endScreen = GetEndScreenOverlay();
+        PanelContainer endScreen = GetEndScreenOverlay();
         StringBuilder text = new("Winners:");
 
         text.AppendLine();
@@ -461,7 +462,7 @@ public partial class Arena : Node2D
         text.AppendLine().AppendLine();
         text.Append("YOU CAN NOW JUMP FREELY (until Adam gets back)!");
 
-        endScreen.GetNode<Label>("Output").Text = text.ToString();
+        endScreen.GetNode<Label>(EndScreenOutput).Text = text.ToString();
     }
 
     private void OnLobbyTimerDone()

@@ -1,69 +1,42 @@
-[gd_scene load_steps=6 format=3 uid="uid://bvl6vnp0t3iy6"]
+[gd_scene load_steps=4 format=3 uid="uid://bvl6vnp0t3iy6"]
 
 [ext_resource type="Script" path="res://src/LobbyOverlay.cs" id="1_15rvs"]
-[ext_resource type="TileSet" uid="uid://c5tayfuvuqgs" path="res://UITileSet.tres" id="2_iuupr"]
+[ext_resource type="StyleBox" uid="uid://ccjbiokdyflra" path="res://Resources/UIBackground.tres" id="1_banke"]
 [ext_resource type="LabelSettings" uid="uid://b4hkbiiau0wu3" path="res://Resources/LobbyLabelSettings.tres" id="3_wrh45"]
-[ext_resource type="Texture2D" uid="uid://88m2watmfubl" path="res://assets/sprites/Examples.png" id="4_a1nhq"]
-[ext_resource type="Texture2D" uid="uid://c2chrigd32eb6" path="res://assets/sprites/Characters.png" id="5_ryf34"]
 
-[node name="LobbyOverlay" type="VFlowContainer"]
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 20.0
-offset_top = 109.0
-offset_right = -20.0
-offset_bottom = 809.89
-grow_horizontal = 2
-theme_override_constants/v_separation = 11
+[node name="LobbyOverlay" type="PanelContainer"]
+offset_right = 406.0
+offset_bottom = 184.0
+theme_override_styles/panel = ExtResource("1_banke")
 script = ExtResource("1_15rvs")
 
-[node name="TileMap" type="TileMap" parent="."]
-texture_filter = 1
-position = Vector2(-24, -24)
-scale = Vector2(4, 4)
-tile_set = ExtResource("2_iuupr")
-format = 2
-layer_0/tile_data = PackedInt32Array(458769, 196609, 2, 393233, 196609, 1, 327697, 196609, 1, 262161, 196609, 1, 196625, 196609, 1, 131089, 196609, 1, 65553, 196609, 1, 17, 196609, 0, 458768, 131073, 2, 393232, 131073, 1, 327696, 131073, 1, 262160, 131073, 1, 196624, 131073, 1, 131088, 131073, 1, 65552, 131073, 1, 16, 131073, 0, 393231, 131073, 1, 327695, 131073, 1, 262159, 131073, 1, 196623, 131073, 1, 131087, 131073, 1, 65551, 131073, 1, 15, 131073, 0, 458766, 131073, 2, 393230, 131073, 1, 327694, 131073, 1, 262158, 131073, 1, 196622, 131073, 1, 131086, 131073, 1, 65550, 131073, 1, 14, 131073, 0, 458765, 131073, 2, 393229, 131073, 1, 327693, 131073, 1, 262157, 131073, 1, 196621, 131073, 1, 131085, 131073, 1, 65549, 131073, 1, 13, 131073, 0, 458764, 131073, 2, 393228, 131073, 1, 327692, 131073, 1, 262156, 131073, 1, 196620, 131073, 1, 131084, 131073, 1, 65548, 131073, 1, 12, 131073, 0, 458763, 131073, 2, 393227, 131073, 1, 327691, 131073, 1, 262155, 131073, 1, 196619, 131073, 1, 131083, 131073, 1, 65547, 131073, 1, 11, 131073, 0, 458762, 131073, 2, 393226, 131073, 1, 327690, 131073, 1, 262154, 131073, 1, 196618, 131073, 1, 131082, 131073, 1, 65546, 131073, 1, 10, 131073, 0, 458761, 131073, 2, 393225, 131073, 1, 327689, 131073, 1, 262153, 131073, 1, 196617, 131073, 1, 131081, 131073, 1, 65545, 131073, 1, 9, 131073, 0, 458760, 131073, 2, 393224, 131073, 1, 327688, 131073, 1, 262152, 131073, 1, 196616, 131073, 1, 131080, 131073, 1, 65544, 131073, 1, 8, 131073, 0, 458759, 131073, 2, 393223, 131073, 1, 327687, 131073, 1, 262151, 131073, 1, 196615, 131073, 1, 131079, 131073, 1, 65543, 131073, 1, 7, 131073, 0, 458758, 131073, 2, 393222, 131073, 1, 327686, 131073, 1, 262150, 131073, 1, 196614, 131073, 1, 131078, 131073, 1, 65542, 131073, 1, 6, 131073, 0, 458757, 131073, 2, 393221, 131073, 1, 327685, 131073, 1, 262149, 131073, 1, 196613, 131073, 1, 131077, 131073, 1, 65541, 131073, 1, 5, 131073, 0, 458756, 131073, 2, 393220, 131073, 1, 327684, 131073, 1, 262148, 131073, 1, 196612, 131073, 1, 131076, 131073, 1, 65540, 131073, 1, 4, 131073, 0, 458755, 131073, 2, 393219, 131073, 1, 327683, 131073, 1, 262147, 131073, 1, 196611, 131073, 1, 131075, 131073, 1, 65539, 131073, 1, 3, 131073, 0, 458754, 131073, 2, 393218, 131073, 1, 327682, 131073, 1, 262146, 131073, 1, 196610, 131073, 1, 131074, 131073, 1, 65538, 131073, 1, 2, 131073, 0, 458753, 131073, 2, 393217, 131073, 1, 327681, 131073, 1, 262145, 131073, 1, 196609, 131073, 1, 131073, 131073, 1, 65537, 131073, 1, 1, 131073, 0, 458752, 65537, 2, 393216, 65537, 1, 327680, 65537, 1, 262144, 65537, 1, 196608, 65537, 1, 131072, 65537, 1, 65536, 65537, 1, 0, 65537, 0, 458767, 131073, 2)
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
 
-[node name="JoinInstructions" type="Label" parent="."]
+[node name="JoinInstructions" type="Label" parent="VBoxContainer"]
 texture_filter = 2
 layout_mode = 2
 text = "Type \"join\" to play!"
 label_settings = ExtResource("3_wrh45")
 
-[node name="JumpInstructions" type="Label" parent="."]
+[node name="JumpInstructions" type="Label" parent="VBoxContainer"]
 texture_filter = 2
 layout_mode = 2
-text = "Jumping:         ANGLE and POWER parameters are optional!
-  - j ANGLE POWER: jump at a specific angle (-90 is left, 90 is right)
-  - Alternatively, use \"l\" for LEFT, \"r\" for RIGHT\", \"u\" for UP (power only)
-  - l 30 - 30deg Left      |      r 45 - 45deg right     |     Both directions with positive angle: 0-90
-  - u 50 - up, half jump power
-  - Refer to the examples here =>
-  - Subscriber/VIP cosmetics:
-    - glow <color> (hex/name)
-    - namecolor <color> (hex/name)"
+text = "Type \"!jr\" for more instructions
+The bots will demonstrate how to jump
+ "
 label_settings = ExtResource("3_wrh45")
 
-[node name="LobbyTimer" type="Label" parent="."]
+[node name="LobbyTimer" type="Label" parent="VBoxContainer"]
+unique_name_in_owner = true
 texture_filter = 2
 layout_mode = 2
 text = "Game will start soon!"
 label_settings = ExtResource("3_wrh45")
 
-[node name="NumPlayers" type="Label" parent="."]
+[node name="NumPlayers" type="Label" parent="VBoxContainer"]
+unique_name_in_owner = true
 texture_filter = 2
 layout_mode = 2
 text = "Players: 0"
 label_settings = ExtResource("3_wrh45")
-
-[node name="Character choices" type="Sprite2D" parent="."]
-z_index = -1
-texture_filter = 1
-position = Vector2(552, 599)
-texture = ExtResource("5_ryf34")
-
-[node name="InstructionsExamples" type="Sprite2D" parent="."]
-texture_filter = 1
-position = Vector2(780, 323)
-texture = ExtResource("4_a1nhq")
