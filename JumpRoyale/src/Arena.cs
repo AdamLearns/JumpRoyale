@@ -11,6 +11,11 @@ public partial class Arena : Node2D
     public const int WallHeightInTiles = 15;
     public const int ArenaHeightInTiles = 600;
 
+    /// <summary>
+    /// If the game timer reaches this value, players won't be able to revive anymore.
+    /// </summary>
+    public const int RevivePreventionCountdown = 30;
+
     private const string LobbyOverlayNodeName = "LobbyOverlay";
     private const string GameOverlayNodeName = "GameOverlay";
     private const string TimerOverlayNodeName = "TimerOverlay";
@@ -18,7 +23,10 @@ public partial class Arena : Node2D
     private const string CameraNodeName = "Camera";
     private const string CanvasLayerNodeName = "CanvasLayer";
 
+    private TimerOverlay _timerOverlay = null!;
     private TileMap _lobbyTilemap = new();
+
+    private ArenaBuilder _arenaBuilder = null!;
 
     private bool _hasGameEnded;
 
@@ -53,7 +61,9 @@ public partial class Arena : Node2D
         PlayerStats.Instance.StatsFilePath = ProjectSettings.GlobalizePath(ResourcePathsConstants.PathToPlayerStats);
         PlayerStats.Instance.LoadPlayerData();
 
+        _timerOverlay = GetTimerOverlay();
         _lobbyTilemap = new TileMap { Name = "TileMap", TileSet = TileSetToUse };
+        _arenaBuilder = new(_lobbyTilemap);
 
         TwitchChatClient twitchChatClient = new();
 
@@ -139,11 +149,11 @@ public partial class Arena : Node2D
 
     private void SetBackground()
     {
-        Sprite2D background = GetNode<Sprite2D>("Background");
-        string[] colors = ["Blue", "Brown", "Gray", "Green", "Pink", "Purple", "Yellow"];
-        string color = colors[Rng.IntRange(0, colors.Length - 1)];
+        Sprite2D backgroundNode = GetNode<Sprite2D>("Background");
+        string[] backgrounds = ["Bricks", "Tiles", "TilesAlt", "BrickWallAlt", "BrickWall", "BricksAlt"];
+        string background = backgrounds[Rng.IntRange(0, backgrounds.Length - 1)];
 
-        background.Texture = ResourceLoader.Load<Texture2D>($"res://assets/sprites/backgrounds/{color}.png");
+        backgroundNode.Texture = ResourceLoader.Load<Texture2D>($"res://assets/sprites/backgrounds/{background}.png");
     }
 
     private FlowContainer GetEndScreenOverlay()
@@ -200,20 +210,20 @@ public partial class Arena : Node2D
         // Draw the vertical walls
         for (int y = wallStartY; y >= _ceilingHeight; y--)
         {
-            _lobbyTilemap.SetCell(0, new Vector2I(0, y), 0, new Vector2I(12, 1));
-            _lobbyTilemap.SetCell(0, new Vector2I(_widthInTiles - 1, y), 0, new Vector2I(12, 1));
+            _arenaBuilder.DrawPoint(0, y);
+            _arenaBuilder.DrawPoint(_widthInTiles - 1, y);
         }
 
         for (int y = wallStartY; y >= _ceilingHeight - 200; y--)
         {
-            _lobbyTilemap.SetCell(0, new Vector2I(0, y), 0, new Vector2I(12, 1));
-            _lobbyTilemap.SetCell(0, new Vector2I(_widthInTiles - 1, y), 0, new Vector2I(12, 1));
+            _arenaBuilder.DrawPoint(0, y);
+            _arenaBuilder.DrawPoint(_widthInTiles - 1, y);
         }
 
         // Draw the ceiling
         for (int x = 1; x < _widthInTiles - 1; x++)
         {
-            _lobbyTilemap.SetCell(0, new Vector2I(x, _ceilingHeight), 0, new Vector2I(12, 1));
+            _arenaBuilder.DrawPoint(x, _ceilingHeight);
         }
 
         // Generate some lobby platforms
@@ -223,9 +233,9 @@ public partial class Arena : Node2D
         for (int y = platformStartY; y >= platformEndY; y--)
         {
             int width = Rng.IntRange(3, 15);
-            int startX = Rng.IntRange(2, _widthInTiles - width - 2);
+            int startX = Rng.IntRange(2, _widthInTiles - width - 3);
 
-            AddPlatform(startX, y, width);
+            _arenaBuilder.DrawPlatform(startX, y, width);
         }
 
         for (int y = _ceilingHeight - 1; y >= _ceilingHeight - ArenaHeightInTiles; y--)
@@ -240,7 +250,7 @@ public partial class Arena : Node2D
                 int blockWidth = 2 + (int)(difficultyFactor * 24);
                 int blockX = Rng.IntRange(2, _widthInTiles - 1 - blockWidth);
 
-                DrawRectangleOfTiles(blockX, y + 1, blockWidth, blockWidth, new Vector2I(12, 1));
+                DrawRectangleOfTiles(blockX, y + 1, blockWidth, blockWidth);
             }
         }
 
@@ -287,38 +297,18 @@ public partial class Arena : Node2D
             }
 
             int width = Rng.IntRange(3, 15 - (int)Math.Round(6 * difficultyFactor));
-            int startX = Rng.IntRange(2, _widthInTiles - width - 2);
+            int startX = Rng.IntRange(2, _widthInTiles - width - 3);
 
-            AddPlatform(startX, y, width);
+            _arenaBuilder.DrawPlatform(startX, y, width);
         }
 
         _generatedMaxHeight = cameraPosInTiles;
     }
 
-    private void AddPlatform(int x, int y, int width)
-    {
-        int endX = x + width - 1;
-
-        // Draw left side
-        _lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(17, 1));
-
-        // Draw middle
-        if (width > 2)
-        {
-            for (int i = x + 1; i < endX; i++)
-            {
-                _lobbyTilemap.SetCell(0, new Vector2I(i, y), 0, new Vector2I(18, 1));
-            }
-        }
-
-        // Draw right side
-        _lobbyTilemap.SetCell(0, new Vector2I(endX, y), 0, new Vector2I(19, 1));
-    }
-
     private void OnGameTimerDone()
     {
         GetGameOverlay().Visible = false;
-        GetTimerOverlay().Visible = false;
+        _timerOverlay.Visible = false;
         _hasGameEnded = true;
         _timeSinceGameEnd = DateTime.Now.Ticks;
 
@@ -340,11 +330,11 @@ public partial class Arena : Node2D
             {
                 if (x == 0 || x == _widthInTiles - 1 || y == _heightInTiles - 1)
                 {
-                    _lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(12, 1));
+                    _arenaBuilder.DrawPoint(x, y);
                 }
                 else
                 {
-                    _lobbyTilemap.SetCell(0, new Vector2I(x, y), -1);
+                    _arenaBuilder.RemovePoint(x, y);
                 }
             }
         }
@@ -362,9 +352,9 @@ public partial class Arena : Node2D
         int startY = podiumY + podiumHeight + 10;
         for (int y = startY; y < _heightInTiles; y += 6)
         {
-            for (int x = Rng.IntRange(3, 7); x < _widthInTiles - 5; x += Rng.IntRange(2, 6))
+            for (int x = Rng.IntRange(3, 15); x < _widthInTiles - 5; x += Rng.IntRange(8, 15))
             {
-                AddPlatform(x, y, 1);
+                _arenaBuilder.DrawPlatform(x, y, GD.RandRange(0, 2));
                 platformCoords.Add(new Tuple<int, int>(x, y));
             }
         }
@@ -390,21 +380,9 @@ public partial class Arena : Node2D
         camera.Position = new Vector2(0, 0);
 
         // Draw podiums
-        DrawRectangleOfTiles(podiumX, podiumY, podiumWidth, podiumHeight, new Vector2I(12, 1));
-        DrawRectangleOfTiles(
-            podiumX - podiumWidth,
-            podiumY,
-            podiumWidth,
-            podiumHeight - podiumHeightDifference,
-            new Vector2I(12, 1)
-        );
-        DrawRectangleOfTiles(
-            podiumX + podiumWidth,
-            podiumY,
-            podiumWidth,
-            podiumHeight - podiumHeightDifference * 2,
-            new Vector2I(12, 1)
-        );
+        DrawRectangleOfTiles(podiumX, podiumY, podiumWidth, podiumHeight);
+        DrawRectangleOfTiles(podiumX - podiumWidth, podiumY, podiumWidth, podiumHeight - podiumHeightDifference);
+        DrawRectangleOfTiles(podiumX + podiumWidth, podiumY, podiumWidth, podiumHeight - podiumHeightDifference * 2);
 
         // Place winners on podiums
         for (int i = 0; i < winners.Length; i++)
@@ -435,13 +413,13 @@ public partial class Arena : Node2D
         }
     }
 
-    private void DrawRectangleOfTiles(int leftX, int bottomY, int width, int height, Vector2I tileIndex)
+    private void DrawRectangleOfTiles(int leftX, int bottomY, int width, int height)
     {
         for (int x = leftX; x < leftX + width; x++)
         {
             for (int y = bottomY; y > bottomY - height; y--)
             {
-                _lobbyTilemap.SetCell(0, new Vector2I(x, y), 0, tileIndex);
+                _arenaBuilder.DrawPoint(x, y);
             }
         }
     }
@@ -484,7 +462,7 @@ public partial class Arena : Node2D
     {
         for (int x = 1; x < _widthInTiles - 1; x++)
         {
-            _lobbyTilemap.SetCell(0, new Vector2I(x, _ceilingHeight), -1);
+            _arenaBuilder.RemovePoint(x, _ceilingHeight);
         }
 
         GetLobbyOverlay().Visible = false;
@@ -492,9 +470,7 @@ public partial class Arena : Node2D
         GameOverlay gameOverlay = GetGameOverlay();
         gameOverlay.Visible = true;
         gameOverlay.Init();
-
-        TimerOverlay timerOverlay = GetTimerOverlay();
-        timerOverlay.Init();
+        _timerOverlay.Init();
     }
 
     private void OnRedemption(object sender, OnRewardRedeemedArgs e)
@@ -511,6 +487,11 @@ public partial class Arena : Node2D
 
     private void RedeemRevive(string displayName)
     {
+        if (_timerOverlay.TimerSeconds > RevivePreventionCountdown)
+        {
+            return;
+        }
+
         foreach (Jumper jumper in ActiveJumpers.Instance.AllJumpers())
         {
             if (!jumper.PlayerData.Name.Equals(displayName, StringComparison.CurrentCultureIgnoreCase))

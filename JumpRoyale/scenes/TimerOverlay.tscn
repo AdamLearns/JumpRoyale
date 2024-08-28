@@ -1,7 +1,14 @@
-[gd_scene load_steps=3 format=3 uid="uid://bilf6xw44urbm"]
+[gd_scene load_steps=5 format=3 uid="uid://bilf6xw44urbm"]
 
 [ext_resource type="Script" path="res://src/TimerOverlay.cs" id="1_gy4ca"]
 [ext_resource type="Texture2D" uid="uid://bnqvickavfqhm" path="res://assets/sprites/timerborder.png" id="2_r3xmd"]
+
+[sub_resource type="Gradient" id="Gradient_jb2f7"]
+colors = PackedColorArray(0, 0, 0, 0, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_fapye"]
+gradient = SubResource("Gradient_jb2f7")
+width = 1
 
 [node name="TimerOverlay" type="VFlowContainer"]
 anchors_preset = 5
@@ -11,6 +18,10 @@ offset_left = -960.0
 offset_right = -960.0
 grow_horizontal = 2
 script = ExtResource("1_gy4ca")
+
+[node name="Dummy - See Description" type="Sprite2D" parent="."]
+editor_description = "For integrated GPUs (Intel HD < 630), this child is required to force the next children to render with correct transform. Please refer to this issue: https://github.com/godotengine/godot/issues/58314"
+texture = SubResource("GradientTexture1D_fapye")
 
 [node name="Background" type="Sprite2D" parent="."]
 position = Vector2(1013, 36)
