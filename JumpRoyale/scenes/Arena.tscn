@@ -36,6 +36,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="GameOverlay" parent="CanvasLayer" instance=ExtResource("5_5yfyu")]
+visible = false
 z_index = 1
 offset_left = -447.0
 offset_top = 15.0
