@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
+using System.Threading.Tasks;
 using Godot;
 using TwitchChat;
 using TwitchLib.PubSub.Events;
@@ -10,6 +11,7 @@ public partial class Arena : Node2D
 {
     public const int WallHeightInTiles = 15;
     public const int ArenaHeightInTiles = 600;
+    public const int TileSizeInPixels = 16;
 
     /// <summary>
     /// If the game timer reaches this value, players won't be able to revive anymore.
@@ -24,11 +26,22 @@ public partial class Arena : Node2D
     private const string CanvasLayerNodeName = "CanvasLayer";
     private const string EndScreenOutput = "%EndScreenOutput";
 
+    private readonly Dictionary<string, InstructionBot> _instructionBotsTemplates =
+        new()
+        {
+            ["jumps_left"] = new("jumps_left", "j -45 OR l 45", TileSizeInPixels * 105, 45),
+            ["jumps_up"] = new("jumps_up", "u OR u u", TileSizeInPixels * 60, 90),
+            ["jumps_right"] = new("jumps_right", "j 30 OR r 30", TileSizeInPixels * 20, 120),
+        };
+
+    private readonly Collection<Jumper> _spawnedInstructionBots = [];
+
     private TimerOverlay _timerOverlay = null!;
     private TileMap _lobbyTilemap = new();
 
     private ArenaBuilder _arenaBuilder = null!;
 
+    private bool _hasGameStarted;
     private bool _hasGameEnded;
 
     private int _ceilingHeight;
@@ -75,6 +88,7 @@ public partial class Arena : Node2D
 
         SetBackground();
         GenerateLobby();
+        SpawnInstructionBots();
     }
 
     public override void _PhysicsProcess(double delta)
@@ -131,6 +145,65 @@ public partial class Arena : Node2D
     public bool IsAllowedToJump()
     {
         return _timeSinceGameEnd <= 0 || (DateTime.Now.Ticks - _timeSinceGameEnd) / TimeSpan.TicksPerMillisecond > 5000;
+    }
+
+    private void SpawnInstructionBots()
+    {
+        Ensure.IsNotNull(JumperScene);
+        Ensure.IsNotNull(TileSetToUse);
+
+        // Position the instruction bots above the lobby
+        int y = ((int)(GetViewportRect().Size.Y / TileSizeInPixels) - 1 - WallHeightInTiles - 5) * TileSizeInPixels;
+
+        foreach (KeyValuePair<string, InstructionBot> bot in _instructionBotsTemplates)
+        {
+            // This is a modified CommandHandler logic portion for adding players, except we are not adding an actual
+            // player, but a dummy jumper, which won't exist in the player data or active jumpers list
+            Jumper jumper = (Jumper)JumperScene.Instantiate();
+
+            // Create some fake data just to make Jumper methods work
+            PlayerData playerData =
+                new("ffffff", GD.RandRange(1, 18), "ffffff")
+                {
+                    Name = bot.Value.DisplayName,
+                    UserId = bot.Value.UserId,
+                };
+
+            jumper.Init(bot.Value.XSpawnPosition, y, playerData);
+            AddChild(jumper);
+            _spawnedInstructionBots.Add(jumper);
+        }
+
+        _ = MakeBotsAutoJump(y);
+    }
+
+    /// <param name="y">Initial Y position, used to reset the bots on Y-axis.</param>
+    private async Task MakeBotsAutoJump(int y)
+    {
+        await ToSignal(GetTree().CreateTimer(2.0f), SceneTreeTimer.SignalName.Timeout);
+
+        // Abort this task if the game has already started, because the jumpers will be Freed at this point
+        if (_hasGameStarted)
+        {
+            return;
+        }
+
+        foreach (Jumper bot in _spawnedInstructionBots)
+        {
+            bot.Jump(_instructionBotsTemplates[bot.PlayerData.UserId].JumpAngle, 100);
+            bot.FlashPlayerName();
+        }
+
+        await ToSignal(GetTree().CreateTimer(2.0f), SceneTreeTimer.SignalName.Timeout);
+
+        // Reset the bots to their original position
+        foreach (Jumper bot in _spawnedInstructionBots)
+        {
+            bot.Position = new Vector2(_instructionBotsTemplates[bot.PlayerData.UserId].XSpawnPosition, y);
+            bot.FlashPlayerName();
+        }
+
+        _ = MakeBotsAutoJump(y);
     }
 
     private void OnMessage(object sender, ChatMessageEventArgs e)
@@ -467,6 +540,13 @@ public partial class Arena : Node2D
 
     private void OnLobbyTimerDone()
     {
+        _hasGameStarted = true;
+
+        foreach (Jumper bot in _spawnedInstructionBots)
+        {
+            bot.QueueFree();
+        }
+
         for (int x = 1; x < _widthInTiles - 1; x++)
         {
             _arenaBuilder.RemovePoint(x, _ceilingHeight);
