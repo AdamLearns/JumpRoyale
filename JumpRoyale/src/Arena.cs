@@ -29,9 +29,19 @@ public partial class Arena : Node2D
     private readonly Dictionary<string, InstructionBot> _instructionBotsTemplates =
         new()
         {
-            ["jumps_left"] = new("jumps_left", "j -45 OR l 45", TileSizeInPixels * 105, 45),
-            ["jumps_up"] = new("jumps_up", "u OR u u", TileSizeInPixels * 60, 90),
-            ["jumps_right"] = new("jumps_right", "j 30 OR r 30", TileSizeInPixels * 20, 120),
+            ["jumps_left"] = new(
+                "jumps_left",
+                "[color=cyan]j -45[/color] or [color=cyan]l 45[/color]",
+                TileSizeInPixels * 105,
+                45
+            ),
+            ["jumps_up"] = new("jumps_up", "[color=cyan]u[/color]", TileSizeInPixels * 60, 90),
+            ["jumps_right"] = new(
+                "jumps_right",
+                "[color=cyan]j 30[/color] or [color=cyan]r 30[/color]",
+                TileSizeInPixels * 20,
+                120
+            ),
         };
 
     private readonly Collection<Jumper> _spawnedInstructionBots = [];

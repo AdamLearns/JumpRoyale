@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://bvl6vnp0t3iy6"]
+[gd_scene load_steps=5 format=3 uid="uid://bvl6vnp0t3iy6"]
 
 [ext_resource type="Script" path="res://src/LobbyOverlay.cs" id="1_15rvs"]
 [ext_resource type="StyleBox" uid="uid://ccjbiokdyflra" path="res://Resources/UIBackground.tres" id="1_banke"]
+[ext_resource type="Theme" uid="uid://keary5vfopmg" path="res://Resources/RichTextLabelTheme.tres" id="3_8c3v8"]
 [ext_resource type="LabelSettings" uid="uid://b4hkbiiau0wu3" path="res://Resources/LobbyLabelSettings.tres" id="3_wrh45"]
 
 [node name="LobbyOverlay" type="PanelContainer"]
@@ -13,22 +14,18 @@ script = ExtResource("1_15rvs")
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
 
-[node name="JoinInstructions" type="Label" parent="VBoxContainer"]
+[node name="Instructions" type="RichTextLabel" parent="VBoxContainer"]
 texture_filter = 2
 layout_mode = 2
-text = "Type \"join\" to play!"
-label_settings = ExtResource("3_wrh45")
+theme = ExtResource("3_8c3v8")
+bbcode_enabled = true
+text = "Type [color=cyan]join[/color] to play!
+Jump with [color=cyan]j[/color] [[color=yellow]-90[/color] to [color=yellow]90[/color]]
+  ([color=gray]see example jumpers below[/color])
 
-[node name="JumpInstructions" type="Label" parent="VBoxContainer"]
-texture_filter = 2
-layout_mode = 2
-text = "Type \"!jr\" for more instructions
-The bots will demonstrate how to jump
-Jump angles:
-    - \"j\" command: -90 to 90
-    - \"r\" / \"l\" commands: 0 to 90
+Type [color=cyan]!jr[/color] for more instructions
  "
-label_settings = ExtResource("3_wrh45")
+fit_content = true
 
 [node name="LobbyTimer" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
