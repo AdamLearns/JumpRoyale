@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://src/Arena.cs" id="1_5vcv2"]
 [ext_resource type="PackedScene" uid="uid://bhke5myraos1m" path="res://scenes/Jumper.tscn" id="2_6nvro"]
-[ext_resource type="TileSet" uid="uid://dxyjk1rm2jjjv" path="res://scenes/TileSet.tres" id="3_cg3j3"]
+[ext_resource type="TileSet" uid="uid://dxyjk1rm2jjjv" path="res://Resources/TileSet.tres" id="3_cg3j3"]
 [ext_resource type="PackedScene" uid="uid://bvl6vnp0t3iy6" path="res://scenes/LobbyOverlay.tscn" id="4_2j1ab"]
 [ext_resource type="PackedScene" uid="uid://c5b384kxo0vyl" path="res://scenes/GameOverlay.tscn" id="5_5yfyu"]
 [ext_resource type="PackedScene" uid="uid://cibfccggfqmwh" path="res://scenes/EndScreenOverlay.tscn" id="6_eibxd"]
@@ -23,14 +23,20 @@ position_smoothing_speed = 0.02
 
 [node name="LobbyOverlay" parent="CanvasLayer" instance=ExtResource("4_2j1ab")]
 z_index = 1
-anchors_preset = 0
-anchor_right = 0.0
-offset_left = 549.0
-offset_right = 1464.0
-grow_horizontal = 1
-size_flags_horizontal = 8
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -253.0
+offset_top = -390.0
+offset_right = 253.0
+offset_bottom = -130.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="GameOverlay" parent="CanvasLayer" instance=ExtResource("5_5yfyu")]
+visible = false
 z_index = 1
 offset_left = -447.0
 offset_top = 15.0
@@ -39,10 +45,10 @@ offset_bottom = 515.0
 
 [node name="EndScreenOverlay" parent="CanvasLayer" instance=ExtResource("6_eibxd")]
 visible = false
-offset_left = -1877.0
-offset_top = 29.0
-offset_right = -70.0
-offset_bottom = 432.0
+offset_left = 48.0
+offset_top = 48.0
+offset_right = 191.0
+offset_bottom = 103.0
 
 [node name="TimerOverlay" parent="CanvasLayer" instance=ExtResource("7_f58o7")]
 anchors_preset = 0

@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
 using Godot;
 
-public partial class LobbyOverlay : FlowContainer
+public partial class LobbyOverlay : PanelContainer
 {
-    private const string LobbyTimerNodeName = "LobbyTimer";
-    private const string NumPlayersNodeName = "NumPlayers";
+    private const string LobbyTimerNodeName = "%LobbyTimer";
+    private const string NumPlayersNodeName = "%NumPlayers";
 
     private int _lobbyTimer = 40;
 
