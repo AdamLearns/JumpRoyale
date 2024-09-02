@@ -196,6 +196,12 @@ public partial class Arena : Node2D
 
         await ToSignal(GetTree().CreateTimer(2.0f), SceneTreeTimer.SignalName.Timeout);
 
+        // The game may have started since we last checked
+        if (_hasGameStarted)
+        {
+            return;
+        }
+
         // Reset the bots to their original position
         foreach (Jumper bot in _spawnedInstructionBots)
         {
