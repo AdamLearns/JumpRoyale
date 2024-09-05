@@ -1,13 +1,21 @@
-[gd_scene format=3 uid="uid://cibfccggfqmwh"]
+[gd_scene load_steps=3 format=3 uid="uid://cibfccggfqmwh"]
 
-[node name="EndScreenOverlay" type="VFlowContainer"]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -249.0
-offset_bottom = 440.0
-grow_horizontal = 0
+[ext_resource type="StyleBox" uid="uid://ccjbiokdyflra" path="res://Resources/UIBackground.tres" id="1_fpa8u"]
 
-[node name="Output" type="Label" parent="."]
+[sub_resource type="LabelSettings" id="LabelSettings_ifyhp"]
+shadow_color = Color(0, 0, 0, 0.392157)
+
+[node name="EndScreenOverlay" type="PanelContainer"]
+offset_right = 111.0
+offset_bottom = 23.0
+theme_override_styles/panel = ExtResource("1_fpa8u")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="EndScreenOutput" type="Label" parent="VBoxContainer"]
+unique_name_in_owner = true
+texture_filter = 2
 layout_mode = 2
 text = "Scroll speed: 5"
+label_settings = SubResource("LabelSettings_ifyhp")

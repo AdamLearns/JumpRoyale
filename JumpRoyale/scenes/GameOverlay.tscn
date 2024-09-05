@@ -12,20 +12,24 @@ grow_horizontal = 0
 script = ExtResource("1_612sj")
 
 [node name="NumPlayers" type="Label" parent="."]
+texture_filter = 2
 layout_mode = 2
 text = "Number of players goes here
 "
 
 [node name="JumpInstructions" type="Label" parent="."]
+texture_filter = 2
 layout_mode = 2
 text = "Jump with \"j <angle>\""
 
 [node name="HeightOutput" type="Label" parent="."]
+texture_filter = 2
 layout_mode = 2
 text = "Height output
 "
 autowrap_mode = 2
 
 [node name="CameraScrollSpeed" type="Label" parent="."]
+texture_filter = 2
 layout_mode = 2
 text = "Scroll speed: 5"
