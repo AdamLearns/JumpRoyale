@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://c5b384kxo0vyl" path="res://scenes/GameOverlay.tscn" id="5_5yfyu"]
 [ext_resource type="PackedScene" uid="uid://cibfccggfqmwh" path="res://scenes/EndScreenOverlay.tscn" id="6_eibxd"]
 [ext_resource type="PackedScene" uid="uid://bilf6xw44urbm" path="res://scenes/TimerOverlay.tscn" id="7_f58o7"]
-[ext_resource type="Texture2D" uid="uid://dppmxvp2mcbw3" path="res://assets/sprites/backgrounds/Blue.png" id="7_xjx8h"]
+[ext_resource type="Texture2D" uid="uid://bl5jjt55tqvyq" path="res://assets/sprites/backgrounds/Bricks.png" id="8_oquvf"]
 
 [node name="Arena" type="Node2D"]
 script = ExtResource("1_5vcv2")
@@ -62,6 +62,6 @@ grow_horizontal = 1
 [node name="Background" type="Sprite2D" parent="."]
 texture_repeat = 2
 position = Vector2(863.25, -3398.18)
-texture = ExtResource("7_xjx8h")
+texture = ExtResource("8_oquvf")
 region_enabled = true
 region_rect = Rect2(2.08165e-12, 2.08165e-12, 2500, 9000)
