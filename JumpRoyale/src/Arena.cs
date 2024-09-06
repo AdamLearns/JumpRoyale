@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Godot;
@@ -584,7 +585,7 @@ public partial class Arena : Node2D
 
     private void RedeemRevive(string displayName)
     {
-        if (_timerOverlay.TimerSeconds > RevivePreventionCountdown)
+        if (_timerOverlay.TimerSeconds <= RevivePreventionCountdown)
         {
             return;
         }
@@ -603,7 +604,16 @@ public partial class Arena : Node2D
                 break;
             }
 
-            string thirdHighestPlayerId = playersByHeight[2].Item1;
+            // Take user IDs of the top three players
+            List<string> topPlayers = playersByHeight.Take(3).Select(p => p.Item1).ToList();
+
+            // If the reviving player is already in the top 3, don't revive them
+            if (topPlayers.Contains(jumper.PlayerData.UserId))
+            {
+                break;
+            }
+
+            string thirdHighestPlayerId = topPlayers[2];
             Jumper thirdHighestJumper = ActiveJumpers.Instance.GetById(thirdHighestPlayerId);
 
             GD.Print("Reviving " + displayName);
