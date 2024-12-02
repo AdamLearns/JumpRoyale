@@ -4,7 +4,22 @@ using System.Diagnostics.CodeAnalysis;
 
 public class JumpCommand
 {
-    private readonly List<string> _fixedAngleDirections = ["u", "ll", "lll", "jj", "rr", "jjj", "rrr"];
+    private readonly List<string> _fixedAngleDirections = 
+    [
+        "u", 
+        "ll", 
+        "lll", 
+        "jj", 
+        "rr", 
+        "jjj", 
+        "rrr", 
+        "e", 
+        "ee", 
+        "eee", 
+        "i", 
+        "ii", 
+        "iii",
+    ];
 
     private int _power;
 
@@ -59,12 +74,21 @@ public class JumpCommand
         {
             // Predefined set of angles for available jump commands. The pattern matching allows
             // for typos and garbage while still allowing the angle to be changed.
-            string when direction.StartsWith("rrr") || direction.StartsWith("jjj") => 150,
-            string when direction.StartsWith("rr") || direction.StartsWith("jj") => 120,
-            string when direction.StartsWith("lll") => 30,
-            string when direction.StartsWith("ll") => 60,
-            string when direction.StartsWith('j') || direction.StartsWith('r') => Angle + 90,
-            string when direction.StartsWith('l') => 90 - Angle,
+            string when direction.StartsWith("rrr") 
+            || direction.StartsWith("jjj") 
+            || direction.StartsWith("iii") => 150,
+            string when direction.StartsWith("rr") 
+            || direction.StartsWith("jj") 
+            || direction.StartsWith("ii") => 120,
+            string when direction.StartsWith("lll") 
+            || direction.StartsWith("eee") => 30,
+            string when direction.StartsWith("ll") 
+            || direction.StartsWith("ee") => 60,
+            string when direction.StartsWith('j') 
+            || direction.StartsWith('r') 
+            || direction.StartsWith('i') => Angle + 90,
+            string when direction.StartsWith('l') 
+            || direction.StartsWith('e') => 90 - Angle,
             string when direction.StartsWith('u') => 90,
             _ => 90
         };
