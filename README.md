@@ -24,7 +24,7 @@ The only way to play is for Adam to be streaming the game. At that point, you ca
 
 -   `join`: joins the game. Available at any time, although you'll only really stand a chance at winning if you join in the first ~45 seconds. 😉
 
-To jump, you have to send one of the following commands in the chat: `l`, `u`, `r` (see full list aliases below). Optionally, you can adjust your angle and jump power.
+To jump, you have to send one of the following commands in the chat: `l`, `u`, `r` (see full list of aliases below). Optionally, you can adjust your angle and jump power.
 
 Jump commands are currently accepted in the following format:
 
