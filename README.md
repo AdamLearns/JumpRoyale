@@ -36,7 +36,7 @@ Both `angle` and `power` have a default value, so you don't have to type them in
 
 Quick help:
 
--   `l` (aliases: `e`) - jump left, e.g. `l 45` or `e 45` to jump ↖
+-   `l` (alias: `e`) - jump left, e.g. `l 45` or `e 45` to jump ↖
 -   `r` (aliases: `j`, `i`) - jump right, e.g. `j 45` or `r 45` to jump ↗︎
 -   `u` - jump up, **does not require `angle`**, but allows specifying `power` for weaker jumps, e.g. `u 50`
 
