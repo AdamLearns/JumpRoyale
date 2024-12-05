@@ -24,7 +24,7 @@ The only way to play is for Adam to be streaming the game. At that point, you ca
 
 -   `join`: joins the game. Available at any time, although you'll only really stand a chance at winning if you join in the first ~45 seconds. 😉
 
-To jump, you have to send one of the following commands in the chat: `l`, `u`, `r` (alias `j`). Optionally, you can adjust your angle and jump power.
+To jump, you have to send one of the following commands in the chat: `l`, `u`, `r` (see full list of aliases below). Optionally, you can adjust your angle and jump power.
 
 Jump commands are currently accepted in the following format:
 
@@ -36,16 +36,16 @@ Both `angle` and `power` have a default value, so you don't have to type them in
 
 Quick help:
 
--   `l` - jump left, e.g. `l 45` to jump ↖
--   `r` or `j` - jump right, e.g. `j 45` or `r 45` to jump ↗︎
+-   `l` (alias: `e`) - jump left, e.g. `l 45` or `e 45` to jump ↖
+-   `r` (aliases: `j`, `i`) - jump right, e.g. `j 45` or `r 45` to jump ↗︎
 -   `u` - jump up, **does not require `angle`**, but allows specifying `power` for weaker jumps, e.g. `u 50`
 
 There are additional fixed-angle commands used as shortcuts:
 
--   `rrr` or `jjj`: same as `r 60` or `j 60`
--   `rr` or `jj`: same as `r 30` or `j 30`
--   `lll`: same as `l 60`
--   `ll`: same as `l 30`
+-   `rrr`, `jjj`, or `iii`: same as `r 60` or `j 60`
+-   `rr`, `jj`, or `ii`: same as `r 30` or `j 30`
+-   `lll` or `eee`: same as `l 60`
+-   `ll` or `ee`: same as `l 30`
 
 | angle input    | -90 | -45 | 0   | 45  | 90  |
 | -------------- | --- | --- | --- | --- | --- |

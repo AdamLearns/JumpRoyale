@@ -135,10 +135,14 @@ public class JumpCommandTests
             {
                 { "rrr", 150 },
                 { "jjj", 150 },
+                { "iii", 150 },
                 { "rr", 120 },
                 { "jj", 120 },
+                { "ii", 120 },
                 { "lll", 30 },
+                { "eee", 30 },
                 { "ll", 60 },
+                { "ee", 60 },
                 { "u", 90 },
             };
 
